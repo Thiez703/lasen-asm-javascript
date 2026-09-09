@@ -1,0 +1,256 @@
+/* =========================================================
+   LÁ SEN — cart.css
+   Riêng cho trang giỏ hàng.
+   ========================================================= */
+
+.cart {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  align-items: start;
+}
+
+.cart-table-wrap {
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+  overflow: hidden;
+}
+
+/* Bảng được bố cục bằng grid thay vì table-layout để đổi hình dạng
+   giữa mobile và desktop. Ngữ nghĩa bảng giữ nguyên nhờ thuộc tính
+   role đặt sẵn trong HTML. */
+.cart-table,
+.cart-table thead,
+.cart-table tbody {
+  display: block;
+}
+
+/* ---------- Mobile: mỗi dòng là một thẻ ---------- */
+
+.cart-table__head {
+  display: none;
+}
+
+.cart-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.cart-row:last-child {
+  border-bottom: 0;
+}
+
+.cart-row__product {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  grid-column: 1;
+  text-align: left;
+  font-weight: 400;
+}
+
+.cart-row__thumb {
+  flex: none;
+  width: 72px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cart-row__thumb img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.cart-row__info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.cart-row__name {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-ink);
+}
+
+.cart-row__name:hover {
+  color: var(--c-primary);
+}
+
+.cart-row__meta {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.cart-row__cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  grid-column: 1 / -1;
+  font-size: var(--fs-sm);
+}
+
+.cart-row__label {
+  color: var(--c-ink-muted);
+}
+
+.cart-row__price {
+  font-weight: 500;
+}
+
+.cart-row__total {
+  font-weight: 700;
+  color: var(--c-primary);
+}
+
+.cart-row__cell--action {
+  grid-column: 2;
+  grid-row: 1;
+  justify-content: flex-end;
+}
+
+.cart-row__remove {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  color: var(--c-ink-muted);
+  transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.cart-row__remove:hover {
+  background-color: var(--c-paper);
+  color: var(--c-sale);
+}
+
+/* ---------- Chân bảng & mã giảm giá ---------- */
+
+.cart__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-top: var(--sp-4);
+}
+
+.coupon {
+  margin-top: var(--sp-6);
+  padding: var(--sp-6);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+}
+
+.coupon__title {
+  margin-bottom: var(--sp-2);
+  font-family: var(--f-body);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.coupon__hint {
+  max-width: 52ch;
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.coupon .field--inline {
+  max-width: 420px;
+}
+
+.coupon__ok {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--c-primary);
+}
+
+/* ---------- Từ 768px: quay lại dạng bảng thật ---------- */
+
+@media (min-width: 768px) {
+  .cart-table__head {
+    display: block;
+  }
+
+  .cart-table__head tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 120px 132px 120px 52px;
+    align-items: center;
+    gap: var(--sp-3);
+    padding: var(--sp-3) var(--sp-4);
+    background-color: var(--c-paper);
+    border-bottom: 1px solid var(--c-line);
+  }
+
+  .cart-table__head th {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-align: left;
+    color: var(--c-ink-muted);
+  }
+
+  .cart-table__head th:nth-child(2),
+  .cart-table__head th:nth-child(4) {
+    text-align: right;
+  }
+
+  .cart-table__head th:nth-child(3) {
+    text-align: center;
+  }
+
+  .cart-row {
+    grid-template-columns: minmax(0, 1fr) 120px 132px 120px 52px;
+    align-items: center;
+    gap: var(--sp-3);
+  }
+
+  .cart-row__product {
+    align-items: center;
+  }
+
+  .cart-row__label {
+    display: none;
+  }
+
+  .cart-row__cell {
+    grid-column: auto;
+    grid-row: auto;
+    justify-content: flex-end;
+    white-space: nowrap;
+  }
+
+  .cart-row__cell:nth-of-type(2) {
+    justify-content: center;
+  }
+
+  .cart-row__cell--action {
+    justify-content: flex-end;
+  }
+}
+
+/* ---------- Từ 1024px: tổng tiền dính bên phải ---------- */
+
+@media (min-width: 1024px) {
+  .cart {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: var(--sp-8);
+  }
+
+  .cart__aside {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+  }
+}

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập &amp; đăng ký — Lá Sen</title>
+  <meta name="description" content="Đăng nhập tài khoản Lá Sen để theo dõi đơn hàng và lưu sản phẩm yêu thích, hoặc tạo tài khoản mới trong một phút.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+</head>
+<body>
+
+<!-- ===== Kho icon dùng chung (inline SVG, tham chiếu bằng <use href="#i-...">) ===== -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-lotus" viewBox="0 0 24 24"><path d="M12 21c5.2-2 8-6 8-11 0-3.2-2.4-6.2-8-8-5.6 1.8-8 4.8-8 8 0 5 2.8 9 8 11z"/><path d="M12 21V7"/><path d="M12 13.5c-2-1-3.4-2.6-4-4.5"/><path d="M12 13.5c2-1 3.4-2.6 4-4.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 11.6a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21.5 7H6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45L2.6 9.45l6.5-.95L12 2.6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.7 16.7"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 21v-6M4 11V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 15h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.6 5a5.2 5.2 0 0 0-7.4 0L12 6.2 10.8 5a5.2 5.2 0 1 0-7.4 7.4l8.6 8.6 8.6-8.6a5.2 5.2 0 0 0 0-7.4z"/></symbol>
+  <symbol id="i-compare" viewBox="0 0 24 24"><path d="M7 4v16M7 4L3.5 7.5M7 4l3.5 3.5M17 20V4M17 20l-3.5-3.5M17 20l3.5-3.5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M18.5 6l-1 14H6.5l-1-14M10 10.5v6M14 10.5v6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5.5L12 2 4 5.5V12c0 6 8 10 8 10z"/><path d="M9 11.8l2 2 4-4"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M1 4.5h14v12H1z"/><path d="M15 8.5h4l4 4v4h-8"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M22 4v6h-6M2 20v-6h6"/><path d="M19.4 9A8.5 8.5 0 0 0 5.6 6.1L2 10m20 4l-3.6 3.9A8.5 8.5 0 0 1 4.6 15"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 20.6l1.6-5.1A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1.5 12S5.7 5 12 5s10.5 7 10.5 7-4.2 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.3 0 10.5 7 10.5 7a18 18 0 0 1-2.3 3.2M6.2 6.7A17.6 17.6 0 0 0 1.5 12S5.7 19 12 19a9.9 9.9 0 0 0 4.2-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M21.5 16.9v2.8a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3 19.3 19.3 0 0 1-6-6 19.6 19.6 0 0 1-3-8.6 2 2 0 0 1 2-2.2H6.6a2 2 0 0 1 2 1.7c.13.95.36 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.6 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.5c.9.34 1.85.57 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="M2.6 6l9.4 6.4L21.4 6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l3.5 2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8.5V21H3V8.5M1.5 3h21v5.5h-21zM10 12h4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-8 5-14 16-15 0 10-5 15-12 15H4z"/><path d="M4.5 19.5c2-5 5-8.5 9-10.5"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3l-4.9-8.8V3"/><path d="M8 3h8M7.2 14.5h9.6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2.4 12.4V3.4h9l8.2 8.2a2 2 0 0 1 0 1.8z"/><circle cx="7.4" cy="7.4" r="1.3"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24">
+      <path d="M12 20V4M6 10l6-6 6 6" />
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24">
+      <path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z" />
+    </symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24">
+      <path d="M3 11h18v10H3zM2 7h20v4H2zM12 7v14" />
+      <path d="M12 7S10.5 3 8 3a2.2 2.2 0 0 0 0 4h4zM12 7s1.5-4 4-4a2.2 2.2 0 0 1 0 4h-4z" />
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </symbol>
+  </svg>
+
+<a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
+
+  <!-- ===== THANH KHUYẾN MÃI ===== -->
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <p class="topbar__promo">
+        <span class="topbar__track">
+          <span class="topbar__code">Nhập mã <b>LASEN30</b> — giảm 30.000đ cho đơn từ 299.000đ</span>
+          <span class="topbar__code">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__code">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__code" aria-hidden="true">Nhập mã <b>LASEN30</b> — giảm 30.000đ cho đơn từ 299.000đ</span>
+          <span class="topbar__code" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__code" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+        </span>
+      </p>
+
+      <ul class="topbar__links">
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+          Cửa hàng Cần Thơ
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
+          Tra cứu đơn hàng
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+          Hỏi đáp
+        </a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" data-header>
+    <div class="container header__inner">
+      <button class="header__toggle" type="button" aria-label="Mở menu danh mục" aria-expanded="false"
+        aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon" aria-hidden="true">
+          <use href="#i-menu"></use>
+        </svg>
+      </button>
+
+      <a class="logo" href="index.html">
+        <svg class="logo__mark" aria-hidden="true">
+          <use href="#i-lotus"></use>
+        </svg>
+        <span class="logo__name">
+          <span class="logo__text">Lá Sen</span>
+          <span class="logo__sub">Mỹ phẩm sen Việt</span>
+        </span>
+      </a>
+
+      <form class="search" role="search" action="products.html" method="get" data-search-form>
+        <label class="sr-only" for="site-search">Tìm sản phẩm</label>
+        <div class="search__control">
+          <input class="search__input" type="search" id="site-search" name="q" autocomplete="off"
+            placeholder="Tìm sữa rửa mặt, serum, kem chống nắng…" data-search-input>
+          <button class="search__btn" type="submit" aria-label="Tìm kiếm">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-search"></use>
+            </svg>
+          </button>
+        </div>
+        <!-- JS đổ danh sách gợi ý vào đây -->
+        <div class="search__suggest" data-search-suggest></div>
+      </form>
+
+      <div class="header__actions">
+        <button class="header__search-toggle" type="button" aria-label="Mở ô tìm kiếm" data-search-toggle>
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-search"></use>
+          </svg>
+        </button>
+
+        <a class="header__act header__phone" href="tel:02923812345">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-phone"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tư vấn miễn phí</span>
+            <span class="header__act-val">0292 381 2345</span>
+          </span>
+        </a>
+
+        <a class="header__act" href="login.html">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-user"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tài khoản</span>
+            <span class="header__act-val">Đăng nhập</span>
+          </span>
+        </a>
+
+        <a class="header__act cart-btn" href="cart.html" aria-label="Giỏ hàng của bạn">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-cart"></use>
+            </svg>
+          </span>
+          <span class="cart-btn__count" data-cart-count>0</span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Giỏ hàng</span>
+            <span class="header__act-val" data-cart-total>0đ</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <nav class="catnav" id="site-nav" aria-label="Danh mục sản phẩm" data-nav>
+      <div class="container catnav__inner">
+        <ul class="catnav__list">
+          <li class="catnav__item"><a class="catnav__link" href="index.html" data-nav-key="home">Trang chủ</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html" data-nav-key="products">Tất cả sản
+              phẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=dac-tri">Đặc trị
+              <span class="catnav__tag">Sale</span></a></li>
+          <li class="catnav__item"><a class="catnav__link" href="compare.html" data-nav-key="compare">So sánh</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="about.html" data-nav-key="about">Giới thiệu</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="contact.html" data-nav-key="contact">Liên hệ</a></li>
+        </ul>
+
+        <p class="catnav__note">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-truck"></use>
+          </svg>
+          Freeship từ 500.000đ
+        </p>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== NỘI DUNG ===== -->
+<main id="main">
+  <div class="auth">
+
+    <!-- ----- Nửa trái: hình ảnh thương hiệu ----- -->
+    <aside class="auth__brand">
+      <img class="auth__brand-img" src="https://picsum.photos/seed/lasen-auth/1200/1600" alt="Đầm sen buổi sớm ở ngoại ô Cần Thơ, lá sen còn đọng sương">
+      <div class="auth__brand-body">
+        <p class="auth__brand-quote">“Da khoẻ không đến từ mười bước dưỡng. Nó đến từ ba bước làm đúng, lặp lại mỗi ngày.”</p>
+        <p class="auth__brand-by">Nguyễn Hồng Đào — người sáng lập Lá Sen</p>
+        <ul class="auth__brand-list">
+          <li>
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            Theo dõi đơn hàng và lịch sử mua
+          </li>
+          <li>
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            Lưu sản phẩm yêu thích trên mọi thiết bị
+          </li>
+          <li>
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            Nhận ưu đãi sinh nhật và mã dùng riêng
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- ----- Nửa phải: form ----- -->
+    <div class="auth__panel">
+      <div class="auth__card">
+
+        <h1 class="auth__title">Chào mừng bạn đến Lá Sen</h1>
+        <p class="auth__desc">Đăng nhập để xem lại đơn cũ, hoặc tạo tài khoản mới trong khoảng một phút.</p>
+
+        <div class="tabs auth__tabs" data-auth-tabs>
+          <div class="tabs__list" role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
+            <button class="tabs__btn is-active" type="button" role="tab" id="tab-dang-nhap" aria-controls="panel-dang-nhap" aria-selected="true" data-auth-tab="dang-nhap">Đăng nhập</button>
+            <button class="tabs__btn" type="button" role="tab" id="tab-dang-ky" aria-controls="panel-dang-ky" aria-selected="false" data-auth-tab="dang-ky">Đăng ký</button>
+          </div>
+
+          <!-- ----- Panel đăng nhập ----- -->
+          <div class="tabs__panel" role="tabpanel" id="panel-dang-nhap" aria-labelledby="tab-dang-nhap" data-auth-panel="dang-nhap">
+            <form data-login-form novalidate>
+
+              <div class="field">
+                <label class="field__label" for="login-email">Email <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="email" id="login-email" name="email" autocomplete="email" placeholder="email@cuaban.com" required aria-describedby="err-login-email" data-input="email">
+                <span class="field__error" id="err-login-email" data-error-for="loginEmail"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="login-password">Mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+                <div class="field__control">
+                  <input class="field__input" type="password" id="login-password" name="matKhau" autocomplete="current-password" placeholder="Nhập mật khẩu" required aria-describedby="err-login-password" data-input="matKhau">
+                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="login-password">
+                    <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                  </button>
+                </div>
+                <span class="field__error" id="err-login-password" data-error-for="loginMatKhau"></span>
+              </div>
+
+              <div class="auth__row">
+                <label class="check">
+                  <input class="check__input" type="checkbox" name="nhoDangNhap" data-input="nhoDangNhap">
+                  <span class="check__text">Nhớ đăng nhập</span>
+                </label>
+                <a class="auth__link" href="contact.html" data-forgot-password>Quên mật khẩu?</a>
+              </div>
+
+              <button class="btn btn--primary btn--block btn--lg" type="submit" data-login-submit>Đăng nhập</button>
+
+              <p class="auth__switch">Chưa có tài khoản?
+                <button class="auth__link" type="button" data-auth-tab="dang-ky">Đăng ký ngay</button>
+              </p>
+            </form>
+          </div>
+
+          <!-- ----- Panel đăng ký ----- -->
+          <div class="tabs__panel is-hidden" role="tabpanel" id="panel-dang-ky" aria-labelledby="tab-dang-ky" data-auth-panel="dang-ky">
+            <form data-register-form novalidate>
+
+              <div class="field">
+                <label class="field__label" for="reg-name">Họ và tên <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="text" id="reg-name" name="hoTen" autocomplete="name" placeholder="Nguyễn Thị Lan" required aria-describedby="err-reg-name" data-input="hoTen">
+                <span class="field__error" id="err-reg-name" data-error-for="regHoTen"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-email">Email <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="email" id="reg-email" name="email" autocomplete="email" placeholder="email@cuaban.com" required aria-describedby="err-reg-email" data-input="email">
+                <span class="field__error" id="err-reg-email" data-error-for="regEmail"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-phone">Số điện thoại <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="tel" id="reg-phone" name="soDienThoai" autocomplete="tel" inputmode="numeric" placeholder="0912 345 678" required aria-describedby="err-reg-phone" data-input="soDienThoai">
+                <span class="field__error" id="err-reg-phone" data-error-for="regSoDienThoai"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-password">Mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+                <div class="field__control">
+                  <input class="field__input" type="password" id="reg-password" name="matKhau" autocomplete="new-password" placeholder="Ít nhất 8 ký tự" required aria-describedby="hint-reg-password err-reg-password" data-input="matKhau">
+                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="reg-password">
+                    <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                  </button>
+                </div>
+                <span class="field__hint" id="hint-reg-password">Tối thiểu 8 ký tự, nên có cả chữ và số.</span>
+                <span class="field__error" id="err-reg-password" data-error-for="regMatKhau"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-password2">Nhập lại mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+                <div class="field__control">
+                  <input class="field__input" type="password" id="reg-password2" name="nhapLaiMatKhau" autocomplete="new-password" placeholder="Gõ lại mật khẩu ở trên" required aria-describedby="err-reg-password2" data-input="nhapLaiMatKhau">
+                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="reg-password2">
+                    <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                  </button>
+                </div>
+                <span class="field__error" id="err-reg-password2" data-error-for="regNhapLaiMatKhau"></span>
+              </div>
+
+              <label class="check">
+                <input class="check__input" type="checkbox" name="dongY" required data-input="dongY">
+                <span class="check__text">Tôi đồng ý để Lá Sen lưu thông tin đơn hàng của tôi.</span>
+              </label>
+              <span class="field__error" data-error-for="regDongY"></span>
+
+              <button class="btn btn--primary btn--block btn--lg auth__submit" type="submit" data-register-submit>Tạo tài khoản</button>
+
+              <p class="auth__switch">Đã có tài khoản?
+                <button class="auth__link" type="button" data-auth-tab="dang-nhap">Đăng nhập</button>
+              </p>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__col">
+        <a class="logo" href="index.html">
+          <svg class="logo__mark" aria-hidden="true">
+            <use href="#i-lotus"></use>
+          </svg>
+          <span class="logo__name">
+            <span class="logo__text">Lá Sen</span>
+            <span class="logo__sub">Mỹ phẩm sen Việt</span>
+          </span>
+        </a>
+        <p class="footer__desc">Mỹ phẩm chăm sóc da lành tính, chiết xuất từ sen và thảo mộc trồng tại đồng bằng sông
+          Cửu Long. Cửa hàng ở Cần Thơ, giao hàng toàn quốc.</p>
+
+        <a class="footer__hotline" href="tel:02923812345">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-phone"></use>
+          </svg>
+          0292 381 2345
+        </a>
+
+        <ul class="footer__social">
+          <li><a href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-chat"></use>
+            </svg>
+          </a></li>
+          <li><a href="mailto:xinchao@lasen.vn" aria-label="Gửi email cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+          </a></li>
+          <li><a href="contact.html" aria-label="Xem đường đi tới cửa hàng">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Danh mục</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li><a class="footer__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li><a class="footer__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li><a class="footer__link" href="products.html?cat=dac-tri">Đặc trị</a></li>
+          <li><a class="footer__link" href="products.html?cat=mat-na">Mặt nạ</a></li>
+          <li><a class="footer__link" href="products.html">Xem tất cả sản phẩm</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Hỗ trợ khách hàng</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="about.html">Câu chuyện Lá Sen</a></li>
+          <li><a class="footer__link" href="contact.html">Liên hệ &amp; hỏi đáp</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách đổi trả 7 ngày</a></li>
+          <li><a class="footer__link" href="contact.html">Hướng dẫn đặt hàng</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách bảo mật</a></li>
+          <li><a class="footer__link" href="compare.html">So sánh sản phẩm</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Thư chăm da hằng tháng</h2>
+        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và ưu đãi dành riêng cho khách quen.
+        </p>
+        <form class="footer__form" data-newsletter-form novalidate>
+          <div class="field field--inline">
+            <label class="sr-only" for="footer-email">Email nhận thư</label>
+            <input class="field__input" type="email" id="footer-email" name="email" placeholder="email@cuaban.com"
+              data-newsletter-email>
+            <button class="btn btn--primary" type="submit">Đăng ký</button>
+          </div>
+          <span class="field__error" data-error-for="newsletterEmail"></span>
+        </form>
+
+        <address class="footer__address">
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+            128 Trần Hưng Đạo, phường An Phú, quận Ninh Kiều, TP. Cần Thơ
+          </span>
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-clock"></use>
+            </svg>
+            Mở cửa 8:00 – 21:00 tất cả các ngày
+          </span>
+          <a class="footer__link" href="mailto:xinchao@lasen.vn">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+            xinchao@lasen.vn
+          </a>
+        </address>
+
+        <h3 class="footer__title">Thanh toán</h3>
+        <ul class="footer__pay">
+          <li>COD</li>
+          <li>Chuyển khoản</li>
+          <li>Momo</li>
+          <li>ZaloPay</li>
+          <li>Thẻ ATM</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="container">
+        <p>© 2026 Lá Sen Cosmetics — 128 Trần Hưng Đạo, Ninh Kiều, Cần Thơ.</p>
+        <p>Bài tập môn WEB1044 — Lập trình cơ sở với JavaScript, FPT Polytechnic Cần Thơ.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Nút nổi: gọi nhanh, nhắn tin, lên đầu trang -->
+  <div class="floaties">
+    <a class="floaty floaty--call" href="tel:02923812345" aria-label="Gọi tư vấn 0292 381 2345">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-phone"></use>
+      </svg>
+    </a>
+    <a class="floaty" href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-chat"></use>
+      </svg>
+    </a>
+    <button class="floaty floaty--top" type="button" aria-label="Lên đầu trang" data-back-to-top>
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-arrow-up"></use>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Nơi JS chèn thông báo ngắn -->
+  <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toast></div>
+
+</body>
+</html>

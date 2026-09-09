@@ -1,0 +1,174 @@
+/* =========================================================
+   LÁ SEN — auth.css
+   Riêng cho trang đăng nhập / đăng ký.
+   ========================================================= */
+
+.auth {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+/* Trang này chiếm trọn chiều cao nên footer không cần khoảng đệm phía trên */
+.footer {
+  margin-top: 0;
+}
+
+/* ---------- Nửa hình ảnh thương hiệu ---------- */
+
+.auth__brand {
+  position: relative;
+  display: grid;
+  align-items: end;
+  min-height: 220px;
+  background-color: var(--c-primary);
+  overflow: hidden;
+}
+
+.auth__brand-img {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.35;
+}
+
+.auth__brand-body {
+  grid-area: 1 / 1;
+  position: relative;
+  padding: var(--sp-8) var(--sp-6);
+  color: var(--c-paper);
+}
+
+.auth__brand-quote {
+  max-width: 24ch;
+  font-family: var(--f-head);
+  font-size: var(--fs-xl);
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--c-surface);
+}
+
+.auth__brand-by {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-sm);
+  opacity: 0.85;
+}
+
+.auth__brand-list {
+  display: none;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-top: var(--sp-8);
+  font-size: var(--fs-sm);
+}
+
+.auth__brand-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.auth__brand-list .icon {
+  color: var(--c-primary-soft);
+}
+
+/* ---------- Nửa form ---------- */
+
+.auth__panel {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-8) var(--sp-4) var(--sp-12);
+}
+
+.auth__card {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth__title {
+  margin-bottom: var(--sp-2);
+}
+
+.auth__desc {
+  margin-bottom: var(--sp-6);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.auth__tabs .tabs__list {
+  margin-bottom: var(--sp-2);
+}
+
+.auth__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+}
+
+.auth__link {
+  padding: 0;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-primary);
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.auth__link:hover {
+  border-bottom-color: currentColor;
+}
+
+.auth__submit {
+  margin-top: var(--sp-6);
+}
+
+.auth__switch {
+  margin-top: var(--sp-6);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+  text-align: center;
+}
+
+/* ---------- Từ 768px ---------- */
+
+@media (min-width: 768px) {
+  .auth__brand {
+    min-height: 300px;
+  }
+
+  .auth__brand-body {
+    padding: var(--sp-12) var(--sp-8);
+  }
+
+  .auth__panel {
+    padding-inline: var(--sp-8);
+  }
+}
+
+/* ---------- Từ 1024px: chia đôi màn hình ---------- */
+
+@media (min-width: 1024px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: calc(100vh - var(--header-h));
+  }
+
+  .auth__brand {
+    min-height: 0;
+  }
+
+  .auth__brand-list {
+    display: flex;
+  }
+
+  .auth__panel {
+    align-items: center;
+    padding: var(--sp-12) var(--sp-8);
+  }
+}

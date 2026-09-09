@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>So sánh sản phẩm — Lá Sen</title>
+  <meta name="description" content="Đặt tối đa 3 sản phẩm cạnh nhau để so giá, dung tích, loại da phù hợp và thành phần chính trước khi quyết định mua.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/compare.css">
+</head>
+<body>
+
+<!-- ===== Kho icon dùng chung (inline SVG, tham chiếu bằng <use href="#i-...">) ===== -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-lotus" viewBox="0 0 24 24"><path d="M12 21c5.2-2 8-6 8-11 0-3.2-2.4-6.2-8-8-5.6 1.8-8 4.8-8 8 0 5 2.8 9 8 11z"/><path d="M12 21V7"/><path d="M12 13.5c-2-1-3.4-2.6-4-4.5"/><path d="M12 13.5c2-1 3.4-2.6 4-4.5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></symbol>
+  <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.4 11.6a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21.5 7H6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.45L12 17.45 6.2 20.5l1.1-6.45L2.6 9.45l6.5-.95L12 2.6z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20.5 20.5L16.7 16.7"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 21v-6M4 11V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 15h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.6 5a5.2 5.2 0 0 0-7.4 0L12 6.2 10.8 5a5.2 5.2 0 1 0-7.4 7.4l8.6 8.6 8.6-8.6a5.2 5.2 0 0 0 0-7.4z"/></symbol>
+  <symbol id="i-compare" viewBox="0 0 24 24"><path d="M7 4v16M7 4L3.5 7.5M7 4l3.5 3.5M17 20V4M17 20l-3.5-3.5M17 20l3.5-3.5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M18.5 6l-1 14H6.5l-1-14M10 10.5v6M14 10.5v6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5.5L12 2 4 5.5V12c0 6 8 10 8 10z"/><path d="M9 11.8l2 2 4-4"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M1 4.5h14v12H1z"/><path d="M15 8.5h4l4 4v4h-8"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M22 4v6h-6M2 20v-6h6"/><path d="M19.4 9A8.5 8.5 0 0 0 5.6 6.1L2 10m20 4l-3.6 3.9A8.5 8.5 0 0 1 4.6 15"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 20.6l1.6-5.1A8.4 8.4 0 0 1 12 3.1a8.4 8.4 0 0 1 9 8.4z"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M1.5 12S5.7 5 12 5s10.5 7 10.5 7-4.2 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.6 5.2A9.9 9.9 0 0 1 12 5c6.3 0 10.5 7 10.5 7a18 18 0 0 1-2.3 3.2M6.2 6.7A17.6 17.6 0 0 0 1.5 12S5.7 19 12 19a9.9 9.9 0 0 0 4.2-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M21.5 16.9v2.8a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3 19.3 19.3 0 0 1-6-6 19.6 19.6 0 0 1-3-8.6 2 2 0 0 1 2-2.2H6.6a2 2 0 0 1 2 1.7c.13.95.36 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.6 9.6a16 16 0 0 0 6 6l1.1-1.2a2 2 0 0 1 2.1-.5c.9.34 1.85.57 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4.5" width="20" height="15" rx="2"/><path d="M2.6 6l9.4 6.4L21.4 6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6.5-8 12-8 12s-8-5.5-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l3.5 2"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8.5V21H3V8.5M1.5 3h21v5.5h-21zM10 12h4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-8 5-14 16-15 0 10-5 15-12 15H4z"/><path d="M4.5 19.5c2-5 5-8.5 9-10.5"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.5 3v6.2L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3l-4.9-8.8V3"/><path d="M8 3h8M7.2 14.5h9.6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2.4 12.4V3.4h9l8.2 8.2a2 2 0 0 1 0 1.8z"/><circle cx="7.4" cy="7.4" r="1.3"/></symbol>
+    <symbol id="i-arrow-up" viewBox="0 0 24 24">
+      <path d="M12 20V4M6 10l6-6 6 6" />
+    </symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24">
+      <path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z" />
+    </symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24">
+      <path d="M3 11h18v10H3zM2 7h20v4H2zM12 7v14" />
+      <path d="M12 7S10.5 3 8 3a2.2 2.2 0 0 0 0 4h4zM12 7s1.5-4 4-4a2.2 2.2 0 0 1 0 4h-4z" />
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </symbol>
+  </svg>
+
+<a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
+
+  <!-- ===== THANH KHUYẾN MÃI ===== -->
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <p class="topbar__promo">
+        <span class="topbar__track">
+          <span class="topbar__code">Nhập mã <b>LASEN30</b> — giảm 30.000đ cho đơn từ 299.000đ</span>
+          <span class="topbar__code">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__code">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__code" aria-hidden="true">Nhập mã <b>LASEN30</b> — giảm 30.000đ cho đơn từ 299.000đ</span>
+          <span class="topbar__code" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__code" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+        </span>
+      </p>
+
+      <ul class="topbar__links">
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+          Cửa hàng Cần Thơ
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
+          Tra cứu đơn hàng
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+          Hỏi đáp
+        </a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" data-header>
+    <div class="container header__inner">
+      <button class="header__toggle" type="button" aria-label="Mở menu danh mục" aria-expanded="false"
+        aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon" aria-hidden="true">
+          <use href="#i-menu"></use>
+        </svg>
+      </button>
+
+      <a class="logo" href="index.html">
+        <svg class="logo__mark" aria-hidden="true">
+          <use href="#i-lotus"></use>
+        </svg>
+        <span class="logo__name">
+          <span class="logo__text">Lá Sen</span>
+          <span class="logo__sub">Mỹ phẩm sen Việt</span>
+        </span>
+      </a>
+
+      <form class="search" role="search" action="products.html" method="get" data-search-form>
+        <label class="sr-only" for="site-search">Tìm sản phẩm</label>
+        <div class="search__control">
+          <input class="search__input" type="search" id="site-search" name="q" autocomplete="off"
+            placeholder="Tìm sữa rửa mặt, serum, kem chống nắng…" data-search-input>
+          <button class="search__btn" type="submit" aria-label="Tìm kiếm">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-search"></use>
+            </svg>
+          </button>
+        </div>
+        <!-- JS đổ danh sách gợi ý vào đây -->
+        <div class="search__suggest" data-search-suggest></div>
+      </form>
+
+      <div class="header__actions">
+        <button class="header__search-toggle" type="button" aria-label="Mở ô tìm kiếm" data-search-toggle>
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-search"></use>
+          </svg>
+        </button>
+
+        <a class="header__act header__phone" href="tel:02923812345">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-phone"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tư vấn miễn phí</span>
+            <span class="header__act-val">0292 381 2345</span>
+          </span>
+        </a>
+
+        <a class="header__act" href="login.html">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-user"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tài khoản</span>
+            <span class="header__act-val">Đăng nhập</span>
+          </span>
+        </a>
+
+        <a class="header__act cart-btn" href="cart.html" aria-label="Giỏ hàng của bạn">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-cart"></use>
+            </svg>
+          </span>
+          <span class="cart-btn__count" data-cart-count>0</span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Giỏ hàng</span>
+            <span class="header__act-val" data-cart-total>0đ</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <nav class="catnav" id="site-nav" aria-label="Danh mục sản phẩm" data-nav>
+      <div class="container catnav__inner">
+        <ul class="catnav__list">
+          <li class="catnav__item"><a class="catnav__link" href="index.html" data-nav-key="home">Trang chủ</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html" data-nav-key="products">Tất cả sản
+              phẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=dac-tri">Đặc trị
+              <span class="catnav__tag">Sale</span></a></li>
+          <li class="catnav__item"><a class="catnav__link is-active" aria-current="page" href="compare.html" data-nav-key="compare">So sánh</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="about.html" data-nav-key="about">Giới thiệu</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="contact.html" data-nav-key="contact">Liên hệ</a></li>
+        </ul>
+
+        <p class="catnav__note">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-truck"></use>
+          </svg>
+          Freeship từ 500.000đ
+        </p>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== NỘI DUNG ===== -->
+<main id="main">
+  <div class="container">
+
+    <nav aria-label="Đường dẫn trang">
+      <ol class="breadcrumb">
+        <li class="breadcrumb__item"><a class="breadcrumb__link" href="index.html">Trang chủ</a></li>
+        <li class="breadcrumb__item" aria-current="page">So sánh sản phẩm</li>
+      </ol>
+    </nav>
+
+    <div class="page-head">
+      <h1 class="page-head__title">So sánh sản phẩm</h1>
+      <p class="page-head__desc">Đặt tối đa ba sản phẩm cạnh nhau để nhìn thẳng vào giá theo ml, loại da phù hợp và thành phần chính. Bấm biểu tượng so sánh trên bất kỳ thẻ sản phẩm nào để thêm vào bảng.</p>
+    </div>
+
+    <!-- Bảng so sánh — JS dựng lại cột theo danh sách đã chọn -->
+    <div class="compare" data-compare>
+      <div class="compare__toolbar">
+        <p class="compare__count">Đang so sánh <strong data-compare-count>2</strong> / 3 sản phẩm</p>
+        <button class="btn btn--ghost btn--sm" type="button" data-compare-clear>Xoá toàn bộ bảng</button>
+      </div>
+
+      <div class="compare-scroll">
+        <table class="compare-table" data-compare-table>
+          <caption class="sr-only">Bảng so sánh chi tiết giữa các sản phẩm đã chọn</caption>
+
+          <thead>
+            <tr>
+              <th class="compare-table__corner" scope="col"><span class="sr-only">Tiêu chí so sánh</span></th>
+
+              <th class="compare-col" scope="col" data-compare-slot="1" data-id="p2">
+                <button class="compare-col__remove" type="button" aria-label="Bỏ Serum Vitamin C 15% khỏi bảng so sánh" data-compare-remove data-id="p2">
+                  <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                </button>
+                <a class="compare-col__media" href="product-detail.html?id=p2" tabindex="-1">
+                  <img src="https://picsum.photos/seed/lasen-02/400/400" alt="Lọ serum Vitamin C 15% Lá Sen 30ml">
+                </a>
+                <a class="compare-col__name" href="product-detail.html?id=p2">Serum Vitamin C 15% làm sáng da 30ml</a>
+                <span class="compare-col__brand">Lá Sen</span>
+              </th>
+
+              <th class="compare-col" scope="col" data-compare-slot="2" data-id="p5">
+                <button class="compare-col__remove" type="button" aria-label="Bỏ Kem dưỡng ẩm ceramide ban đêm khỏi bảng so sánh" data-compare-remove data-id="p5">
+                  <svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg>
+                </button>
+                <a class="compare-col__media" href="product-detail.html?id=p5" tabindex="-1">
+                  <img src="https://picsum.photos/seed/lasen-05/400/400" alt="Hũ kem dưỡng ẩm ceramide ban đêm Lá Sen 50ml">
+                </a>
+                <a class="compare-col__name" href="product-detail.html?id=p5">Kem dưỡng ẩm ceramide ban đêm 50ml</a>
+                <span class="compare-col__brand">Lá Sen</span>
+              </th>
+
+              <th class="compare-col compare-col--empty" scope="col" data-compare-slot="3">
+                <a class="compare-pick" href="products.html" data-compare-pick>
+                  <svg class="icon icon--lg" aria-hidden="true"><use href="#i-plus"></use></svg>
+                  <span class="compare-pick__text">Chọn sản phẩm</span>
+                  <span class="compare-pick__hint">Còn một chỗ trống</span>
+                </a>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <th class="compare-table__label" scope="row">Giá bán</th>
+              <td class="compare-cell">
+                <span class="compare-cell__price" data-price>289.000đ</span>
+                <s class="compare-cell__price-old" data-price-old>385.000đ</s>
+              </td>
+              <td class="compare-cell">
+                <span class="compare-cell__price" data-price>289.000đ</span>
+                <s class="compare-cell__price-old" data-price-old>340.000đ</s>
+              </td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Giá trên mỗi ml</th>
+              <td class="compare-cell">9.633đ / ml</td>
+              <td class="compare-cell">5.780đ / ml</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Dung tích</th>
+              <td class="compare-cell" data-volume>30ml</td>
+              <td class="compare-cell" data-volume>50ml</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Loại da phù hợp</th>
+              <td class="compare-cell" data-skin>Mọi loại da, kể cả da nhạy cảm</td>
+              <td class="compare-cell" data-skin>Da khô, da thiếu ẩm, da vừa qua đợt bong tróc</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Dùng vào buổi</th>
+              <td class="compare-cell">Sáng, trước kem chống nắng</td>
+              <td class="compare-cell">Tối, bước cuối cùng</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Thành phần chính</th>
+              <td class="compare-cell" data-ingredients>
+                <ul class="compare-cell__list">
+                  <li>3-O-Ethyl Ascorbic Acid 15%</li>
+                  <li>Niacinamide 2%</li>
+                  <li>Chiết xuất lá sen 3%</li>
+                  <li>Sodium Hyaluronate 1%</li>
+                </ul>
+              </td>
+              <td class="compare-cell" data-ingredients>
+                <ul class="compare-cell__list">
+                  <li>Ceramide NP, AP, EOP</li>
+                  <li>Squalane từ mía 8%</li>
+                  <li>Panthenol 3%</li>
+                  <li>Cholesterol, axit béo tự do</li>
+                </ul>
+              </td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Kết cấu</th>
+              <td class="compare-cell">Lỏng nhẹ, thấm nhanh</td>
+              <td class="compare-cell">Kem đặc vừa, hơi bóng khi mới thoa</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Đánh giá</th>
+              <td class="compare-cell">
+                <span class="rating" data-rating="4.9">
+                  <span class="rating__stars" aria-hidden="true">
+                    <svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg>
+                  </span>
+                  <span class="rating__value">4.9</span>
+                  <span class="rating__count">(214)</span>
+                </span>
+              </td>
+              <td class="compare-cell">
+                <span class="rating" data-rating="4.8">
+                  <span class="rating__stars" aria-hidden="true">
+                    <svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star rating__star--off"><use href="#i-star"></use></svg>
+                  </span>
+                  <span class="rating__value">4.8</span>
+                  <span class="rating__count">(152)</span>
+                </span>
+              </td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row">Tình trạng kho</th>
+              <td class="compare-cell" data-stock="in-stock">Còn 28 sản phẩm</td>
+              <td class="compare-cell" data-stock="in-stock">Còn 12 sản phẩm</td>
+              <td class="compare-cell compare-cell--empty">—</td>
+            </tr>
+
+            <tr>
+              <th class="compare-table__label" scope="row"><span class="sr-only">Đặt mua</span></th>
+              <td class="compare-cell">
+                <button class="btn btn--primary btn--block" type="button" data-add-to-cart data-id="p2">Thêm vào giỏ</button>
+              </td>
+              <td class="compare-cell">
+                <button class="btn btn--primary btn--block" type="button" data-add-to-cart data-id="p5">Thêm vào giỏ</button>
+              </td>
+              <td class="compare-cell compare-cell--empty">
+                <a class="btn btn--outline btn--block" href="products.html">Chọn sản phẩm</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Chưa chọn gì — JS bỏ class is-hidden khi bảng so sánh trống -->
+    <div class="empty is-hidden" data-compare-empty>
+      <svg class="empty__icon" aria-hidden="true"><use href="#i-compare"></use></svg>
+      <h2 class="empty__title">Bảng so sánh đang trống</h2>
+      <p class="empty__text">Mở trang sản phẩm và bấm biểu tượng so sánh ở góc mỗi thẻ. Bảng nhận tối đa ba sản phẩm cùng lúc — đủ để nhìn ra khác biệt mà không rối mắt.</p>
+      <div class="empty__actions">
+        <a class="btn btn--primary" href="products.html">Chọn sản phẩm để so sánh</a>
+      </div>
+    </div>
+
+    <!-- ----- Gợi ý thêm vào bảng ----- -->
+    <section class="section" aria-labelledby="compare-suggest-title">
+      <div class="section__head">
+        <h2 id="compare-suggest-title">Hay được đem ra so cùng</h2>
+        <a class="section__link" href="products.html">
+          Xem tất cả
+          <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+        </a>
+      </div>
+
+      <div class="grid" data-list="compare-suggest">
+
+        <article class="card" data-product data-id="p8">
+          <a class="card__media" href="product-detail.html?id=p8" tabindex="-1">
+            <img class="card__img" src="https://picsum.photos/seed/lasen-08/600/600" alt="Lọ serum HA cấp ẩm sâu Lá Sen 30ml">
+            <span class="card__quick">Mọi loại da · Cấp ẩm cho da mất nước</span>
+          </a>
+          <div class="card__body">
+            <h3 class="card__name"><a href="product-detail.html?id=p8">Serum HA cấp ẩm sâu 30ml</a></h3>
+            <p class="card__meta">Lá Sen · 30ml</p>
+            <p class="rating" data-rating="4.8">
+              <span class="rating__stars" aria-hidden="true"><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star rating__star--off"><use href="#i-star"></use></svg></span>
+              <span class="rating__value">4.8</span>
+              <span class="rating__count">(187)</span>
+            </p>
+            <p class="card__price">
+              <span class="card__price-now" data-price>310.000đ</span>
+            </p>
+            <div class="card__actions">
+              <button class="btn btn--primary" type="button" data-compare-add data-id="p8">Thêm vào bảng</button>
+              <button class="btn btn--outline btn--icon" type="button" aria-label="Thêm Serum HA cấp ẩm sâu vào giỏ hàng" data-add-to-cart data-id="p8">
+                <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-product data-id="p3">
+          <a class="card__media" href="product-detail.html?id=p3" tabindex="-1">
+            <img class="card__img" src="https://picsum.photos/seed/lasen-03/600/600" alt="Chai toner hoa hồng Sen Việt 250ml nắp bật">
+            <span class="badge card__badge">-14%</span>
+            <span class="card__quick">Da khô, da nhạy cảm · Cân bằng pH sau rửa mặt</span>
+          </a>
+          <div class="card__body">
+            <h3 class="card__name"><a href="product-detail.html?id=p3">Toner hoa hồng cân bằng độ pH 250ml</a></h3>
+            <p class="card__meta">Sen Việt · 250ml</p>
+            <p class="rating" data-rating="4.7">
+              <span class="rating__stars" aria-hidden="true"><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star rating__star--off"><use href="#i-star"></use></svg></span>
+              <span class="rating__value">4.7</span>
+              <span class="rating__count">(98)</span>
+            </p>
+            <p class="card__price card__price--sale">
+              <span class="card__price-now" data-price>189.000đ</span>
+              <s class="card__price-old" data-price-old>220.000đ</s>
+            </p>
+            <div class="card__actions">
+              <button class="btn btn--primary" type="button" data-compare-add data-id="p3">Thêm vào bảng</button>
+              <button class="btn btn--outline btn--icon" type="button" aria-label="Thêm Toner hoa hồng vào giỏ hàng" data-add-to-cart data-id="p3">
+                <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-product data-id="p11">
+          <a class="card__media" href="product-detail.html?id=p11" tabindex="-1">
+            <img class="card__img" src="https://picsum.photos/seed/lasen-11/600/600" alt="Tuýp kem mắt collagen sen trắng Lá Sen 15ml">
+            <span class="badge card__badge">-17%</span>
+            <span class="card__quick">Mọi loại da · Giảm quầng thâm và nếp nhăn nhỏ</span>
+          </a>
+          <div class="card__body">
+            <h3 class="card__name"><a href="product-detail.html?id=p11">Kem mắt collagen sen trắng 15ml</a></h3>
+            <p class="card__meta">Lá Sen · 15ml</p>
+            <p class="rating" data-rating="4.7">
+              <span class="rating__stars" aria-hidden="true"><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star rating__star--off"><use href="#i-star"></use></svg></span>
+              <span class="rating__value">4.7</span>
+              <span class="rating__count">(56)</span>
+            </p>
+            <p class="card__price card__price--sale">
+              <span class="card__price-now" data-price>229.000đ</span>
+              <s class="card__price-old" data-price-old>275.000đ</s>
+            </p>
+            <div class="card__actions">
+              <button class="btn btn--primary" type="button" data-compare-add data-id="p11">Thêm vào bảng</button>
+              <button class="btn btn--outline btn--icon" type="button" aria-label="Thêm Kem mắt collagen sen trắng vào giỏ hàng" data-add-to-cart data-id="p11">
+                <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-product data-id="p12">
+          <a class="card__media" href="product-detail.html?id=p12" tabindex="-1">
+            <img class="card__img" src="https://picsum.photos/seed/lasen-12/600/600" alt="Chai xịt khoáng sen hồng Sen Việt 150ml dạng phun sương">
+            <span class="badge badge--soft card__badge">Mới về</span>
+            <span class="card__quick">Da nhạy cảm · Làm dịu da sau khi đi nắng</span>
+          </a>
+          <div class="card__body">
+            <h3 class="card__name"><a href="product-detail.html?id=p12">Xịt khoáng sen hồng làm dịu 150ml</a></h3>
+            <p class="card__meta">Sen Việt · 150ml</p>
+            <p class="rating" data-rating="4.5">
+              <span class="rating__stars" aria-hidden="true"><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star"><use href="#i-star"></use></svg><svg class="rating__star rating__star--off"><use href="#i-star"></use></svg></span>
+              <span class="rating__value">4.5</span>
+              <span class="rating__count">(142)</span>
+            </p>
+            <p class="card__price card__price--sale">
+              <span class="card__price-now" data-price>129.000đ</span>
+              <s class="card__price-old" data-price-old>155.000đ</s>
+            </p>
+            <div class="card__actions">
+              <button class="btn btn--primary" type="button" data-compare-add data-id="p12">Thêm vào bảng</button>
+              <button class="btn btn--outline btn--icon" type="button" aria-label="Thêm Xịt khoáng sen hồng vào giỏ hàng" data-add-to-cart data-id="p12">
+                <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__col">
+        <a class="logo" href="index.html">
+          <svg class="logo__mark" aria-hidden="true">
+            <use href="#i-lotus"></use>
+          </svg>
+          <span class="logo__name">
+            <span class="logo__text">Lá Sen</span>
+            <span class="logo__sub">Mỹ phẩm sen Việt</span>
+          </span>
+        </a>
+        <p class="footer__desc">Mỹ phẩm chăm sóc da lành tính, chiết xuất từ sen và thảo mộc trồng tại đồng bằng sông
+          Cửu Long. Cửa hàng ở Cần Thơ, giao hàng toàn quốc.</p>
+
+        <a class="footer__hotline" href="tel:02923812345">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-phone"></use>
+          </svg>
+          0292 381 2345
+        </a>
+
+        <ul class="footer__social">
+          <li><a href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-chat"></use>
+            </svg>
+          </a></li>
+          <li><a href="mailto:xinchao@lasen.vn" aria-label="Gửi email cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+          </a></li>
+          <li><a href="contact.html" aria-label="Xem đường đi tới cửa hàng">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Danh mục</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li><a class="footer__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li><a class="footer__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li><a class="footer__link" href="products.html?cat=dac-tri">Đặc trị</a></li>
+          <li><a class="footer__link" href="products.html?cat=mat-na">Mặt nạ</a></li>
+          <li><a class="footer__link" href="products.html">Xem tất cả sản phẩm</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Hỗ trợ khách hàng</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="about.html">Câu chuyện Lá Sen</a></li>
+          <li><a class="footer__link" href="contact.html">Liên hệ &amp; hỏi đáp</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách đổi trả 7 ngày</a></li>
+          <li><a class="footer__link" href="contact.html">Hướng dẫn đặt hàng</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách bảo mật</a></li>
+          <li><a class="footer__link" href="compare.html">So sánh sản phẩm</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Thư chăm da hằng tháng</h2>
+        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và ưu đãi dành riêng cho khách quen.
+        </p>
+        <form class="footer__form" data-newsletter-form novalidate>
+          <div class="field field--inline">
+            <label class="sr-only" for="footer-email">Email nhận thư</label>
+            <input class="field__input" type="email" id="footer-email" name="email" placeholder="email@cuaban.com"
+              data-newsletter-email>
+            <button class="btn btn--primary" type="submit">Đăng ký</button>
+          </div>
+          <span class="field__error" data-error-for="newsletterEmail"></span>
+        </form>
+
+        <address class="footer__address">
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+            128 Trần Hưng Đạo, phường An Phú, quận Ninh Kiều, TP. Cần Thơ
+          </span>
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-clock"></use>
+            </svg>
+            Mở cửa 8:00 – 21:00 tất cả các ngày
+          </span>
+          <a class="footer__link" href="mailto:xinchao@lasen.vn">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+            xinchao@lasen.vn
+          </a>
+        </address>
+
+        <h3 class="footer__title">Thanh toán</h3>
+        <ul class="footer__pay">
+          <li>COD</li>
+          <li>Chuyển khoản</li>
+          <li>Momo</li>
+          <li>ZaloPay</li>
+          <li>Thẻ ATM</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="container">
+        <p>© 2026 Lá Sen Cosmetics — 128 Trần Hưng Đạo, Ninh Kiều, Cần Thơ.</p>
+        <p>Bài tập môn WEB1044 — Lập trình cơ sở với JavaScript, FPT Polytechnic Cần Thơ.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Nút nổi: gọi nhanh, nhắn tin, lên đầu trang -->
+  <div class="floaties">
+    <a class="floaty floaty--call" href="tel:02923812345" aria-label="Gọi tư vấn 0292 381 2345">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-phone"></use>
+      </svg>
+    </a>
+    <a class="floaty" href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-chat"></use>
+      </svg>
+    </a>
+    <button class="floaty floaty--top" type="button" aria-label="Lên đầu trang" data-back-to-top>
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-arrow-up"></use>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Nơi JS chèn thông báo ngắn -->
+  <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toast></div>
+
+</body>
+</html>
