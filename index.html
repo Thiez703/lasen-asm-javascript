@@ -319,276 +319,37 @@
        trên màn hình vì vai trò dẫn dắt thị giác đã do slider banner đảm nhiệm. -->
     <h1 class="sr-only">Lá Sen — mỹ phẩm chăm sóc da từ sen và thảo mộc Việt Nam</h1>
 
-    <!-- ----- 1. Banner: slider lớn ----- -->
-    <section aria-label="Ưu đãi và giới thiệu nổi bật">
-      <!-- Slider nằm ngoài .container để trải hết chiều ngang màn hình;
-         phần chữ bên trong tự canh theo lề container trên màn rộng. -->
-      <div class="hero-row">
+    <!-- ----- 1. Banner ----- -->
+    <section class="hero-banner" aria-label="Ưu đãi và giới thiệu nổi bật">
+      <img class="hero-banner__img" src="assets/img/banners/banner.png"
+        alt="Lá Sen — Dưỡng da dịu lành từ sen Việt. Sữa rửa mặt, Serum, Kem dưỡng, Chống nắng — mỹ phẩm chính hãng 100%">
 
-        <div class="slider hero-slider" data-slider>
-          <div class="slider__viewport">
-            <div class="slider__track" data-slider-track>
-
-              <div class="slider__slide" role="group" aria-roledescription="slide" aria-label="Slide 1 trên 3">
-                <div class="hero">
-                  <div class="hero__body">
-                    <span class="hero__eyebrow">
-                      <span class="hero__dot" aria-hidden="true"></span>
-                      Mỹ phẩm chính hãng 100%
-                    </span>
-                    <h2 class="hero__title">Lá Sen</h2>
-                    <p class="hero__tagline">Dưỡng da dịu lành từ sen Việt</p>
-                    <p class="hero__text">Sữa rửa mặt · Serum · Kem dưỡng · Chống nắng — công thức tối giản,
-                      không cồn khô, hợp cả da nhạy cảm.</p>
-                    <div class="hero__actions">
-                      <a class="btn btn--primary btn--lg" href="products.html">Mua ngay</a>
-                      <a class="btn btn--outline btn--lg" href="products.html?sale=1">Xem ưu đãi</a>
-                    </div>
-                    <ul class="hero__perks">
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-truck"></use>
-                        </svg>
-                        Freeship từ 299k
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-bolt"></use>
-                        </svg>
-                        Giao 2h nội thành Cần Thơ
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-refresh"></use>
-                        </svg>
-                        Đổi trả 7 ngày
-                      </li>
-                    </ul>
-                  </div>
-
-                  <!-- Hoa sen trên lá, hai bên là hũ kem và chai dưỡng -->
-                  <div class="hero__art">
-                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
-                      <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
-
-                      <circle cx="120" cy="118" r="7" fill="#F9BBD3" />
-                      <circle cx="152" cy="84" r="4" fill="#F49BC0" />
-                      <circle cx="350" cy="94" r="6" fill="#F9BBD3" />
-                      <circle cx="390" cy="130" r="4" fill="#F49BC0" />
-
-                      <ellipse cx="235" cy="252" rx="145" ry="26" fill="#7FC49F" />
-                      <ellipse cx="235" cy="245" rx="128" ry="19" fill="#9BD6B4" />
-
-                      <g fill="#FBC3D8">
-                        <ellipse cx="235" cy="192" rx="19" ry="46" transform="rotate(-68 235 238)" />
-                        <ellipse cx="235" cy="192" rx="19" ry="46" transform="rotate(-34 235 238)" />
-                        <ellipse cx="235" cy="192" rx="19" ry="46" />
-                        <ellipse cx="235" cy="192" rx="19" ry="46" transform="rotate(34 235 238)" />
-                        <ellipse cx="235" cy="192" rx="19" ry="46" transform="rotate(68 235 238)" />
-                      </g>
-                      <g fill="#F49BC0">
-                        <ellipse cx="235" cy="202" rx="16" ry="38" transform="rotate(-46 235 238)" />
-                        <ellipse cx="235" cy="202" rx="16" ry="38" transform="rotate(-16 235 238)" />
-                        <ellipse cx="235" cy="202" rx="16" ry="38" transform="rotate(16 235 238)" />
-                        <ellipse cx="235" cy="202" rx="16" ry="38" transform="rotate(46 235 238)" />
-                      </g>
-                      <g fill="#ED6FA5">
-                        <ellipse cx="235" cy="212" rx="13" ry="30" transform="rotate(-22 235 238)" />
-                        <ellipse cx="235" cy="212" rx="13" ry="30" />
-                        <ellipse cx="235" cy="212" rx="13" ry="30" transform="rotate(22 235 238)" />
-                      </g>
-                      <circle cx="235" cy="224" r="13" fill="#F8D86A" />
-                      <circle cx="230" cy="221" r="2.2" fill="#E0A63A" />
-                      <circle cx="240" cy="222" r="2.2" fill="#E0A63A" />
-                      <circle cx="235" cy="229" r="2.2" fill="#E0A63A" />
-
-                      <rect x="100" y="214" width="56" height="38" rx="11" fill="#F9BBD3" />
-                      <rect x="107" y="204" width="42" height="13" rx="6" fill="#ED6FA5" />
-                      <rect x="110" y="224" width="36" height="16" rx="4" fill="#FFFFFF" opacity=".6" />
-
-                      <rect x="316" y="176" width="36" height="76" rx="13" fill="#A9DDC2" />
-                      <rect x="329" y="163" width="10" height="15" fill="#7FC49F" />
-                      <rect x="322" y="154" width="24" height="10" rx="5" fill="#7FC49F" />
-                      <rect x="323" y="196" width="22" height="26" rx="4" fill="#FFFFFF" opacity=".65" />
-
-                      <rect x="356" y="198" width="28" height="54" rx="10" fill="#FFFFFF" />
-                      <rect x="361" y="189" width="18" height="11" rx="4" fill="#F49BC0" />
-                      <rect x="362" y="210" width="16" height="18" rx="3" fill="#FDE0EB" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div class="slider__slide" role="group" aria-roledescription="slide" aria-label="Slide 2 trên 3">
-                <div class="hero">
-                  <div class="hero__body">
-                    <span class="hero__eyebrow">
-                      <span class="hero__dot" aria-hidden="true"></span>
-                      Ưu đãi đến hết Chủ Nhật
-                    </span>
-                    <h2 class="hero__title">Giảm 25%</h2>
-                    <p class="hero__tagline">Serum Vitamin C 15% làm sáng da</p>
-                    <p class="hero__text">Ethyl Ascorbic Acid ổn định, pH quanh 5,5 nên da mỏng vẫn dùng được.</p>
-                    <div class="hero__actions">
-                      <a class="btn btn--primary btn--lg" href="product-detail.html?id=p2">Mua ngay 289.000đ</a>
-                      <a class="btn btn--outline btn--lg" href="compare.html">So sánh serum</a>
-                    </div>
-                    <ul class="hero__perks">
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-tag"></use>
-                        </svg>
-                        Giá gốc 385.000đ
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-box"></use>
-                        </svg>
-                        Còn 28 lọ tại kho Cần Thơ
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-shield"></use>
-                        </svg>
-                        Tem chống giả
-                      </li>
-                    </ul>
-                  </div>
-
-                  <!-- Lọ serum có ống nhỏ giọt, cạnh lát cam vitamin C -->
-                  <div class="hero__art">
-                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
-                      <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
-                      <ellipse cx="228" cy="262" rx="140" ry="18" fill="#F9BBD3" opacity=".7" />
-
-                      <circle cx="120" cy="104" r="6" fill="#F9BBD3" />
-                      <circle cx="356" cy="88" r="5" fill="#F49BC0" />
-                      <circle cx="384" cy="126" r="7" fill="#F9BBD3" />
-
-                      <circle cx="108" cy="196" r="42" fill="#F8D86A" />
-                      <circle cx="108" cy="196" r="33" fill="#FCEAB0" />
-                      <g stroke="#F8D86A" stroke-width="3" stroke-linecap="round">
-                        <path d="M108 196L108 165M108 196L134 180M108 196L134 212M108 196L108 227M108 196L82 212M108 196L82 180" />
-                      </g>
-                      <circle cx="108" cy="196" r="5" fill="#F8D86A" />
-
-                      <rect x="196" y="78" width="46" height="32" rx="9" fill="#D6246B" />
-                      <rect x="208" y="68" width="22" height="12" rx="6" fill="#ED6FA5" />
-                      <rect x="207" y="108" width="24" height="20" fill="#F9BBD3" />
-                      <rect x="180" y="126" width="78" height="128" rx="20" fill="#F49BC0" />
-                      <path d="M188 176h62v58a12 12 0 0 1-12 12h-38a12 12 0 0 1-12-12z" fill="#ED6FA5" />
-                      <rect x="192" y="150" width="54" height="44" rx="8" fill="#FFFFFF" opacity=".92" />
-                      <rect x="200" y="162" width="38" height="5" rx="2.5" fill="#F49BC0" />
-                      <rect x="200" y="174" width="26" height="5" rx="2.5" fill="#FBC3D8" />
-
-                      <path d="M300 150c0 8-6 14-14 14s-14-6-14-14 14-26 14-26 14 18 14 26z" fill="#ED6FA5" />
-                      <path d="M336 196c0 6-4 10-10 10s-10-4-10-10 10-19 10-19 10 13 10 19z" fill="#F49BC0" />
-                      <path d="M312 236c0 5-3 8-8 8s-8-3-8-8 8-15 8-15 8 10 8 15z" fill="#FBC3D8" />
-                    </svg>
-
-                    <!-- Con dấu giảm giá nghiêng ở góc trên phải của hình -->
-                    <span class="hero__stamp" aria-hidden="true">
-                      <b>−25%</b>
-                      <small>hôm nay</small>
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="slider__slide" role="group" aria-roledescription="slide" aria-label="Slide 3 trên 3">
-                <div class="hero">
-                  <div class="hero__body">
-                    <span class="hero__eyebrow">
-                      <span class="hero__dot" aria-hidden="true"></span>
-                      Cửa hàng Cần Thơ
-                    </span>
-                    <h2 class="hero__title">Soi da miễn phí</h2>
-                    <p class="hero__tagline">Ghé tiệm, đo tình trạng da trong 15 phút</p>
-                    <p class="hero__text">Kỹ thuật viên soi da bằng đèn Wood, đọc kết quả và gợi ý routine
-                      ngay tại chỗ — không tính phí, không ép mua.</p>
-                    <div class="hero__actions">
-                      <a class="btn btn--primary btn--lg" href="contact.html">Xem đường đi</a>
-                      <a class="btn btn--outline btn--lg" href="contact.html">Đặt lịch tư vấn</a>
-                    </div>
-                    <ul class="hero__perks">
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-pin"></use>
-                        </svg>
-                        128 Trần Hưng Đạo, Ninh Kiều
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-clock"></use>
-                        </svg>
-                        8:00 – 21:00 mỗi ngày
-                      </li>
-                      <li class="hero__perk">
-                        <svg class="icon" aria-hidden="true">
-                          <use href="#i-chat"></use>
-                        </svg>
-                        Tư vấn 1–1
-                      </li>
-                    </ul>
-                  </div>
-
-                  <!-- Mặt tiền cửa hàng với mái hiên sọc và ghim bản đồ -->
-                  <div class="hero__art">
-                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
-                      <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
-                      <ellipse cx="225" cy="262" rx="150" ry="18" fill="#F9BBD3" opacity=".7" />
-
-                      <circle cx="112" cy="112" r="6" fill="#F9BBD3" />
-                      <circle cx="366" cy="104" r="5" fill="#F49BC0" />
-
-                      <path d="M225 40c-16 0-29 13-29 29 0 21 29 47 29 47s29-26 29-47c0-16-13-29-29-29z" fill="#D6246B" />
-                      <circle cx="225" cy="69" r="11" fill="#FFFFFF" />
-
-                      <rect x="140" y="144" width="170" height="112" rx="8" fill="#FFFFFF" />
-                      <rect x="140" y="144" width="170" height="112" rx="8" fill="none" stroke="#F4C8D9"
-                        stroke-width="3" />
-
-                      <path d="M130 132h190l-10 24H140z" fill="#ED6FA5" />
-                      <path d="M152 132h24l-8 24h-24zM200 132h24l-8 24h-24zM248 132h24l-8 24h-24z" fill="#FBC3D8" />
-
-                      <rect x="203" y="190" width="44" height="66" rx="6" fill="#FBC3D8" />
-                      <circle cx="238" cy="224" r="3" fill="#D6246B" />
-
-                      <rect x="156" y="176" width="38" height="32" rx="5" fill="#DFF1E7" />
-                      <rect x="256" y="176" width="38" height="32" rx="5" fill="#DFF1E7" />
-
-                      <ellipse cx="132" cy="240" rx="16" ry="10" fill="#7FC49F" />
-                      <ellipse cx="318" cy="240" rx="16" ry="10" fill="#7FC49F" />
-                      <rect x="124" y="240" width="16" height="16" rx="3" fill="#F49BC0" />
-                      <rect x="310" y="240" width="16" height="16" rx="3" fill="#F49BC0" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <button class="slider__btn slider__btn--prev" type="button" aria-label="Slide trước" data-slider-prev>
-            <svg class="icon" aria-hidden="true">
-              <use href="#i-chevron-left"></use>
-            </svg>
-          </button>
-          <button class="slider__btn slider__btn--next" type="button" aria-label="Slide kế tiếp" data-slider-next>
-            <svg class="icon" aria-hidden="true">
-              <use href="#i-chevron-right"></use>
-            </svg>
-          </button>
-
-          <div class="slider__dots" role="tablist" aria-label="Chọn slide" data-slider-dots>
-            <button class="slider__dot is-active" type="button" role="tab" aria-selected="true" aria-label="Slide 1"
-              data-slider-dot="0"></button>
-            <button class="slider__dot" type="button" role="tab" aria-selected="false" aria-label="Slide 2"
-              data-slider-dot="1"></button>
-            <button class="slider__dot" type="button" role="tab" aria-selected="false" aria-label="Slide 3"
-              data-slider-dot="2"></button>
-          </div>
+      <!-- Overlay nút bấm + cam kết góc dưới trái -->
+      <div class="hero-banner__overlay">
+        <div class="hero-banner__actions">
+          <a class="btn btn--primary btn--lg" href="products.html">
+            <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+            Mua ngay
+          </a>
+          <a class="btn btn--outline btn--lg" href="products.html?sale=1">
+            Xem ưu đãi
+            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </a>
         </div>
+        <ul class="hero-banner__perks">
+          <li class="hero-banner__perk">
+            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+            Freeship từ 299k
+          </li>
+          <li class="hero-banner__perk">
+            <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
+            Giao 2h nội thành Cần Thơ
+          </li>
+          <li class="hero-banner__perk">
+            <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+            Đổi trả 7 ngày
+          </li>
+        </ul>
       </div>
     </section>
 

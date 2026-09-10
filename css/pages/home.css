@@ -11,8 +11,110 @@
 }
 
 /* =========================================================
-   1. Banner đầu trang — slider lớn
+   1. Banner đầu trang — ảnh toàn chiều rộng
    ========================================================= */
+
+.hero-banner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.hero-banner__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Overlay: nút bấm + cam kết, đặt ngay dưới phần chữ trên banner */
+.hero-banner__overlay {
+  position: absolute;
+  left: 10%;
+  bottom: 18%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-6);
+  line-height: 1.5;
+}
+
+/* Nhóm nút CTA */
+.hero-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.hero-banner__actions .btn {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(214, 36, 107, 0.18);
+  font-weight: 700;
+}
+
+.hero-banner__actions .btn--outline {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.hero-banner__actions .btn--outline:hover {
+  background-color: var(--c-primary);
+  color: #fff;
+}
+
+/* Dải cam kết nhỏ dưới nút */
+.hero-banner__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-banner__perk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+
+.hero-banner__perk .icon {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--c-primary);
+}
+
+/* Responsive: mobile nhỏ thì thu gọn */
+@media (max-width: 575px) {
+  .hero-banner__overlay {
+    padding: var(--sp-2) var(--sp-3);
+    gap: var(--sp-2);
+  }
+
+  .hero-banner__actions .btn {
+    padding: var(--sp-2) var(--sp-4);
+    font-size: var(--fs-sm);
+  }
+
+  .hero-banner__perk {
+    font-size: 0.6875rem;
+    padding: 2px var(--sp-2);
+  }
+}
 
 .hero-row {
   padding-top: var(--sp-4);
@@ -305,6 +407,7 @@
 }
 
 @media (min-width: 768px) {
+
   /* Chữ bên trái, hình minh hoạ bên phải.
      Lề trái tối thiểu 80px để nút mũi tên không đè lên chữ. */
   .hero {
@@ -501,7 +604,7 @@
   border-radius: 14px;
   text-align: center;
   transition: background-color 0.3s ease, border-color 0.3s ease,
-              transform 0.3s var(--ease-out), box-shadow 0.3s ease;
+    transform 0.3s var(--ease-out), box-shadow 0.3s ease;
 }
 
 .cat:hover {
@@ -581,7 +684,7 @@
   pointer-events: none;
 }
 
-.flash > .container {
+.flash>.container {
   position: relative;
   z-index: 1;
 }
