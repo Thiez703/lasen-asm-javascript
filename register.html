@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập — Lá Sen</title>
-  <meta name="description" content="Đăng nhập tài khoản Lá Sen để theo dõi đơn hàng và lưu sản phẩm yêu thích. Chưa có tài khoản thì đăng ký mới trong một phút.">
+  <title>Đăng ký tài khoản — Lá Sen</title>
+  <meta name="description" content="Tạo tài khoản Lá Sen trong khoảng một phút để theo dõi đơn hàng, lưu sản phẩm yêu thích và nhận mã giảm giá dành riêng cho khách quen.">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pages/auth.css">
@@ -232,74 +232,135 @@
 
     <!-- ----- Nửa trái: hình ảnh thương hiệu ----- -->
     <aside class="auth__brand">
-      <img class="auth__brand-img" src="https://picsum.photos/seed/lasen-auth/1200/1600" alt="Đầm sen buổi sớm ở ngoại ô Cần Thơ, lá sen còn đọng sương">
+      <img class="auth__brand-img" src="https://picsum.photos/seed/lasen-auth-register/1200/1600" alt="Búp sen hồng vừa hé nở trên mặt nước buổi sớm">
       <div class="auth__brand-body">
-        <p class="auth__brand-quote">“Da khoẻ không đến từ mười bước dưỡng. Nó đến từ ba bước làm đúng, lặp lại mỗi ngày.”</p>
+        <p class="auth__brand-quote">“Mỗi làn da có một nhịp riêng. Biết được nhịp đó, bạn chỉ cần vài sản phẩm là đủ.”</p>
         <p class="auth__brand-by">Nguyễn Hồng Đào — người sáng lập Lá Sen</p>
         <ul class="auth__brand-list">
           <li>
-            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
-            Theo dõi đơn hàng và lịch sử mua
+            <svg class="icon" aria-hidden="true"><use href="#i-gift"></use></svg>
+            Tặng ngay mã <b>CHAOBAN</b> giảm 50.000đ cho đơn đầu tiên
           </li>
           <li>
-            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
+            Theo dõi đơn hàng và mua lại chỉ với một chạm
+          </li>
+          <li>
+            <svg class="icon" aria-hidden="true"><use href="#i-heart"></use></svg>
             Lưu sản phẩm yêu thích trên mọi thiết bị
           </li>
           <li>
-            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
-            Nhận ưu đãi sinh nhật và mã dùng riêng
+            <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+            Được nhắc lịch soi da và ưu đãi sinh nhật
           </li>
         </ul>
       </div>
     </aside>
 
-    <!-- ----- Nửa phải: form ----- -->
+    <!-- ----- Nửa phải: form đăng ký ----- -->
     <div class="auth__panel">
       <div class="auth__card">
 
-        <h1 class="auth__title">Chào mừng bạn đến Lá Sen</h1>
-        <p class="auth__desc">Đăng nhập để xem lại đơn cũ và mua tiếp giỏ hàng còn dở.</p>
+        <h1 class="auth__title">Tạo tài khoản Lá Sen</h1>
+        <p class="auth__desc">Điền vài thông tin dưới đây, mất khoảng một phút. Các ô có dấu
+          <span class="field__req" aria-hidden="true">*</span> là bắt buộc.</p>
 
-        <!-- Hai lối vào tài khoản: đăng nhập ngay tại đây, đăng ký sang register.html -->
+        <!-- Cặp lối vào giống trang đăng nhập, chỉ đổi bên nào đang mở -->
         <div class="tabs auth__tabs">
           <div class="tabs__list">
-            <span class="tabs__btn is-active" aria-current="page">Đăng nhập</span>
-            <a class="tabs__btn" href="register.html">Đăng ký</a>
+            <a class="tabs__btn" href="login.html">Đăng nhập</a>
+            <span class="tabs__btn is-active" aria-current="page">Đăng ký</span>
           </div>
 
-          <!-- ----- Form đăng nhập ----- -->
           <div class="tabs__panel">
-            <form data-login-form novalidate>
+            <form data-register-form novalidate>
 
               <div class="field">
-                <label class="field__label" for="login-email">Email <span class="field__req" aria-hidden="true">*</span></label>
-                <input class="field__input" type="email" id="login-email" name="email" autocomplete="email" placeholder="email@cuaban.com" required aria-describedby="err-login-email" data-input="email">
-                <span class="field__error" id="err-login-email" data-error-for="loginEmail"></span>
+                <label class="field__label" for="reg-name">Họ và tên <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="text" id="reg-name" name="hoTen" autocomplete="name" placeholder="Nguyễn Thị Lan" required aria-describedby="err-reg-name" data-input="hoTen">
+                <span class="field__error" id="err-reg-name" data-error-for="regHoTen"></span>
               </div>
 
               <div class="field">
-                <label class="field__label" for="login-password">Mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+                <label class="field__label" for="reg-email">Email <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="email" id="reg-email" name="email" autocomplete="email" placeholder="email@cuaban.com" required aria-describedby="hint-reg-email err-reg-email" data-input="email">
+                <span class="field__hint" id="hint-reg-email">Email này dùng để đăng nhập và nhận thông tin đơn hàng.</span>
+                <span class="field__error" id="err-reg-email" data-error-for="regEmail"></span>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-phone">Số điện thoại <span class="field__req" aria-hidden="true">*</span></label>
+                <input class="field__input" type="tel" id="reg-phone" name="soDienThoai" autocomplete="tel" inputmode="numeric" placeholder="0912 345 678" required aria-describedby="err-reg-phone" data-input="soDienThoai">
+                <span class="field__error" id="err-reg-phone" data-error-for="regSoDienThoai"></span>
+              </div>
+
+              <!-- Hai ô không bắt buộc: dùng để gợi ý sản phẩm và tặng quà sinh nhật -->
+              <div class="auth__grid">
+                <div class="field">
+                  <label class="field__label" for="reg-birthday">Ngày sinh</label>
+                  <input class="field__input" type="date" id="reg-birthday" name="ngaySinh" autocomplete="bday" aria-describedby="err-reg-birthday" data-input="ngaySinh">
+                  <span class="field__error" id="err-reg-birthday" data-error-for="regNgaySinh"></span>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="reg-skin">Loại da</label>
+                  <select class="field__select" id="reg-skin" name="loaiDa" data-input="loaiDa">
+                    <option value="">Chưa rõ / để Lá Sen tư vấn</option>
+                    <option value="da-thuong">Da thường</option>
+                    <option value="da-kho">Da khô</option>
+                    <option value="da-dau">Da dầu</option>
+                    <option value="da-hon-hop">Da hỗn hợp</option>
+                    <option value="da-nhay-cam">Da nhạy cảm</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="reg-password">Mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
                 <div class="field__control">
-                  <input class="field__input" type="password" id="login-password" name="matKhau" autocomplete="current-password" placeholder="Nhập mật khẩu" required aria-describedby="err-login-password" data-input="matKhau">
-                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="login-password">
+                  <input class="field__input" type="password" id="reg-password" name="matKhau" autocomplete="new-password" placeholder="Ít nhất 8 ký tự" required aria-describedby="hint-reg-password err-reg-password" data-input="matKhau">
+                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="reg-password">
                     <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
                   </button>
                 </div>
-                <span class="field__error" id="err-login-password" data-error-for="loginMatKhau"></span>
+                <span class="field__hint" id="hint-reg-password">Tối thiểu 8 ký tự, nên có cả chữ và số.</span>
+                <span class="field__error" id="err-reg-password" data-error-for="regMatKhau"></span>
               </div>
 
-              <div class="auth__row">
+              <div class="field">
+                <label class="field__label" for="reg-password2">Nhập lại mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+                <div class="field__control">
+                  <input class="field__input" type="password" id="reg-password2" name="nhapLaiMatKhau" autocomplete="new-password" placeholder="Gõ lại mật khẩu ở trên" required aria-describedby="err-reg-password2" data-input="nhapLaiMatKhau">
+                  <button class="field__action" type="button" aria-label="Hiện mật khẩu" aria-pressed="false" data-toggle-password="reg-password2">
+                    <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                  </button>
+                </div>
+                <span class="field__error" id="err-reg-password2" data-error-for="regNhapLaiMatKhau"></span>
+              </div>
+
+              <!-- Hai lựa chọn cuối: một cái bắt buộc, một cái tuỳ khách -->
+              <div class="auth__checks">
+                <div class="auth__check">
+                  <label class="check">
+                    <input class="check__input" type="checkbox" name="dongY" required aria-describedby="hint-reg-dongy" data-input="dongY">
+                    <span class="check__text">Tôi đồng ý để Lá Sen lưu thông tin đơn hàng của tôi.
+                      <span class="field__req" aria-hidden="true">*</span></span>
+                  </label>
+                  <!-- Link tách khỏi label để bấm xem chính sách không tick nhầm ô -->
+                  <span class="field__hint" id="hint-reg-dongy">Xem <a class="auth__link" href="contact.html">chính sách bảo mật</a> của Lá Sen.</span>
+                  <span class="field__error" data-error-for="regDongY"></span>
+                </div>
+
                 <label class="check">
-                  <input class="check__input" type="checkbox" name="nhoDangNhap" data-input="nhoDangNhap">
-                  <span class="check__text">Nhớ đăng nhập</span>
+                  <input class="check__input" type="checkbox" name="nhanThu" checked data-input="nhanThu">
+                  <span class="check__text">Nhận thư chăm da hằng tháng và mã giảm giá dành riêng cho khách quen.</span>
                 </label>
-                <a class="auth__link" href="contact.html" data-forgot-password>Quên mật khẩu?</a>
               </div>
 
-              <button class="btn btn--primary btn--block btn--lg" type="submit" data-login-submit>Đăng nhập</button>
+              <button class="btn btn--primary btn--block btn--lg auth__submit" type="submit" data-register-submit>Tạo tài khoản</button>
 
-              <p class="auth__switch">Chưa có tài khoản?
-                <a class="auth__link" href="register.html">Đăng ký ngay</a>
+              <p class="auth__switch">Đã có tài khoản?
+                <a class="auth__link" href="login.html">Đăng nhập</a>
               </p>
             </form>
           </div>

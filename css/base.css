@@ -10,90 +10,139 @@
      Hồng sen đậm  = màu chủ đạo, nút và tiêu đề
      Hồng phấn     = nền dịu, viền, chip
      Đỏ            = giá sale và flash sale, chỉ dùng cho con số  */
-  --c-primary:      #D6246B;   /* hồng sen đậm — màu chủ đạo */
-  --c-primary-dark: #A8144F;   /* hồng mận — hover, nhấn mạnh */
-  --c-primary-soft: #F27BA9;   /* hồng trung — viền, icon phụ */
-  --c-primary-tint: #FFE7F0;   /* hồng phấn — nền chip, badge mềm */
-  --c-paper:        #FFF5F8;   /* nền trang ngả hồng */
-  --c-surface:      #FFFFFF;   /* nền thẻ, ô nhập */
-  --c-ink:          #2B1620;   /* mực đậm ngả mận */
-  --c-ink-muted:    #7A5F6C;   /* chữ phụ */
-  --c-sale:         #E8342F;   /* đỏ — giá sale, flash sale, lỗi */
-  --c-line:         #F3DCE5;   /* đường kẻ, viền */
-  --c-gold:         #E9A23B;   /* vàng — sao đánh giá, huy hiệu */
-  --c-gold-soft:    #F7D69A;   /* vàng nhạt — hover, glow */
-  --c-green:        #2E8B62;   /* xanh lá sen — chi tiết phụ trên banner */
+  --c-primary: #D6246B;
+  /* hồng sen đậm — màu chủ đạo */
+  --c-primary-dark: #A8144F;
+  /* hồng mận — hover, nhấn mạnh */
+  --c-primary-soft: #F27BA9;
+  /* hồng trung — viền, icon phụ */
+  --c-primary-tint: #FFE7F0;
+  /* hồng phấn — nền chip, badge mềm */
+  --c-paper: #FFF5F8;
+  /* nền trang ngả hồng */
+  --c-surface: #FFFFFF;
+  /* nền thẻ, ô nhập */
+  --c-ink: #2B1620;
+  /* mực đậm ngả mận */
+  --c-ink-muted: #7A5F6C;
+  /* chữ phụ */
+  --c-sale: #E8342F;
+  /* đỏ — giá sale, flash sale, lỗi */
+  --c-line: #F3DCE5;
+  /* đường kẻ, viền */
+  --c-gold: #E9A23B;
+  /* vàng — sao đánh giá, huy hiệu */
+  --c-gold-soft: #F7D69A;
+  /* vàng nhạt — hover, glow */
+  --c-green: #2E8B62;
+  /* xanh lá sen — chi tiết phụ trên banner */
 
   /* Chữ */
   --f-body: 'Be Vietnam Pro', system-ui, sans-serif;
   --f-head: 'Be Vietnam Pro', system-ui, sans-serif;
 
-  --fs-xs:   0.8125rem;
-  --fs-sm:   0.875rem;
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.875rem;
   --fs-base: 1rem;
-  --fs-lg:   1.25rem;
-  --fs-xl:   1.75rem;
-  --fs-2xl:  2.5rem;
+  --fs-lg: 1.25rem;
+  --fs-xl: 1.75rem;
+  --fs-2xl: 2.5rem;
 
   /* Khoảng cách — thang 4px */
-  --sp-1: 0.25rem;  --sp-2: 0.5rem;  --sp-3: 0.75rem;
-  --sp-4: 1rem;     --sp-6: 1.5rem;  --sp-8: 2rem;
-  --sp-12: 3rem;    --sp-16: 4rem;
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-6: 1.5rem;
+  --sp-8: 2rem;
+  --sp-12: 3rem;
+  --sp-16: 4rem;
 
   /* Khác */
-  --radius:    10px;
+  --radius: 10px;
   --radius-sm: 6px;
   --radius-pill: 999px;
-  --shadow:    0 2px 8px rgba(168, 20, 79, 0.10);
+  --shadow: 0 2px 8px rgba(168, 20, 79, 0.10);
   --container: 1200px;
-  --header-h:  76px;
-  --catnav-h:  46px;
+  --header-h: 76px;
+  --catnav-h: 46px;
 
   /* ── Premium tokens ── */
-  --shadow-sm:   0 1px 3px rgba(168, 20, 79, 0.08);
-  --shadow-md:   0 4px 16px rgba(168, 20, 79, 0.13);
-  --shadow-lg:   0 8px 32px rgba(168, 20, 79, 0.16);
+  --shadow-sm: 0 1px 3px rgba(168, 20, 79, 0.08);
+  --shadow-md: 0 4px 16px rgba(168, 20, 79, 0.13);
+  --shadow-lg: 0 8px 32px rgba(168, 20, 79, 0.16);
   --shadow-glow: 0 0 20px rgba(214, 36, 107, 0.28);
   --shadow-card-hover: 0 12px 28px rgba(168, 20, 79, 0.16);
 
   --grad-primary: linear-gradient(135deg, #8E0E43 0%, #D6246B 55%, #F0568F 100%);
-  --grad-warm:    linear-gradient(135deg, #D6246B 0%, #F27BA9 100%);
-  --grad-flash:   linear-gradient(90deg, #E8342F 0%, #F0568F 45%, #D6246B 100%);
-  --grad-shine:   linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.22) 50%, transparent 60%);
+  --grad-warm: linear-gradient(135deg, #D6246B 0%, #F27BA9 100%);
+  --grad-flash: linear-gradient(90deg, #E8342F 0%, #F0568F 45%, #D6246B 100%);
+  --grad-shine: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --ease-out:    cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --glass-bg:   rgba(255, 255, 255, 0.94);
+  --glass-bg: rgba(255, 255, 255, 0.94);
   --glass-blur: 14px;
 }
 
 /* ---------- Keyframes ---------- */
 
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes shimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
 }
 
 @keyframes pulseGlow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(214, 36, 107, 0.30); }
-  50%      { box-shadow: 0 0 12px 4px rgba(214, 36, 107, 0.14); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(214, 36, 107, 0.30);
+  }
+
+  50% {
+    box-shadow: 0 0 12px 4px rgba(214, 36, 107, 0.14);
+  }
 }
 
 /* Dùng cho tia sét ở tiêu đề flash sale */
 @keyframes throb {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.08); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 /* ---------- Reset ---------- */
@@ -190,15 +239,34 @@ h4 {
   text-wrap: balance;
 }
 
-h1 { font-size: var(--fs-xl); }
-h2 { font-size: var(--fs-lg); }
-h3 { font-size: var(--fs-base); }
-h4 { font-size: var(--fs-sm); }
+h1 {
+  font-size: var(--fs-xl);
+}
+
+h2 {
+  font-size: var(--fs-lg);
+}
+
+h3 {
+  font-size: var(--fs-base);
+}
+
+h4 {
+  font-size: var(--fs-sm);
+}
 
 @media (min-width: 768px) {
-  h1 { font-size: var(--fs-2xl); }
-  h2 { font-size: var(--fs-xl); }
-  h3 { font-size: var(--fs-lg); }
+  h1 {
+    font-size: var(--fs-2xl);
+  }
+
+  h2 {
+    font-size: var(--fs-xl);
+  }
+
+  h3 {
+    font-size: var(--fs-lg);
+  }
 }
 
 p {

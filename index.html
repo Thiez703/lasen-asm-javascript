@@ -319,9 +319,11 @@
        trên màn hình vì vai trò dẫn dắt thị giác đã do slider banner đảm nhiệm. -->
     <h1 class="sr-only">Lá Sen — mỹ phẩm chăm sóc da từ sen và thảo mộc Việt Nam</h1>
 
-    <!-- ----- 1. Banner: slider lớn + hai banner phụ ----- -->
+    <!-- ----- 1. Banner: slider lớn ----- -->
     <section aria-label="Ưu đãi và giới thiệu nổi bật">
-      <div class="container hero-row">
+      <!-- Slider nằm ngoài .container để trải hết chiều ngang màn hình;
+         phần chữ bên trong tự canh theo lề container trên màn rộng. -->
+      <div class="hero-row">
 
         <div class="slider hero-slider" data-slider>
           <div class="slider__viewport">
@@ -336,17 +338,37 @@
                     </span>
                     <h2 class="hero__title">Lá Sen</h2>
                     <p class="hero__tagline">Dưỡng da dịu lành từ sen Việt</p>
-                    <p class="hero__text">Sữa rửa mặt · Serum · Kem dưỡng · Chống nắng</p>
+                    <p class="hero__text">Sữa rửa mặt · Serum · Kem dưỡng · Chống nắng — công thức tối giản,
+                      không cồn khô, hợp cả da nhạy cảm.</p>
                     <div class="hero__actions">
                       <a class="btn btn--primary btn--lg" href="products.html">Mua ngay</a>
                       <a class="btn btn--outline btn--lg" href="products.html?sale=1">Xem ưu đãi</a>
                     </div>
-                    <p class="hero__note">Freeship đơn từ 299k · Giao nhanh 2h nội thành Cần Thơ</p>
+                    <ul class="hero__perks">
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-truck"></use>
+                        </svg>
+                        Freeship từ 299k
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-bolt"></use>
+                        </svg>
+                        Giao 2h nội thành Cần Thơ
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-refresh"></use>
+                        </svg>
+                        Đổi trả 7 ngày
+                      </li>
+                    </ul>
                   </div>
 
                   <!-- Hoa sen trên lá, hai bên là hũ kem và chai dưỡng -->
-                  <div class="hero__art" aria-hidden="true">
-                    <svg viewBox="0 0 420 300" focusable="false">
+                  <div class="hero__art">
+                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
                       <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
 
                       <circle cx="120" cy="118" r="7" fill="#F9BBD3" />
@@ -411,12 +433,31 @@
                       <a class="btn btn--primary btn--lg" href="product-detail.html?id=p2">Mua ngay 289.000đ</a>
                       <a class="btn btn--outline btn--lg" href="compare.html">So sánh serum</a>
                     </div>
-                    <p class="hero__note">Giá gốc 385.000đ · Còn 28 lọ tại kho Cần Thơ</p>
+                    <ul class="hero__perks">
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-tag"></use>
+                        </svg>
+                        Giá gốc 385.000đ
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-box"></use>
+                        </svg>
+                        Còn 28 lọ tại kho Cần Thơ
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-shield"></use>
+                        </svg>
+                        Tem chống giả
+                      </li>
+                    </ul>
                   </div>
 
                   <!-- Lọ serum có ống nhỏ giọt, cạnh lát cam vitamin C -->
-                  <div class="hero__art" aria-hidden="true">
-                    <svg viewBox="0 0 420 300" focusable="false">
+                  <div class="hero__art">
+                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
                       <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
                       <ellipse cx="228" cy="262" rx="140" ry="18" fill="#F9BBD3" opacity=".7" />
 
@@ -444,6 +485,12 @@
                       <path d="M336 196c0 6-4 10-10 10s-10-4-10-10 10-19 10-19 10 13 10 19z" fill="#F49BC0" />
                       <path d="M312 236c0 5-3 8-8 8s-8-3-8-8 8-15 8-15 8 10 8 15z" fill="#FBC3D8" />
                     </svg>
+
+                    <!-- Con dấu giảm giá nghiêng ở góc trên phải của hình -->
+                    <span class="hero__stamp" aria-hidden="true">
+                      <b>−25%</b>
+                      <small>hôm nay</small>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -457,17 +504,37 @@
                     </span>
                     <h2 class="hero__title">Soi da miễn phí</h2>
                     <p class="hero__tagline">Ghé tiệm, đo tình trạng da trong 15 phút</p>
-                    <p class="hero__text">128 Trần Hưng Đạo, quận Ninh Kiều · Mở cửa 8:00 – 21:00 mỗi ngày.</p>
+                    <p class="hero__text">Kỹ thuật viên soi da bằng đèn Wood, đọc kết quả và gợi ý routine
+                      ngay tại chỗ — không tính phí, không ép mua.</p>
                     <div class="hero__actions">
                       <a class="btn btn--primary btn--lg" href="contact.html">Xem đường đi</a>
                       <a class="btn btn--outline btn--lg" href="contact.html">Đặt lịch tư vấn</a>
                     </div>
-                    <p class="hero__note">Không tính phí, không ép mua</p>
+                    <ul class="hero__perks">
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-pin"></use>
+                        </svg>
+                        128 Trần Hưng Đạo, Ninh Kiều
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-clock"></use>
+                        </svg>
+                        8:00 – 21:00 mỗi ngày
+                      </li>
+                      <li class="hero__perk">
+                        <svg class="icon" aria-hidden="true">
+                          <use href="#i-chat"></use>
+                        </svg>
+                        Tư vấn 1–1
+                      </li>
+                    </ul>
                   </div>
 
                   <!-- Mặt tiền cửa hàng với mái hiên sọc và ghim bản đồ -->
-                  <div class="hero__art" aria-hidden="true">
-                    <svg viewBox="0 0 420 300" focusable="false">
+                  <div class="hero__art">
+                    <svg viewBox="0 0 420 300" focusable="false" aria-hidden="true">
                       <circle cx="235" cy="138" r="118" fill="#FFFFFF" opacity=".55" />
                       <ellipse cx="225" cy="262" rx="150" ry="18" fill="#F9BBD3" opacity=".7" />
 
@@ -522,29 +589,6 @@
               data-slider-dot="2"></button>
           </div>
         </div>
-
-        <div class="hero-side">
-          <a class="side-banner" href="products.html?cat=chong-nang">
-            <img class="side-banner__img" src="https://picsum.photos/seed/lasen-side-1/800/600"
-              alt="Tuýp kem chống nắng đặt cạnh chiếc nón lá dưới nắng">
-            <div class="side-banner__body">
-              <span class="side-banner__tag">Mùa nắng</span>
-              <span class="side-banner__title">Chống nắng vật lý SPF50+</span>
-              <span class="side-banner__text">Không cồn, không hương liệu — hợp da nhạy cảm</span>
-            </div>
-          </a>
-
-          <a class="side-banner" href="products.html?cat=lam-sach">
-            <img class="side-banner__img" src="https://picsum.photos/seed/lasen-side-2/800/600"
-              alt="Bộ đôi tẩy trang và sữa rửa mặt Lá Sen trên kệ gỗ">
-            <div class="side-banner__body">
-              <span class="side-banner__tag">Combo</span>
-              <span class="side-banner__title">Bộ đôi làm sạch giảm 15%</span>
-              <span class="side-banner__text">Tẩy trang dầu hạt sen + sữa rửa mặt tràm trà</span>
-            </div>
-          </a>
-        </div>
-
       </div>
     </section>
 

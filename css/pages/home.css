@@ -11,20 +11,29 @@
 }
 
 /* =========================================================
-   1. Banner đầu trang — slider lớn + hai banner phụ
+   1. Banner đầu trang — slider lớn
    ========================================================= */
 
 .hero-row {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-3);
   padding-top: var(--sp-4);
 }
 
+/* Banner trải hết chiều ngang màn hình: bỏ bo góc, viền và đổ bóng
+   để mép slider chạm sát cạnh trình duyệt, chân banner không có vạch. */
 .hero-slider {
-  border-radius: 14px;
-  border: 1px solid var(--c-line);
-  box-shadow: var(--shadow-sm);
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Nút mũi tên đứng hẳn ngoài lề container (rộng 48px + 16px khoảng hở)
+   để không đè lên chữ; màn hẹp thì nép vào sát mép, vẫn cách chữ 20px. */
+.hero-slider .slider__btn--prev {
+  left: max(var(--sp-3), calc((100% - var(--container)) / 2 - 64px));
+}
+
+.hero-slider .slider__btn--next {
+  right: max(var(--sp-3), calc((100% - var(--container)) / 2 - 64px));
 }
 
 /* Slide cao bằng nhau: khung slider lấy chiều cao của slide dài nhất,
@@ -34,6 +43,11 @@
 }
 
 .hero {
+  /* Hoạ tiết bông sen dùng lại dáng của icon #i-lotus, vẽ thẳng bằng data URI
+     nên rải được ở nhiều chỗ mà không phải lặp SVG trong từng slide.
+     Bản trắng dành cho nửa trái nền hồng đậm, bản hồng cho nửa phải nhạt. */
+  --lotus-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 42'%3E%3Cg fill='%23fff' opacity='.5'%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-68 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(68 24 28.5)'/%3E%3C/g%3E%3Cg fill='%23fff' opacity='.8'%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-46 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(46 24 28.5)'/%3E%3C/g%3E%3Ccircle cx='24' cy='27' r='2.6' fill='%23fff'/%3E%3C/svg%3E");
+  --lotus-pink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 42'%3E%3Cg fill='%23F27BA9' opacity='.34'%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-68 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(68 24 28.5)'/%3E%3C/g%3E%3Cg fill='%23ED6FA5' opacity='.42'%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-46 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(46 24 28.5)'/%3E%3C/g%3E%3Ccircle cx='24' cy='27' r='2.6' fill='%23E9A23B' opacity='.5'/%3E%3C/svg%3E");
   position: relative;
   display: grid;
   grid-template-columns: 1fr;
@@ -41,23 +55,63 @@
   gap: var(--sp-2);
   flex: 1;
   min-height: 300px;
-  padding: var(--sp-8) var(--sp-6) var(--sp-12);
-  background: linear-gradient(115deg, #FFC2D9 0%, #FFDCE9 46%, #FFF3F7 100%);
+  /* Nền trải hết màn hình nhưng chữ vẫn thẳng hàng với lề container 1200px:
+     phần trăm trong padding tính theo bề ngang của slide. */
+  padding-block: var(--sp-8) var(--sp-12);
+  padding-inline: max(var(--sp-6), calc((100% - var(--container)) / 2 + var(--sp-4)));
+  /* Nhiều lớp quầng màu chồng lên gradient nền cho banner có chiều sâu:
+     trắng sau hình minh hoạ, xanh lá sen góc dưới trái, hồng góc dưới phải. */
+  background:
+    radial-gradient(40rem 26rem at 76% 6%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(32rem 24rem at 0% 100%, rgba(126, 196, 159, 0.38), transparent 62%),
+    radial-gradient(26rem 20rem at 100% 96%, rgba(242, 123, 169, 0.42), transparent 64%),
+    linear-gradient(115deg, #FFAECE 0%, #FFCFE1 44%, #FFEBF2 100%);
   color: var(--c-ink);
   overflow: hidden;
 }
 
-/* Quầng sáng tròn phía sau hình minh hoạ */
+/* Lưới chấm mờ ở dải lề trái, tạo chất liệu cho nền không bị phẳng */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(214, 36, 107, 0.18) 1.4px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 26%);
+  mask-image: linear-gradient(90deg, #000 0%, transparent 26%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Lớp trang trí sau nội dung: quầng sáng cạnh hình minh hoạ và một cụm sen mờ
+   dồn vào khoảng trống giữa cột chữ và hình vẽ; hai mép chỉ để một bông nhỏ. */
 .hero::after {
   content: '';
   position: absolute;
-  top: -32%;
-  right: -10%;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  inset: 0;
   pointer-events: none;
+  background-image:
+    var(--lotus-pink),
+    var(--lotus-pink),
+    var(--lotus-white),
+    var(--lotus-pink),
+    var(--lotus-white),
+    radial-gradient(circle 190px at calc(100% - 110px) 8%, rgba(255, 255, 255, 0.8), transparent 70%);
+  background-repeat: no-repeat;
+  background-position:
+    53% 88%,
+    47% 14%,
+    58% 44%,
+    62% 4%,
+    3% 94%,
+    0 0;
+  background-size:
+    92px 81px,
+    56px 49px,
+    38px 33px,
+    34px 30px,
+    46px 40px,
+    auto;
 }
 
 .hero__body {
@@ -81,6 +135,24 @@
   height: auto;
   max-height: 230px;
   margin-inline: auto;
+}
+
+/* Dưới 768px hình minh hoạ nằm dưới chữ và khá hẹp nên ẩn con dấu đi */
+.hero__stamp {
+  display: none;
+}
+
+.hero__stamp b {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hero__stamp small {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  opacity: 0.92;
 }
 
 /* Viên thuốc trắng có chấm xanh ở đầu banner */
@@ -109,7 +181,13 @@
 
 .hero__title {
   margin-bottom: var(--sp-2);
+  /* Chữ tô bằng gradient hồng sen cho đậm chất thương hiệu; color là màu
+     dự phòng nếu trình duyệt không hỗ trợ background-clip: text. */
   color: var(--c-primary);
+  background-image: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-size: clamp(2rem, 5.5vw, 3.25rem);
   font-weight: 800;
   line-height: 1.05;
@@ -132,12 +210,6 @@
   color: var(--c-ink-muted);
 }
 
-.hero__note {
-  margin-top: var(--sp-4);
-  font-size: var(--fs-xs);
-  color: var(--c-ink-muted);
-}
-
 .hero__actions {
   display: flex;
   flex-wrap: wrap;
@@ -149,10 +221,40 @@
   background-color: var(--c-surface);
 }
 
-/* Chấm và nút điều hướng của slider lớn */
+/* Dải cam kết ngắn ngay dưới nút bấm — thay cho dòng ghi chú cũ */
+.hero__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  list-style: none;
+}
+
+.hero__perk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.6);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+
+.hero__perk .icon {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--c-primary);
+}
+
+/* Chấm và nút điều hướng của slider lớn.
+   Chấm canh thẳng với lề trái của phần chữ thay vì dính mép màn hình. */
 .hero-slider .slider__dots {
   bottom: var(--sp-4);
-  left: var(--sp-6);
+  left: max(var(--sp-4), calc((100% - var(--container)) / 2 + var(--sp-2)));
   transform: none;
   padding: var(--sp-1) var(--sp-2);
   border-radius: var(--radius-pill);
@@ -180,131 +282,97 @@
     display: grid;
     top: 50%;
     bottom: auto;
+    width: 48px;
+    height: 48px;
     transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.92);
     color: var(--c-primary);
     box-shadow: var(--shadow-md);
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-out);
   }
 }
 
 .hero-slider .slider__btn:hover {
   background-color: var(--c-primary);
   color: var(--c-surface);
+  transform: translateY(-50%) scale(1.08);
 }
 
-/* Hai banner phụ xếp cạnh slider */
-.hero-side {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-3);
-}
-
-.side-banner {
-  position: relative;
-  display: block;
-  min-height: 120px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid var(--c-line);
-  color: var(--c-surface);
-}
-
-.side-banner__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.6s var(--ease-out);
-}
-
-.side-banner:hover .side-banner__img {
-  transform: scale(1.06);
-}
-
-.side-banner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(90, 8, 40, 0.15) 0%, rgba(142, 14, 67, 0.86) 100%);
-}
-
-.side-banner__body {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  height: 100%;
-  min-height: 120px;
-  padding: var(--sp-4);
-}
-
-.side-banner__tag {
-  align-self: flex-start;
-  margin-bottom: var(--sp-2);
-  padding: 2px var(--sp-2);
-  border-radius: var(--radius-sm);
-  background-color: var(--c-gold);
-  color: #4A2C00;
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.side-banner__title {
-  color: var(--c-surface);
-  font-family: var(--f-body);
-  font-size: var(--fs-base);
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.side-banner__text {
-  margin-top: var(--sp-1);
-  font-size: var(--fs-xs);
-  opacity: 0.9;
+.hero-slider .slider__btn .icon {
+  width: 1.4em;
+  height: 1.4em;
 }
 
 @media (min-width: 768px) {
   /* Chữ bên trái, hình minh hoạ bên phải.
-     Lề trái rộng để nút mũi tên của slider không đè lên chữ. */
+     Lề trái tối thiểu 80px để nút mũi tên không đè lên chữ. */
   .hero {
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: var(--sp-4);
-    min-height: 380px;
-    padding: var(--sp-8) var(--sp-6) var(--sp-8) calc(var(--sp-16) + var(--sp-1));
+    min-height: 420px;
+    padding-block: var(--sp-8);
+    padding-left: max(calc(var(--sp-16) + var(--sp-4)), calc((100% - var(--container)) / 2 + var(--sp-4)));
+    padding-right: max(var(--sp-6), calc((100% - var(--container)) / 2 + var(--sp-4)));
+  }
+
+  /* Bó khung hình lại đúng bằng bề ngang hình vẽ và canh giữa cột */
+  .hero__art {
+    width: min(100%, 26rem);
+    justify-self: center;
   }
 
   .hero__art svg {
-    max-height: 300px;
+    max-height: none;
+  }
+
+  /* Con dấu giảm giá tròn, nghiêng nhẹ ở góc trên phải của hình */
+  .hero__stamp {
+    position: absolute;
+    top: -6px;
+    right: 2%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    background: var(--grad-warm);
+    box-shadow: var(--shadow-lg);
+    color: var(--c-surface);
+    text-align: center;
+    transform: rotate(-12deg);
   }
 }
 
 @media (min-width: 1024px) {
-  .hero-row {
-    grid-template-columns: minmax(0, 2.15fr) minmax(0, 1fr);
-    gap: var(--sp-4);
-  }
-
   .hero {
-    min-height: 440px;
-    padding-left: calc(var(--sp-16) + var(--sp-1));
+    min-height: 480px;
   }
 
-  .hero__art svg {
-    max-height: 340px;
+  .hero__art {
+    width: min(100%, 30rem);
   }
 
-  .hero-side {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+  .hero__stamp {
+    width: 104px;
+    height: 104px;
   }
 
-  .side-banner,
-  .side-banner__body {
-    min-height: 0;
+  .hero__stamp b {
+    font-size: 1.65rem;
+  }
+}
+
+/* Màn rộng thì phóng hình minh hoạ to hẳn lên cho banner đỡ loãng */
+@media (min-width: 1280px) {
+  .hero {
+    min-height: 520px;
+  }
+
+  .hero__art {
+    width: min(100%, 34rem);
   }
 }
 

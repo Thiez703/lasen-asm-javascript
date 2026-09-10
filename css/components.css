@@ -1263,6 +1263,11 @@
   color: var(--c-ink);
 }
 
+/* Số lượt đánh giá — nhạt hơn điểm số để mắt đọc điểm trước */
+.rating__count {
+  color: var(--c-ink-muted);
+}
+
 .chip {
   padding: var(--sp-2) var(--sp-4);
   border: 1px solid var(--c-line);

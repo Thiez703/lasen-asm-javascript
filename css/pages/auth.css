@@ -124,6 +124,47 @@
   border-bottom-color: currentColor;
 }
 
+/* Hai ô phụ (ngày sinh, loại da) đứng cạnh nhau cho form đăng ký đỡ dài;
+   màn hẹp thì tự xuống dòng vì cột tối thiểu 180px. */
+.auth__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 var(--sp-3);
+}
+
+/* Cụm ô tick cuối form: tách khỏi ô nhập phía trên, các dòng cách đều nhau */
+.auth__checks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  margin-top: var(--sp-2);
+}
+
+/* Ô tick kèm dòng chú thích và chỗ báo lỗi: bó sát vào nhau */
+.auth__check {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.auth__check .field__hint {
+  padding-left: calc(18px + var(--sp-2));
+}
+
+/* Link nằm trong dòng chú thích thì đọc theo cỡ chữ của dòng đó */
+.auth__check .field__hint .auth__link {
+  font-size: inherit;
+}
+
+/* Câu điều khoản dài hai ba dòng nên ô tick phải nằm ngang dòng đầu */
+.auth__checks .check {
+  align-items: flex-start;
+}
+
+.auth__checks .check__input {
+  margin-top: 2px;
+}
+
 .auth__submit {
   margin-top: var(--sp-6);
 }

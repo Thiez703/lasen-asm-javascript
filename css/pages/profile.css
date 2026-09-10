@@ -1,0 +1,713 @@
+/* =========================================================
+   LÁ SEN — profile.css
+   Riêng cho trang tài khoản: thẻ thành viên, hạng khách, điều hướng
+   dạng tab, đơn hàng, sổ địa chỉ và các khối form trong từng mục.
+   ========================================================= */
+
+/* =========================================================
+   1. Bố cục hai cột
+   ========================================================= */
+
+.account {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  align-items: start;
+  margin-bottom: var(--sp-12);
+}
+
+.account__side {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+/* min-width: 0 để bảng đơn hàng dài không kéo giãn cột */
+.account__main {
+  min-width: 0;
+}
+
+@media (min-width: 1024px) {
+  .account {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  /* Cột trái bám theo khi cuộn, chừa chỗ cho header dính ở đỉnh */
+  .account__side {
+    position: sticky;
+    top: calc(var(--header-h) + var(--sp-4));
+  }
+}
+
+/* =========================================================
+   2. Thẻ thành viên
+   ========================================================= */
+
+.account-card {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-6) var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background: linear-gradient(165deg, var(--c-primary-tint) 0%, var(--c-surface) 62%);
+  text-align: center;
+}
+
+/* Chữ cái đầu của tên, dùng thay ảnh đại diện */
+.account-card__avatar {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--sp-2);
+  border-radius: 50%;
+  background: var(--grad-primary);
+  box-shadow: var(--shadow-md);
+  color: var(--c-surface);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.account-card__name {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.account-card__email {
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+  word-break: break-word;
+}
+
+.account-card__since {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.account-card__since .icon {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* =========================================================
+   3. Hạng thành viên và tiến độ chi tiêu
+   ========================================================= */
+
+.tier {
+  padding: var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+}
+
+.tier__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-3);
+}
+
+.tier__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--c-primary-tint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-primary-dark);
+}
+
+/* #i-lotus đã có màu tô sẵn nên phải gỡ nét vẽ mà .icon áp cho icon dạng nét */
+.tier__badge .icon {
+  width: 1.3em;
+  height: 1.3em;
+  stroke: none;
+}
+
+.tier__point {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--c-ink);
+}
+
+.tier__bar {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background-color: var(--c-primary-tint);
+  overflow: hidden;
+}
+
+/* Bề rộng do thuộc tính style trong HTML quyết định */
+.tier__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--grad-warm);
+}
+
+.tier__note {
+  margin-top: var(--sp-3);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+
+.tier__note b {
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+/* =========================================================
+   4. Điều hướng giữa các mục
+   ========================================================= */
+
+.account-nav {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.account-nav__list {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-2);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+}
+
+.account-nav__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: 100%;
+  padding: var(--sp-3);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: left;
+  color: var(--c-ink);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.account-nav__btn .icon {
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  color: var(--c-primary-soft);
+}
+
+.account-nav__btn:hover {
+  background-color: var(--c-primary-tint);
+}
+
+.account-nav__btn.is-active {
+  background-color: var(--c-primary);
+  color: var(--c-surface);
+}
+
+.account-nav__btn.is-active .icon {
+  color: currentColor;
+}
+
+/* Số đơn / số địa chỉ nằm sát mép phải của mục */
+.account-nav__count {
+  min-width: 22px;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--c-primary-tint);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-align: center;
+  color: var(--c-primary-dark);
+}
+
+.account-nav__btn.is-active .account-nav__count {
+  background-color: rgba(255, 255, 255, 0.24);
+  color: var(--c-surface);
+}
+
+/* Đăng xuất tách riêng khỏi nhóm tab */
+.account-nav__btn--out {
+  border: 1px solid var(--c-line);
+  background-color: var(--c-surface);
+  color: var(--c-ink-muted);
+}
+
+.account-nav__btn--out .icon {
+  color: currentColor;
+}
+
+.account-nav__btn--out:hover {
+  border-color: var(--c-sale);
+  background-color: rgba(232, 52, 47, 0.06);
+  color: var(--c-sale);
+}
+
+/* Dưới 1024px các mục xếp ngang thành một dải cuộn được, đỡ tốn chiều cao */
+@media (max-width: 1023px) {
+  .account-nav__list {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .account-nav__btn {
+    white-space: nowrap;
+  }
+
+  .account-nav__count {
+    margin-left: 0;
+  }
+
+  .account-nav__btn--out {
+    justify-self: start;
+  }
+}
+
+/* =========================================================
+   5. Khung nội dung của từng mục
+   ========================================================= */
+
+.panel {
+  padding: var(--sp-6) var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+}
+
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  margin-bottom: var(--sp-6);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.panel__title {
+  order: 1;
+  font-size: var(--fs-xl);
+  font-weight: 700;
+}
+
+.panel__head-btn {
+  order: 2;
+  flex: none;
+  margin-left: auto;
+}
+
+/* Mô tả luôn xuống dòng riêng, nằm dưới tiêu đề và nút */
+.panel__desc {
+  order: 3;
+  flex: 1 1 100%;
+  max-width: 68ch;
+  font-size: var(--fs-sm);
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+
+.panel__body {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.panel__body--narrow {
+  max-width: 30rem;
+}
+
+/* .field mang sẵn margin-bottom cho form thường; trong lưới thì gap lo việc đó */
+.panel__body .field,
+.form-grid .field {
+  margin-bottom: 0;
+}
+
+.panel__filters {
+  margin-bottom: var(--sp-4);
+}
+
+.panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .panel {
+    padding: var(--sp-6);
+  }
+}
+
+/* =========================================================
+   6. Đơn hàng
+   ========================================================= */
+
+.orders {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.order {
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+  overflow: hidden;
+}
+
+.order__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--c-line);
+  background-color: var(--c-paper);
+}
+
+.order__code {
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.order__date {
+  margin-top: 2px;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+/* ---------- Nhãn trạng thái ---------- */
+
+/* Bốn tông màu trạng thái nằm ngoài bảng token vì chỉ dùng ở đây:
+   vàng chờ xử lý, xanh dương đang giao, xanh lá đã xong, đỏ đã huỷ. */
+.order-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.order-status .icon {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.order-status--wait {
+  background-color: #FFF2DC;
+  color: #8A5A12;
+}
+
+.order-status--ship {
+  background-color: #E4F0FF;
+  color: #17568F;
+}
+
+.order-status--done {
+  background-color: #E2F4EC;
+  color: #1F6B4B;
+}
+
+.order-status--cancel {
+  background-color: #FDEBEA;
+  color: #B32621;
+}
+
+/* ---------- Danh sách sản phẩm trong đơn ---------- */
+
+.order__items {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+
+/* Mobile: ảnh và tên chiếm hai dòng bên trái, số lượng và giá xếp dọc bên phải */
+.order__item {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: var(--sp-1) var(--sp-3);
+  align-items: center;
+}
+
+.order__thumb,
+.order__info {
+  grid-row: 1 / span 2;
+}
+
+.order__thumb {
+  display: block;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-paper);
+  overflow: hidden;
+}
+
+.order__thumb img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.order__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.order__name {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--c-ink);
+}
+
+.order__name:hover {
+  color: var(--c-primary);
+}
+
+.order__meta {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.order__qty {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: end;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+  text-align: right;
+}
+
+.order__price {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: start;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* ---------- Ghi chú và chân đơn ---------- */
+
+.order__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: var(--sp-3);
+  border-radius: var(--radius);
+  background-color: var(--c-paper);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+
+.order__note .icon {
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: 2px;
+  color: var(--c-primary-soft);
+}
+
+.order__note--warn {
+  background-color: rgba(232, 52, 47, 0.07);
+}
+
+.order__note--warn .icon {
+  color: var(--c-sale);
+}
+
+.order__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-top: 1px solid var(--c-line);
+  background-color: var(--c-paper);
+}
+
+.order__total {
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.order__total-value {
+  margin-left: var(--sp-2);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  color: var(--c-primary);
+}
+
+.order__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+/* Đơn đã huỷ: làm nhạt phần hàng hoá để mắt bỏ qua trước */
+.order--cancelled .order__items {
+  opacity: 0.6;
+}
+
+@media (min-width: 640px) {
+  /* Đủ chỗ thì trải cả bốn cột trên một dòng */
+  .order__item {
+    grid-template-columns: 56px minmax(0, 1fr) 56px 110px;
+    gap: var(--sp-3);
+  }
+
+  .order__thumb,
+  .order__info {
+    grid-row: 1;
+  }
+
+  .order__qty {
+    grid-column: 3;
+    align-self: center;
+    text-align: center;
+  }
+
+  .order__price {
+    grid-column: 4;
+    grid-row: 1;
+    align-self: center;
+  }
+}
+
+/* =========================================================
+   7. Sổ địa chỉ
+   ========================================================= */
+
+.addresses {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.address {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+}
+
+/* Địa chỉ mặc định viền hồng và có quầng nhạt bao ngoài cho dễ nhận */
+.address--default {
+  border-color: var(--c-primary-soft);
+  box-shadow: 0 0 0 3px var(--c-primary-tint);
+}
+
+.address__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.address__name {
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.address__tag {
+  padding: 2px var(--sp-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-paper);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--c-ink-muted);
+}
+
+.address__line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+  font-size: var(--fs-sm);
+  line-height: 1.55;
+}
+
+.address__line .icon {
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+  margin-top: 3px;
+  color: var(--c-primary-soft);
+}
+
+/* Thụt vào bằng đúng bề ngang icon để thẳng hàng với dòng địa chỉ */
+.address__note {
+  padding-left: calc(1.15em + var(--sp-2));
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  color: var(--c-ink-muted);
+}
+
+/* margin-top: auto để hàng nút luôn nằm sát đáy dù thẻ cao thấp khác nhau */
+.address__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--c-line);
+}
+
+.address__remove {
+  color: var(--c-sale);
+}
+
+.address__remove:hover {
+  background-color: rgba(232, 52, 47, 0.08);
+  color: var(--c-sale);
+}
+
+@media (min-width: 768px) {
+  .addresses {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
