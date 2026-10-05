@@ -1,0 +1,251 @@
+/* =========================================================
+   LÁ SEN — compare.css
+   Riêng cho trang so sánh sản phẩm.
+   ========================================================= */
+
+.compare {
+  padding-bottom: var(--sp-4);
+}
+
+.compare__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.compare__count {
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.compare__count strong {
+  color: var(--c-ink);
+}
+
+/* Mobile: bảng cuộn ngang, cột tiêu chí dính bên trái */
+.compare-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+}
+
+.compare-table {
+  min-width: 720px;
+  font-size: var(--fs-sm);
+}
+
+/* ---------- Cột tiêu chí ---------- */
+
+.compare-table__corner,
+.compare-table__label {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  width: 148px;
+  min-width: 148px;
+  padding: var(--sp-3) var(--sp-4);
+  text-align: left;
+  vertical-align: middle;
+  background-color: var(--c-paper);
+  border-right: 1px solid var(--c-line);
+  border-bottom: 1px solid var(--c-line);
+  font-family: var(--f-body);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.compare-table__corner {
+  z-index: 3;
+}
+
+/* ---------- Đầu cột sản phẩm ---------- */
+
+.compare-col {
+  position: relative;
+  width: 220px;
+  min-width: 200px;
+  padding: var(--sp-6) var(--sp-4) var(--sp-4);
+  vertical-align: top;
+  text-align: center;
+  background-color: var(--c-surface);
+  border-bottom: 1px solid var(--c-line);
+  font-weight: 400;
+}
+
+.compare-col + .compare-col {
+  border-left: 1px solid var(--c-line);
+}
+
+.compare-col__remove {
+  position: absolute;
+  top: var(--sp-2);
+  right: var(--sp-2);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  color: var(--c-ink-muted);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.compare-col__remove:hover {
+  background-color: var(--c-paper);
+  color: var(--c-sale);
+}
+
+.compare-col__media {
+  display: block;
+  width: 112px;
+  margin: 0 auto var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.compare-col__media img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.compare-col__name {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--c-ink);
+}
+
+.compare-col__name:hover {
+  color: var(--c-primary);
+}
+
+.compare-col__brand {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--c-ink-muted);
+}
+
+/* Ô trống — mời chọn thêm sản phẩm */
+.compare-col--empty {
+  background-color: var(--c-paper);
+}
+
+.compare-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: 196px;
+  padding: var(--sp-4);
+  border: 1px dashed var(--c-line);
+  border-radius: var(--radius-sm);
+  color: var(--c-primary);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.compare-pick:hover {
+  border-color: var(--c-primary);
+  background-color: var(--c-surface);
+}
+
+.compare-pick__text {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.compare-pick__hint {
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  color: var(--c-ink-muted);
+}
+
+/* ---------- Ô dữ liệu ---------- */
+
+.compare-cell {
+  padding: var(--sp-3) var(--sp-4);
+  vertical-align: top;
+  border-bottom: 1px solid var(--c-line);
+  border-left: 1px solid var(--c-line);
+  color: var(--c-ink-muted);
+  line-height: 1.5;
+}
+
+.compare-table tbody tr:last-child .compare-cell,
+.compare-table tbody tr:last-child .compare-table__label {
+  border-bottom: 0;
+}
+
+.compare-cell--empty {
+  background-color: var(--c-paper);
+  color: var(--c-line);
+  text-align: center;
+}
+
+.compare-cell__price {
+  display: block;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--c-sale);
+}
+
+.compare-cell:not(:has(.compare-cell__price-old)) .compare-cell__price {
+  color: var(--c-primary);
+}
+
+.compare-cell__price-old {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.compare-cell__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.compare-cell__list li {
+  position: relative;
+  padding-left: var(--sp-4);
+}
+
+.compare-cell__list li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background-color: var(--c-primary-soft);
+}
+
+/* ---------- Từ 1024px: bảng không cần cuộn nữa ---------- */
+
+@media (min-width: 1024px) {
+  .compare-table {
+    min-width: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .compare-table__corner,
+  .compare-table__label {
+    position: static;
+    width: 200px;
+    min-width: 0;
+  }
+
+  .compare-col {
+    width: auto;
+  }
+}

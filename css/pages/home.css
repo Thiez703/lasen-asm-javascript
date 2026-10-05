@@ -1,0 +1,1067 @@
+/* =========================================================
+   LÁ SEN — home.css
+   Riêng cho trang chủ: banner, voucher, danh mục, flash sale,
+   dải sản phẩm, thương hiệu, bài viết.
+   ========================================================= */
+
+/* Dải nền hồng phấn xen kẽ để các khối sản phẩm không dính vào nhau */
+.section--alt {
+  background-color: var(--c-primary-tint);
+  border-block: 1px solid var(--c-line);
+}
+
+/* =========================================================
+   1. Banner đầu trang — ảnh toàn chiều rộng
+   ========================================================= */
+
+.hero-banner {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.hero-banner__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+/* Overlay: nút bấm + cam kết, đặt ngay dưới phần chữ trên banner */
+.hero-banner__overlay {
+  position: absolute;
+  left: 10%;
+  bottom: 18%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-6);
+  line-height: 1.5;
+}
+
+/* Nhóm nút CTA */
+.hero-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.hero-banner__actions .btn {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 20px rgba(214, 36, 107, 0.18);
+  font-weight: 700;
+}
+
+.hero-banner__actions .btn--outline {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.hero-banner__actions .btn--outline:hover {
+  background-color: var(--c-primary);
+  color: #fff;
+}
+
+/* Dải cam kết nhỏ dưới nút */
+.hero-banner__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.hero-banner__perk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+
+.hero-banner__perk .icon {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--c-primary);
+}
+
+/* Responsive: mobile nhỏ thì thu gọn */
+@media (max-width: 575px) {
+  .hero-banner__overlay {
+    padding: var(--sp-2) var(--sp-3);
+    gap: var(--sp-2);
+  }
+
+  .hero-banner__actions .btn {
+    padding: var(--sp-2) var(--sp-4);
+    font-size: var(--fs-sm);
+  }
+
+  .hero-banner__perk {
+    font-size: 0.6875rem;
+    padding: 2px var(--sp-2);
+  }
+}
+
+.hero-row {
+  padding-top: var(--sp-4);
+}
+
+/* Banner trải hết chiều ngang màn hình: bỏ bo góc, viền và đổ bóng
+   để mép slider chạm sát cạnh trình duyệt, chân banner không có vạch. */
+.hero-slider {
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Nút mũi tên đứng hẳn ngoài lề container (rộng 48px + 16px khoảng hở)
+   để không đè lên chữ; màn hẹp thì nép vào sát mép, vẫn cách chữ 20px. */
+.hero-slider .slider__btn--prev {
+  left: max(var(--sp-3), calc((100% - var(--container)) / 2 - 64px));
+}
+
+.hero-slider .slider__btn--next {
+  right: max(var(--sp-3), calc((100% - var(--container)) / 2 - 64px));
+}
+
+/* Slide cao bằng nhau: khung slider lấy chiều cao của slide dài nhất,
+   nên nền hồng phải kéo đầy ô thay vì chỉ cao bằng nội dung. */
+.hero-slider .slider__slide {
+  display: flex;
+}
+
+.hero {
+  /* Hoạ tiết bông sen dùng lại dáng của icon #i-lotus, vẽ thẳng bằng data URI
+     nên rải được ở nhiều chỗ mà không phải lặp SVG trong từng slide.
+     Bản trắng dành cho nửa trái nền hồng đậm, bản hồng cho nửa phải nhạt. */
+  --lotus-white: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 42'%3E%3Cg fill='%23fff' opacity='.5'%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-68 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(68 24 28.5)'/%3E%3C/g%3E%3Cg fill='%23fff' opacity='.8'%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-46 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(46 24 28.5)'/%3E%3C/g%3E%3Ccircle cx='24' cy='27' r='2.6' fill='%23fff'/%3E%3C/svg%3E");
+  --lotus-pink: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 42'%3E%3Cg fill='%23F27BA9' opacity='.34'%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-68 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(-34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(34 24 28.5)'/%3E%3Cellipse cx='24' cy='18' rx='4.4' ry='10.5' transform='rotate(68 24 28.5)'/%3E%3C/g%3E%3Cg fill='%23ED6FA5' opacity='.42'%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-46 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(-16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(16 24 28.5)'/%3E%3Cellipse cx='24' cy='20' rx='3.7' ry='8.6' transform='rotate(46 24 28.5)'/%3E%3C/g%3E%3Ccircle cx='24' cy='27' r='2.6' fill='%23E9A23B' opacity='.5'/%3E%3C/svg%3E");
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: var(--sp-2);
+  flex: 1;
+  min-height: 300px;
+  /* Nền trải hết màn hình nhưng chữ vẫn thẳng hàng với lề container 1200px:
+     phần trăm trong padding tính theo bề ngang của slide. */
+  padding-block: var(--sp-8) var(--sp-12);
+  padding-inline: max(var(--sp-6), calc((100% - var(--container)) / 2 + var(--sp-4)));
+  /* Nhiều lớp quầng màu chồng lên gradient nền cho banner có chiều sâu:
+     trắng sau hình minh hoạ, xanh lá sen góc dưới trái, hồng góc dưới phải. */
+  background:
+    radial-gradient(40rem 26rem at 76% 6%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(32rem 24rem at 0% 100%, rgba(126, 196, 159, 0.38), transparent 62%),
+    radial-gradient(26rem 20rem at 100% 96%, rgba(242, 123, 169, 0.42), transparent 64%),
+    linear-gradient(115deg, #FFAECE 0%, #FFCFE1 44%, #FFEBF2 100%);
+  color: var(--c-ink);
+  overflow: hidden;
+}
+
+/* Lưới chấm mờ ở dải lề trái, tạo chất liệu cho nền không bị phẳng */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(214, 36, 107, 0.18) 1.4px, transparent 1.5px);
+  background-size: 20px 20px;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 26%);
+  mask-image: linear-gradient(90deg, #000 0%, transparent 26%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Lớp trang trí sau nội dung: quầng sáng cạnh hình minh hoạ và một cụm sen mờ
+   dồn vào khoảng trống giữa cột chữ và hình vẽ; hai mép chỉ để một bông nhỏ. */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    var(--lotus-pink),
+    var(--lotus-pink),
+    var(--lotus-white),
+    var(--lotus-pink),
+    var(--lotus-white),
+    radial-gradient(circle 190px at calc(100% - 110px) 8%, rgba(255, 255, 255, 0.8), transparent 70%);
+  background-repeat: no-repeat;
+  background-position:
+    53% 88%,
+    47% 14%,
+    58% 44%,
+    62% 4%,
+    3% 94%,
+    0 0;
+  background-size:
+    92px 81px,
+    56px 49px,
+    38px 33px,
+    34px 30px,
+    46px 40px,
+    auto;
+}
+
+.hero__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 34rem;
+  animation: fadeInUp 0.7s var(--ease-out) both;
+}
+
+/* Hình minh hoạ vẽ bằng SVG — không dùng ảnh chụp */
+.hero__art {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__art svg {
+  width: 100%;
+  height: auto;
+  max-height: 230px;
+  margin-inline: auto;
+}
+
+/* Dưới 768px hình minh hoạ nằm dưới chữ và khá hẹp nên ẩn con dấu đi */
+.hero__stamp {
+  display: none;
+}
+
+.hero__stamp b {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hero__stamp small {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  opacity: 0.92;
+}
+
+/* Viên thuốc trắng có chấm xanh ở đầu banner */
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-pill);
+  background-color: var(--c-surface);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--c-ink);
+}
+
+.hero__dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 999px;
+  background-color: var(--c-green);
+}
+
+.hero__title {
+  margin-bottom: var(--sp-2);
+  /* Chữ tô bằng gradient hồng sen cho đậm chất thương hiệu; color là màu
+     dự phòng nếu trình duyệt không hỗ trợ background-clip: text. */
+  color: var(--c-primary);
+  background-image: var(--grad-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: clamp(2rem, 5.5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.hero__tagline {
+  margin-bottom: var(--sp-2);
+  color: var(--c-green);
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.hero__text {
+  max-width: 44ch;
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--c-ink-muted);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.hero__actions .btn--outline {
+  background-color: var(--c-surface);
+}
+
+/* Dải cam kết ngắn ngay dưới nút bấm — thay cho dòng ghi chú cũ */
+.hero__perks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  list-style: none;
+}
+
+.hero__perk {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.6);
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-ink);
+}
+
+.hero__perk .icon {
+  width: 1.1em;
+  height: 1.1em;
+  color: var(--c-primary);
+}
+
+/* Chấm và nút điều hướng của slider lớn.
+   Chấm canh thẳng với lề trái của phần chữ thay vì dính mép màn hình. */
+.hero-slider .slider__dots {
+  bottom: var(--sp-4);
+  left: max(var(--sp-4), calc((100% - var(--container)) / 2 + var(--sp-2)));
+  transform: none;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-pill);
+  background-color: rgba(255, 255, 255, 0.65);
+}
+
+.hero-slider .slider__dot {
+  background-color: var(--c-primary-soft);
+  border-color: transparent;
+  opacity: 0.85;
+}
+
+.hero-slider .slider__dot.is-active {
+  background-color: var(--c-primary);
+  opacity: 1;
+}
+
+/* Dưới 768px chỉ còn chấm tròn và vuốt tay — nút mũi tên sẽ đè lên chữ */
+.hero-slider .slider__btn {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hero-slider .slider__btn {
+    display: grid;
+    top: 50%;
+    bottom: auto;
+    width: 48px;
+    height: 48px;
+    transform: translateY(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.92);
+    color: var(--c-primary);
+    box-shadow: var(--shadow-md);
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-out);
+  }
+}
+
+.hero-slider .slider__btn:hover {
+  background-color: var(--c-primary);
+  color: var(--c-surface);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.hero-slider .slider__btn .icon {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+@media (min-width: 768px) {
+
+  /* Chữ bên trái, hình minh hoạ bên phải.
+     Lề trái tối thiểu 80px để nút mũi tên không đè lên chữ. */
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--sp-4);
+    min-height: 420px;
+    padding-block: var(--sp-8);
+    padding-left: max(calc(var(--sp-16) + var(--sp-4)), calc((100% - var(--container)) / 2 + var(--sp-4)));
+    padding-right: max(var(--sp-6), calc((100% - var(--container)) / 2 + var(--sp-4)));
+  }
+
+  /* Bó khung hình lại đúng bằng bề ngang hình vẽ và canh giữa cột */
+  .hero__art {
+    width: min(100%, 26rem);
+    justify-self: center;
+  }
+
+  .hero__art svg {
+    max-height: none;
+  }
+
+  /* Con dấu giảm giá tròn, nghiêng nhẹ ở góc trên phải của hình */
+  .hero__stamp {
+    position: absolute;
+    top: -6px;
+    right: 2%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.7);
+    background: var(--grad-warm);
+    box-shadow: var(--shadow-lg);
+    color: var(--c-surface);
+    text-align: center;
+    transform: rotate(-12deg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero {
+    min-height: 480px;
+  }
+
+  .hero__art {
+    width: min(100%, 30rem);
+  }
+
+  .hero__stamp {
+    width: 104px;
+    height: 104px;
+  }
+
+  .hero__stamp b {
+    font-size: 1.65rem;
+  }
+}
+
+/* Màn rộng thì phóng hình minh hoạ to hẳn lên cho banner đỡ loãng */
+@media (min-width: 1280px) {
+  .hero {
+    min-height: 520px;
+  }
+
+  .hero__art {
+    width: min(100%, 34rem);
+  }
+}
+
+/* =========================================================
+   2. Dải cam kết ngay dưới banner
+   ========================================================= */
+
+.policy-row {
+  padding-top: var(--sp-4);
+}
+
+/* =========================================================
+   3. Mã giảm giá
+   ========================================================= */
+
+.vouchers {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 1fr);
+  gap: var(--sp-3);
+  overflow-x: auto;
+  padding-bottom: var(--sp-2);
+  scrollbar-width: thin;
+}
+
+.voucher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px dashed var(--c-primary-soft);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--c-primary-tint) 0%, var(--c-surface) 70%);
+}
+
+/* Hai khuyết tròn hai bên cho giống phiếu giảm giá */
+.voucher::before,
+.voucher::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background-color: var(--c-paper);
+  border: 1px dashed var(--c-primary-soft);
+  transform: translateY(-50%);
+}
+
+.voucher::before {
+  left: -8px;
+  clip-path: inset(0 0 0 50%);
+}
+
+.voucher::after {
+  right: -8px;
+  clip-path: inset(0 50% 0 0);
+}
+
+.voucher__value {
+  flex: none;
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--c-primary);
+}
+
+.voucher__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.voucher__title {
+  font-family: var(--f-body);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.voucher__cond {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.voucher__code {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-top: var(--sp-1);
+  padding: 2px var(--sp-2);
+  border: 1px solid var(--c-primary-soft);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-surface);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--c-primary-dark);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.voucher__code:hover {
+  background-color: var(--c-primary);
+  border-color: var(--c-primary);
+  color: var(--c-surface);
+}
+
+/* =========================================================
+   4. Danh mục nổi bật
+   ========================================================= */
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.cat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-2);
+  border: 1px solid transparent;
+  border-radius: 14px;
+  text-align: center;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    transform 0.3s var(--ease-out), box-shadow 0.3s ease;
+}
+
+.cat:hover {
+  background-color: var(--c-surface);
+  border-color: var(--c-primary-soft);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.cat__media {
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid var(--c-primary-tint);
+  background-color: var(--c-surface);
+  transition: border-color 0.3s ease;
+}
+
+.cat:hover .cat__media {
+  border-color: var(--c-primary);
+}
+
+.cat__name {
+  font-family: var(--f-body);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--c-ink);
+}
+
+.cat__count {
+  font-size: 0.6875rem;
+  color: var(--c-ink-muted);
+}
+
+@media (min-width: 640px) {
+  .cats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .cats {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--sp-4);
+  }
+
+  .cat__media {
+    width: 104px;
+    height: 104px;
+  }
+
+  .cat__name {
+    font-size: var(--fs-sm);
+  }
+}
+
+/* =========================================================
+   5. Flash sale
+   ========================================================= */
+
+.flash {
+  position: relative;
+  background: var(--grad-flash);
+  color: var(--c-surface);
+  overflow: hidden;
+}
+
+.flash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--grad-shine);
+  background-size: 200% auto;
+  animation: shimmer 6s linear infinite;
+  pointer-events: none;
+}
+
+.flash>.container {
+  position: relative;
+  z-index: 1;
+}
+
+.flash__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3) var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.flash__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--c-surface);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.flash__title .icon {
+  color: var(--c-gold-soft);
+  animation: throb 1.6s ease-in-out infinite;
+}
+
+.flash__desc {
+  flex: 1 1 100%;
+  order: 3;
+  max-width: 60ch;
+  font-size: var(--fs-sm);
+  opacity: 0.92;
+}
+
+.flash__clock {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.flash__clock-lbl {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.flash .countdown__unit {
+  min-width: 46px;
+  padding: var(--sp-1);
+  background-color: var(--c-surface);
+  border-color: transparent;
+  box-shadow: var(--shadow-sm);
+}
+
+.flash .countdown__num {
+  font-size: var(--fs-base);
+  color: var(--c-sale);
+}
+
+.flash .countdown__lbl {
+  font-size: 0.625rem;
+  color: var(--c-ink-muted);
+}
+
+/* Thẻ sản phẩm trong khối flash nằm trên nền đỏ nên bỏ viền hồng */
+.flash .card {
+  border-color: transparent;
+}
+
+.flash .card:hover,
+.flash .card:focus-within {
+  border-color: var(--c-gold);
+}
+
+/* =========================================================
+   6. Banner khuyến mãi đôi
+   ========================================================= */
+
+.promo-duo {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+
+.promo {
+  position: relative;
+  display: block;
+  min-height: 160px;
+  border-radius: 14px;
+  overflow: hidden;
+  color: var(--c-surface);
+}
+
+.promo__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.promo:hover .promo__img {
+  transform: scale(1.05);
+}
+
+.promo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(142, 14, 67, 0.88) 0%, rgba(214, 36, 107, 0.35) 65%, transparent 100%);
+}
+
+.promo__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 160px;
+  max-width: 26rem;
+  padding: var(--sp-6);
+}
+
+.promo__title {
+  color: var(--c-surface);
+  font-family: var(--f-body);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.promo__text {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-sm);
+  opacity: 0.92;
+}
+
+.promo__cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--sp-1);
+  margin-top: var(--sp-4);
+  padding: var(--sp-2) var(--sp-4);
+  border-radius: var(--radius-pill);
+  background-color: var(--c-surface);
+  color: var(--c-primary-dark);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  transition: gap 0.3s var(--ease-spring);
+}
+
+.promo:hover .promo__cta {
+  gap: var(--sp-2);
+}
+
+@media (min-width: 768px) {
+  .promo-duo {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .promo,
+  .promo__body {
+    min-height: 190px;
+  }
+}
+
+/* =========================================================
+   7. Chọn theo loại da
+   ========================================================= */
+
+.skin-filter {
+  margin-bottom: var(--sp-6);
+}
+
+/* =========================================================
+   8. Thương hiệu bán tại Lá Sen
+   ========================================================= */
+
+.brands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.brand {
+  display: grid;
+  place-items: center;
+  min-height: 76px;
+  padding: var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+  text-align: center;
+  transition: border-color 0.25s ease, transform 0.25s var(--ease-out), box-shadow 0.25s ease;
+}
+
+.brand:hover {
+  border-color: var(--c-primary-soft);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+
+.brand__name {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-primary);
+}
+
+.brand__sub {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--c-ink-muted);
+}
+
+@media (min-width: 640px) {
+  .brands {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .brands {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   9. Giới thiệu ngắn
+   ========================================================= */
+
+.intro {
+  position: relative;
+  background-color: var(--c-surface);
+  border-top: 1px solid var(--c-line);
+  overflow: hidden;
+}
+
+.intro::before {
+  content: '';
+  position: absolute;
+  width: 420px;
+  height: 420px;
+  top: -140px;
+  right: -120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214, 36, 107, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.intro__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  align-items: center;
+}
+
+.intro__figure {
+  position: relative;
+}
+
+.intro__img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+}
+
+.intro__figure::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: 8px;
+  bottom: 8px;
+  border: 2px solid var(--c-primary-soft);
+  border-radius: 18px;
+  opacity: 0.45;
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.intro__figure:hover::before {
+  opacity: 0.8;
+  transform: translate(-4px, -4px);
+}
+
+.intro__body {
+  position: relative;
+  padding-left: var(--sp-6);
+}
+
+.intro__body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--grad-warm);
+}
+
+.intro__title {
+  margin-bottom: var(--sp-3);
+  font-weight: 800;
+}
+
+.intro__lead {
+  max-width: 54ch;
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-lg);
+  line-height: 1.5;
+}
+
+.intro__text {
+  max-width: 60ch;
+  margin-bottom: var(--sp-3);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.intro__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-6);
+  margin: var(--sp-6) 0 var(--sp-4);
+}
+
+.intro__stat b {
+  display: block;
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--c-primary);
+}
+
+.intro__stat span {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+/* =========================================================
+   10. Bài viết chăm da
+   ========================================================= */
+
+.posts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-4);
+}
+
+@media (min-width: 640px) {
+  .posts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .posts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .intro__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: var(--sp-12);
+  }
+}
