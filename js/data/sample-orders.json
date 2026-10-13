@@ -1,0 +1,55 @@
+[
+  {
+    "id": "DEMO-ORD-001",
+    "userId": 1,
+    "date": "2026-09-01T10:00:00Z",
+    "status": "Đã giao hàng",
+    "total": 454000,
+    "isDemo": true,
+    "items": [
+      { "productId": "p1", "quantity": 1, "price": 165000 },
+      { "productId": "p2", "quantity": 1, "price": 289000 }
+    ],
+    "shippingAddress": "128 Trần Hưng Đạo, Ninh Kiều, Cần Thơ",
+    "paymentMethod": "COD"
+  },
+  {
+    "id": "DEMO-ORD-002",
+    "userId": 1,
+    "date": "2026-09-08T15:30:00Z",
+    "status": "Đang vận chuyển",
+    "total": 295000,
+    "isDemo": true,
+    "items": [
+      { "productId": "p4", "quantity": 1, "price": 295000 }
+    ],
+    "shippingAddress": "128 Trần Hưng Đạo, Ninh Kiều, Cần Thơ",
+    "paymentMethod": "Chuyển khoản"
+  },
+  {
+    "id": "DEMO-ORD-003",
+    "userId": 1,
+    "date": "2026-10-10T08:15:00Z",
+    "status": "Chờ xác nhận",
+    "total": 340000,
+    "isDemo": true,
+    "items": [
+      { "productId": "p8", "quantity": 1, "price": 310000 }
+    ],
+    "shippingAddress": "45/3 Nguyễn Văn Cừ, An Hoà, Ninh Kiều, Cần Thơ",
+    "paymentMethod": "COD"
+  },
+  {
+    "id": "DEMO-ORD-004",
+    "userId": 1,
+    "date": "2026-07-22T14:20:00Z",
+    "status": "Đã huỷ",
+    "total": 310000,
+    "isDemo": true,
+    "items": [
+      { "productId": "p8", "quantity": 1, "price": 310000 }
+    ],
+    "shippingAddress": "45/3 Nguyễn Văn Cừ, An Hoà, Ninh Kiều, Cần Thơ",
+    "paymentMethod": "COD"
+  }
+]

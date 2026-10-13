@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Làm sạch da",
+    "slug": "lam-sach",
+    "image": "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=800&q=80",
+    "description": "Sữa rửa mặt, nước tẩy trang và gel làm sạch dịu nhẹ từ hoa sen và thảo mộc tự nhiên."
+  },
+  {
+    "id": 2,
+    "name": "Dưỡng ẩm",
+    "slug": "duong-am",
+    "image": "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80",
+    "description": "Toner, gel khóa ẩm và kem dưỡng ẩm phục hồi màng ẩm sinh học cho da mọng nước."
+  },
+  {
+    "id": 3,
+    "name": "Chống nắng",
+    "slug": "chong-nang",
+    "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&q=80",
+    "description": "Kem chống nắng vật lý và chống nắng phổ rộng không nhờn rít, bảo vệ tối ưu."
+  },
+  {
+    "id": 4,
+    "name": "Đặc trị",
+    "slug": "dac-tri",
+    "image": "https://images.unsplash.com/photo-1631729371254-42c2892f0e6e?w=800&q=80",
+    "description": "Serum Vitamin C mờ thâm, tinh chất BHA se khít lỗ chân lông và phục hồi B5."
+  },
+  {
+    "id": 5,
+    "name": "Mặt nạ",
+    "slug": "mat-na",
+    "image": "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=800&q=80",
+    "description": "Mặt nạ đất sét hút dầu thanh lọc da và mặt nạ ngủ tái tạo làn da mệt mỏi."
+  }
+]

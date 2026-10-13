@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "productId": "p2",
+    "userId": 1,
+    "userName": "Nguyễn Thảo My",
+    "rating": 5,
+    "comment": "Da mình dầu và hay bị thâm sau mụn. Dùng hết một lọ trong khoảng bảy tuần thì mấy vết thâm ở cằm nhạt đi thấy rõ. Thấm nhanh, không bết, thoa kem chống nắng lên trên không bị vón.",
+    "date": "2026-07-28"
+  },
+  {
+    "id": 2,
+    "productId": "p2",
+    "userId": 2,
+    "userName": "Trần Quốc Bảo",
+    "rating": 5,
+    "comment": "Mua ở cửa hàng Trần Hưng Đạo, được bạn nhân viên thử lên tay trước khi lấy. Không mùi, không rát. Nam giới da thường như mình dùng ổn.",
+    "date": "2026-07-15"
+  },
+  {
+    "id": 3,
+    "productId": "p2",
+    "userId": 3,
+    "userName": "Lê Minh Châu",
+    "rating": 4,
+    "comment": "Hiệu quả thì mình hài lòng, trừ một điểm: ống nhỏ giọt hút hơi ít, mỗi lần phải bóp hai lần mới đủ cho cả mặt. Mong shop đổi loại ống dài hơn.",
+    "date": "2026-07-02"
+  },
+  {
+    "id": 4,
+    "productId": "p1",
+    "userId": 1,
+    "userName": "Nguyễn Văn A",
+    "rating": 5,
+    "comment": "Sữa rửa mặt tràm trà rửa xong da rất thông thoáng, bớt dầu hẳn mà không hề bị khô căng rát khó chịu.",
+    "date": "2026-08-20"
+  },
+  {
+    "id": 5,
+    "productId": "p4",
+    "userId": 2,
+    "userName": "Trần Thị B",
+    "rating": 5,
+    "comment": "Kem chống nắng Pure Lotus dùng êm nhất trong các loại chống nắng vật lý mình từng thử. Không vón cục, không bị trắng bệch mặt.",
+    "date": "2026-09-05"
+  }
+]

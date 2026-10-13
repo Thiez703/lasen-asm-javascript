@@ -854,7 +854,7 @@
   white-space: nowrap;
 }
 
-/* Nút phụ (so sánh) nhạt hơn để không tranh chỗ với nút mua */
+/* Nút phụ (yêu thích) nhạt hơn để không tranh chỗ với nút mua */
 .card__actions .btn--outline {
   border-color: var(--c-line);
   color: var(--c-primary);
@@ -864,6 +864,39 @@
   border-color: var(--c-primary);
   background-color: var(--c-primary);
   color: var(--c-surface);
+}
+
+/* Trạng thái nút yêu thích khi được lưu (active) */
+.card__actions [data-favorite-toggle][aria-pressed="true"],
+.card__actions [data-favorite-toggle].is-active,
+[data-favorite-toggle][aria-pressed="true"],
+[data-favorite-toggle].is-active,
+[data-wishlist].is-active,
+[data-wishlist][aria-pressed="true"] {
+  border-color: var(--c-sale);
+  color: var(--c-sale);
+  background-color: rgba(232, 52, 47, 0.08);
+}
+
+.card__actions [data-favorite-toggle][aria-pressed="true"] .icon,
+.card__actions [data-favorite-toggle].is-active .icon,
+[data-favorite-toggle][aria-pressed="true"] .icon,
+[data-favorite-toggle].is-active .icon,
+[data-wishlist].is-active .icon,
+[data-wishlist][aria-pressed="true"] .icon {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.card__actions [data-favorite-toggle][aria-pressed="true"]:hover,
+.card__actions [data-favorite-toggle].is-active:hover,
+[data-favorite-toggle][aria-pressed="true"]:hover,
+[data-favorite-toggle].is-active:hover,
+[data-wishlist].is-active:hover,
+[data-wishlist][aria-pressed="true"]:hover {
+  border-color: var(--c-sale);
+  color: var(--c-sale);
+  background-color: rgba(232, 52, 47, 0.16);
 }
 
 /* Dưới 560px lưới còn 2 cột hẹp — nới chỗ cho hàng nút,
@@ -880,98 +913,6 @@
 
   .card__actions .btn--icon {
     width: 34px;
-  }
-}
-
-/* =========================================================
-   5. SLIDER
-   ========================================================= */
-
-.slider {
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  background-color: var(--c-surface);
-}
-
-.slider__viewport {
-  overflow: hidden;
-}
-
-.slider__track {
-  display: flex;
-  transition: transform 0.45s ease;
-}
-
-.slider__slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-}
-
-/* Đặt ở đáy cùng hàng với dot thay vì giữa chiều cao, để nút không
-   bao giờ đè lên tiêu đề hay đoạn văn của slide. */
-.slider__btn {
-  position: absolute;
-  bottom: var(--sp-2);
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  background-color: var(--c-surface);
-  color: var(--c-primary);
-  box-shadow: var(--shadow);
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.slider__btn:hover {
-  background-color: var(--c-primary);
-  color: var(--c-surface);
-}
-
-.slider__btn--prev {
-  left: var(--sp-3);
-}
-
-.slider__btn--next {
-  right: var(--sp-3);
-}
-
-.slider__dots {
-  position: absolute;
-  bottom: var(--sp-4);
-  left: 50%;
-  z-index: 3;
-  display: flex;
-  gap: var(--sp-2);
-  padding: var(--sp-2);
-  border-radius: 999px;
-  transform: translateX(-50%);
-}
-
-.slider__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background-color: var(--c-surface);
-  border: 1px solid var(--c-line);
-  opacity: 0.6;
-  transition: width 0.25s ease, opacity 0.25s ease;
-}
-
-.slider__dot.is-active {
-  width: 28px;
-  opacity: 1;
-}
-
-@media (min-width: 768px) {
-  .slider__btn--prev {
-    left: var(--sp-6);
-  }
-
-  .slider__btn--next {
-    right: var(--sp-6);
   }
 }
 
@@ -1084,22 +1025,6 @@
   left: var(--sp-3);
   color: var(--c-ink-muted);
   pointer-events: none;
-}
-
-.field__action {
-  position: absolute;
-  right: var(--sp-2);
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
-  color: var(--c-ink-muted);
-}
-
-.field__action:hover {
-  color: var(--c-primary);
-  background-color: var(--c-paper);
 }
 
 /* Checkbox / radio */

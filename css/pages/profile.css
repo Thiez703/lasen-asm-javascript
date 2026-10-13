@@ -1,6 +1,6 @@
 /* =========================================================
    LÁ SEN — profile.css
-   Riêng cho trang tài khoản: thẻ thành viên, hạng khách, điều hướng
+   Riêng cho trang tài khoản: thẻ thành viên, điều hướng
    dạng tab, đơn hàng, sổ địa chỉ và các khối form trong từng mục.
    ========================================================= */
 
@@ -96,79 +96,7 @@
 }
 
 /* =========================================================
-   3. Hạng thành viên và tiến độ chi tiêu
-   ========================================================= */
-
-.tier {
-  padding: var(--sp-4);
-  border: 1px solid var(--c-line);
-  border-radius: 14px;
-  background-color: var(--c-surface);
-}
-
-.tier__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-2);
-  margin-bottom: var(--sp-3);
-}
-
-.tier__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-3);
-  border-radius: var(--radius-pill);
-  background-color: var(--c-primary-tint);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  color: var(--c-primary-dark);
-}
-
-/* #i-lotus đã có màu tô sẵn nên phải gỡ nét vẽ mà .icon áp cho icon dạng nét */
-.tier__badge .icon {
-  width: 1.3em;
-  height: 1.3em;
-  stroke: none;
-}
-
-.tier__point {
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  white-space: nowrap;
-  color: var(--c-ink);
-}
-
-.tier__bar {
-  height: 8px;
-  border-radius: var(--radius-pill);
-  background-color: var(--c-primary-tint);
-  overflow: hidden;
-}
-
-/* Bề rộng do thuộc tính style trong HTML quyết định */
-.tier__fill {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--grad-warm);
-}
-
-.tier__note {
-  margin-top: var(--sp-3);
-  font-size: var(--fs-xs);
-  line-height: 1.6;
-  color: var(--c-ink-muted);
-}
-
-.tier__note b {
-  font-weight: 700;
-  color: var(--c-ink);
-}
-
-/* =========================================================
-   4. Điều hướng giữa các mục
+   3. Điều hướng giữa các mục
    ========================================================= */
 
 .account-nav {
@@ -277,7 +205,7 @@
 }
 
 /* =========================================================
-   5. Khung nội dung của từng mục
+   4. Khung nội dung của từng mục
    ========================================================= */
 
 .panel {
@@ -324,10 +252,6 @@
   gap: var(--sp-4);
 }
 
-.panel__body--narrow {
-  max-width: 30rem;
-}
-
 /* .field mang sẵn margin-bottom cho form thường; trong lưới thì gap lo việc đó */
 .panel__body .field,
 .form-grid .field {
@@ -371,7 +295,7 @@
 }
 
 /* =========================================================
-   6. Đơn hàng
+   5. Đơn hàng
    ========================================================= */
 
 .orders {
@@ -407,46 +331,6 @@
   margin-top: 2px;
   font-size: var(--fs-xs);
   color: var(--c-ink-muted);
-}
-
-/* ---------- Nhãn trạng thái ---------- */
-
-/* Bốn tông màu trạng thái nằm ngoài bảng token vì chỉ dùng ở đây:
-   vàng chờ xử lý, xanh dương đang giao, xanh lá đã xong, đỏ đã huỷ. */
-.order-status {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-3);
-  border-radius: var(--radius-pill);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.order-status .icon {
-  width: 1.15em;
-  height: 1.15em;
-}
-
-.order-status--wait {
-  background-color: #FFF2DC;
-  color: #8A5A12;
-}
-
-.order-status--ship {
-  background-color: #E4F0FF;
-  color: #17568F;
-}
-
-.order-status--done {
-  background-color: #E2F4EC;
-  color: #1F6B4B;
-}
-
-.order-status--cancel {
-  background-color: #FDEBEA;
-  color: #B32621;
 }
 
 /* ---------- Danh sách sản phẩm trong đơn ---------- */
@@ -507,15 +391,6 @@
   color: var(--c-ink-muted);
 }
 
-.order__qty {
-  grid-column: 3;
-  grid-row: 1;
-  align-self: end;
-  font-size: var(--fs-xs);
-  color: var(--c-ink-muted);
-  text-align: right;
-}
-
 .order__price {
   grid-column: 3;
   grid-row: 2;
@@ -525,36 +400,7 @@
   text-align: right;
 }
 
-/* ---------- Ghi chú và chân đơn ---------- */
-
-.order__note {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-2);
-  margin: 0 var(--sp-4) var(--sp-4);
-  padding: var(--sp-3);
-  border-radius: var(--radius);
-  background-color: var(--c-paper);
-  font-size: var(--fs-xs);
-  line-height: 1.6;
-  color: var(--c-ink-muted);
-}
-
-.order__note .icon {
-  flex: none;
-  width: 1.2em;
-  height: 1.2em;
-  margin-top: 2px;
-  color: var(--c-primary-soft);
-}
-
-.order__note--warn {
-  background-color: rgba(232, 52, 47, 0.07);
-}
-
-.order__note--warn .icon {
-  color: var(--c-sale);
-}
+/* ---------- Chân đơn ---------- */
 
 .order__foot {
   display: flex;
@@ -570,19 +416,6 @@
 .order__total {
   font-size: var(--fs-sm);
   color: var(--c-ink-muted);
-}
-
-.order__total-value {
-  margin-left: var(--sp-2);
-  font-size: var(--fs-lg);
-  font-weight: 800;
-  color: var(--c-primary);
-}
-
-.order__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
 }
 
 /* Đơn đã huỷ: làm nhạt phần hàng hoá để mắt bỏ qua trước */
@@ -602,12 +435,6 @@
     grid-row: 1;
   }
 
-  .order__qty {
-    grid-column: 3;
-    align-self: center;
-    text-align: center;
-  }
-
   .order__price {
     grid-column: 4;
     grid-row: 1;
@@ -616,7 +443,7 @@
 }
 
 /* =========================================================
-   7. Sổ địa chỉ
+   6. Sổ địa chỉ
    ========================================================= */
 
 .addresses {
@@ -651,16 +478,6 @@
   font-size: var(--fs-base);
   font-weight: 700;
   color: var(--c-ink);
-}
-
-.address__tag {
-  padding: 2px var(--sp-2);
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius-sm);
-  background-color: var(--c-paper);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--c-ink-muted);
 }
 
 .address__line {
@@ -704,6 +521,26 @@
 .address__remove:hover {
   background-color: rgba(232, 52, 47, 0.08);
   color: var(--c-sale);
+}
+
+.form-grid__full {
+  grid-column: 1 / -1;
+}
+
+/* Khối biểu mẫu thêm / chỉnh sửa địa chỉ */
+.address-form-box {
+  margin-bottom: var(--sp-6);
+  padding: var(--sp-5);
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+}
+
+.address-form-box__title {
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--c-ink);
 }
 
 @media (min-width: 768px) {

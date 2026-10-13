@@ -90,19 +90,6 @@
   color: var(--c-ink-muted);
 }
 
-.cart-row__cell {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
-  grid-column: 1 / -1;
-  font-size: var(--fs-sm);
-}
-
-.cart-row__label {
-  color: var(--c-ink-muted);
-}
-
 .cart-row__price {
   font-weight: 500;
 }
@@ -110,27 +97,6 @@
 .cart-row__total {
   font-weight: 700;
   color: var(--c-primary);
-}
-
-.cart-row__cell--action {
-  grid-column: 2;
-  grid-row: 1;
-  justify-content: flex-end;
-}
-
-.cart-row__remove {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  color: var(--c-ink-muted);
-  transition: color 0.2s ease, background-color 0.2s ease;
-}
-
-.cart-row__remove:hover {
-  background-color: var(--c-paper);
-  color: var(--c-sale);
 }
 
 /* ---------- Chân bảng & mã giảm giá ---------- */
@@ -221,24 +187,6 @@
     align-items: center;
   }
 
-  .cart-row__label {
-    display: none;
-  }
-
-  .cart-row__cell {
-    grid-column: auto;
-    grid-row: auto;
-    justify-content: flex-end;
-    white-space: nowrap;
-  }
-
-  .cart-row__cell:nth-of-type(2) {
-    justify-content: center;
-  }
-
-  .cart-row__cell--action {
-    justify-content: flex-end;
-  }
 }
 
 /* ---------- Từ 1024px: tổng tiền dính bên phải ---------- */

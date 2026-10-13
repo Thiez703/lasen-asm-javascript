@@ -1,0 +1,53 @@
+[
+  {
+    "code": "LASEN30",
+    "badge": "30K",
+    "title": "Giảm 30.000đ",
+    "description": "Giảm 30.000đ cho đơn từ 299.000đ",
+    "conditionText": "Cho đơn từ 299.000đ",
+    "minSubtotal": 299000,
+    "discountType": "fixed",
+    "discountValue": 30000
+  },
+  {
+    "code": "SEN50",
+    "badge": "50K",
+    "title": "Giảm 50.000đ",
+    "description": "Giảm 50.000đ cho đơn từ 300.000đ",
+    "conditionText": "Cho đơn từ 300.000đ",
+    "minSubtotal": 300000,
+    "discountType": "fixed",
+    "discountValue": 50000
+  },
+  {
+    "code": "SEN10",
+    "badge": "10%",
+    "title": "Giảm 10% tối đa 80.000đ",
+    "description": "Giảm 10% tối đa 80.000đ cho đơn từ 500.000đ",
+    "conditionText": "Cho đơn từ 500.000đ",
+    "minSubtotal": 500000,
+    "discountType": "percent",
+    "discountValue": 0.1,
+    "maxDiscount": 80000
+  },
+  {
+    "code": "FREESHIP",
+    "badge": "0đ",
+    "title": "Miễn phí vận chuyển",
+    "description": "Miễn phí vận chuyển cho đơn từ 350.000đ",
+    "conditionText": "Toàn quốc, đơn từ 350.000đ",
+    "minSubtotal": 350000,
+    "discountType": "shipping",
+    "discountValue": 0
+  },
+  {
+    "code": "CHAOBAN",
+    "badge": "50K",
+    "title": "Giảm 50.000đ đơn đầu tiên",
+    "description": "Giảm 50.000đ cho khách hàng mới",
+    "conditionText": "Dành cho khách mới đăng ký, đơn từ 250.000đ",
+    "minSubtotal": 250000,
+    "discountType": "fixed",
+    "discountValue": 50000
+  }
+]

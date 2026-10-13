@@ -1,0 +1,7 @@
+[
+  { "key": "tat-ca", "label": "Tất cả" },
+  { "key": "cho-xac-nhan", "label": "Chờ xác nhận" },
+  { "key": "dang-giao", "label": "Đang giao" },
+  { "key": "da-giao", "label": "Đã giao" },
+  { "key": "da-huy", "label": "Đã huỷ" }
+]
