@@ -1,6 +1,3 @@
-/**
- * Nạp dữ liệu JSON trước khi các module sử dụng mảng và hàm tra cứu đồng bộ.
- */
 async function loadJsonData(filename) {
   const url = new URL(`../data/${filename}`, import.meta.url);
   const isNode = typeof process !== 'undefined' && Boolean(process.versions?.node);
