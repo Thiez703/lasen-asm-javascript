@@ -5,7 +5,6 @@
 
 import { cartService as defaultCartService } from './cartService.js';
 import { storage as defaultStorage } from './storage.js';
-import { clearAppliedCoupon } from './couponService.js';
 
 export const ORDERS_KEY = 'lasen_orders';
 export const COMPLETED_CHECKOUT_KEY = 'lasen_last_completed_order';
@@ -109,11 +108,9 @@ export function validateAndSanitizeOrder(order) {
   const rawTotals = order.totals && typeof order.totals === 'object' ? order.totals : {};
   const subtotal = typeof rawTotals.subtotal === 'number' ? Math.max(0, rawTotals.subtotal) : 0;
   const shipping = typeof rawTotals.shipping === 'number' ? Math.max(0, rawTotals.shipping) : 0;
-  const discount = typeof rawTotals.discount === 'number' ? Math.max(0, rawTotals.discount) : 0;
-  const total = typeof rawTotals.total === 'number' ? Math.max(0, rawTotals.total) : (typeof order.total === 'number' ? order.total : Math.max(0, subtotal + shipping - discount));
-  const coupon = (rawTotals.coupon && typeof rawTotals.coupon === 'object') ? rawTotals.coupon : null;
+  const total = typeof rawTotals.total === 'number' ? Math.max(0, rawTotals.total) : (typeof order.total === 'number' ? order.total : subtotal + shipping);
 
-  const totals = { subtotal, shipping, discount, total, coupon };
+  const totals = { subtotal, shipping, total };
 
   return {
     id,
@@ -183,7 +180,7 @@ export function processCheckout(orderInput, deps = {}) {
 
   // 3. Lấy chi tiết giỏ hàng hiện tại
   const items = cartService.getCartDetails();
-  const totals = cartService.getCartTotals(orderInput.couponCode || '');
+  const totals = cartService.getCartTotals();
 
   // 4. Kiểm tra giỏ hàng rỗng
   if (!items || items.length === 0) {
@@ -321,13 +318,12 @@ export function processCheckout(orderInput, deps = {}) {
     };
   }
 
-  // Dọn giỏ thành công -> xóa marker pending và xóa coupon đang lưu
+  // Dọn giỏ thành công -> xóa marker pending
   if (storage && typeof storage.remove === 'function') {
     storage.remove(pendingCleanupKey);
   } else if (storage && typeof storage.set === 'function') {
     storage.set(pendingCleanupKey, null);
   }
-  clearAppliedCoupon();
 
   return {
     success: true,

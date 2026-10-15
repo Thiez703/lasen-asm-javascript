@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sản phẩm — Lá Sen</title>
   <meta name="description"
-    content="Toàn bộ sản phẩm chăm sóc da của Lá Sen: sữa rửa mặt, toner, serum, kem chống nắng, kem dưỡng và mặt nạ. Lọc theo danh mục, loại da, thương hiệu và khoảng giá.">
+    content="Toàn bộ sản phẩm chăm sóc da của Lá Sen: sữa rửa mặt, toner, serum, kem chống nắng, kem dưỡng và mặt nạ. Lọc theo loại sản phẩm và khoảng giá.">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/pages/products.css">
@@ -23,12 +23,12 @@
     <div class="container topbar__inner">
       <p class="topbar__promo">
         <span class="topbar__track">
-          <span class="topbar__code">Nhập mã ưu đãi ở bước thanh toán để nhận ngay giảm giá</span>
-          <span class="topbar__code">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
-          <span class="topbar__code">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
-          <span class="topbar__code" aria-hidden="true">Nhập mã ưu đãi ở bước thanh toán để nhận ngay giảm giá</span>
-          <span class="topbar__code" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
-          <span class="topbar__code" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__message">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__message" aria-hidden="true">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
         </span>
       </p>
 
@@ -193,7 +193,7 @@
           </div>
 
           <div class="filter-group">
-            <h3 class="filter-group__title">Danh mục</h3>
+            <h3 class="filter-group__title">Loại sản phẩm</h3>
             <ul class="filter-group__list">
               <li>
                 <label class="check">
@@ -234,19 +234,6 @@
           </div>
 
           <div class="filter-group">
-            <h3 class="filter-group__title">Khuyến mãi</h3>
-            <ul class="filter-group__list">
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="sale" value="1" data-filter="sale">
-                  <span class="check__text">Đang giảm giá</span>
-                  <span class="check__count" data-count-sale>0</span>
-                </label>
-              </li>
-            </ul>
-          </div>
-
-          <div class="filter-group">
             <h3 class="filter-group__title">Khoảng giá</h3>
             <div class="price-range">
               <div class="field">
@@ -264,81 +251,6 @@
             <span class="field__error" data-error-for="priceRange"></span>
             <button class="btn btn--outline btn--sm btn--block" type="button" data-price-apply>Áp dụng khoảng
               giá</button>
-          </div>
-
-          <div class="filter-group">
-            <h3 class="filter-group__title">Loại da</h3>
-            <ul class="filter-group__list">
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="skin" value="da-dau" data-filter="skin">
-                  <span class="check__text">Da dầu</span>
-                  <span class="check__count">3</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="skin" value="da-kho" data-filter="skin">
-                  <span class="check__text">Da khô</span>
-                  <span class="check__count">3</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="skin" value="da-hon-hop" data-filter="skin">
-                  <span class="check__text">Da hỗn hợp</span>
-                  <span class="check__count">3</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="skin" value="da-nhay-cam" data-filter="skin">
-                  <span class="check__text">Da nhạy cảm</span>
-                  <span class="check__count">4</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="skin" value="moi-loai-da" data-filter="skin">
-                  <span class="check__text">Mọi loại da</span>
-                  <span class="check__count">3</span>
-                </label>
-              </li>
-            </ul>
-          </div>
-
-          <div class="filter-group">
-            <h3 class="filter-group__title">Thương hiệu</h3>
-            <ul class="filter-group__list">
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="brand" value="la-sen" data-filter="brand">
-                  <span class="check__text">Lá Sen</span>
-                  <span class="check__count">5</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="brand" value="sen-viet" data-filter="brand">
-                  <span class="check__text">Sen Việt</span>
-                  <span class="check__count">3</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="brand" value="pure-lotus" data-filter="brand">
-                  <span class="check__text">Pure Lotus</span>
-                  <span class="check__count">2</span>
-                </label>
-              </li>
-              <li>
-                <label class="check">
-                  <input class="check__input" type="checkbox" name="brand" value="thao-moc-xanh" data-filter="brand">
-                  <span class="check__text">Thảo Mộc Xanh</span>
-                  <span class="check__count">2</span>
-                </label>
-              </li>
-            </ul>
           </div>
 
           <button class="btn btn--ghost btn--block" type="button" data-filter-reset>Xoá toàn bộ bộ lọc</button>
@@ -490,7 +402,7 @@
 
       <div class="footer__col">
         <h2 class="footer__title">Thư chăm da hằng tháng</h2>
-        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và ưu đãi dành riêng cho khách quen.
+        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và cập nhật sản phẩm mới.
         </p>
         <form class="footer__form" data-newsletter-form novalidate>
           <div class="field field--inline">

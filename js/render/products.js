@@ -8,51 +8,8 @@ import { cartService } from '../services/cartService.js';
 import { favoriteService } from '../services/favoriteService.js';
 import { showToast } from '../services/toast.js';
 
-/**
- * Cập nhật giao diện tất cả các nút yêu thích của một sản phẩm trên trang
- * @param {string} productId 
- * @param {boolean} isFav 
- */
-function updateFavoriteButtons(productId, isFav) {
-  if (typeof document === 'undefined') return;
-  const buttons = document.querySelectorAll(
-    `[data-favorite-toggle][data-id="${productId}"], [data-wishlist][data-id="${productId}"]`
-  );
-  buttons.forEach(btn => {
-    btn.setAttribute('aria-pressed', isFav ? 'true' : 'false');
-    const label = isFav ? 'Bỏ yêu thích' : 'Thêm vào yêu thích';
-    btn.setAttribute('aria-label', label);
-    btn.setAttribute('title', label);
-    btn.classList.toggle('is-active', isFav);
-  });
-}
-
-/**
- * Gắn sự kiện click toàn cục cho nút Yêu thích trên thẻ sản phẩm và chi tiết
- */
 let isFavListenerAttached = false;
-function setupFavoriteListener() {
-  if (isFavListenerAttached) return;
-  if (typeof document === 'undefined') return;
-  isFavListenerAttached = true;
-
-  document.addEventListener('click', (e) => {
-    const favBtn = e.target.closest('[data-favorite-toggle], [data-wishlist]');
-    if (!favBtn) return;
-    e.preventDefault();
-
-    const productId = favBtn.getAttribute('data-id');
-    if (!productId) return;
-
-    const result = favoriteService.toggleFavorite(productId);
-    if (result.success) {
-      showToast(result.message);
-      updateFavoriteButtons(productId, result.isFavorite);
-    } else {
-      showToast(result.message, 'error');
-    }
-  });
-}
+let isCartListenerAttached = false;
 
 /**
  * Sinh mã HTML an toàn cho thẻ sản phẩm (Card)
@@ -113,38 +70,60 @@ export function createProductCard(product) {
 }
 
 /**
- * Gắn sự kiện click toàn cục cho nút Thêm vào giỏ
- */
-let isCartListenerAttached = false;
-function setupAddToCartListener() {
-  if (isCartListenerAttached) return;
-  isCartListenerAttached = true;
-
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-add-to-cart]');
-    if (!btn) return;
-
-    // Không xử lý nếu là nút trong trang product-detail (trang detail tự quản lý ô số lượng)
-    if (btn.closest('.detail__actions')) return;
-
-    const productId = btn.getAttribute('data-id');
-    if (!productId) return;
-
-    const result = cartService.addToCart(productId, 1);
-    if (result.success) {
-      showToast(result.message);
-    } else {
-      showToast(result.message, 'error');
-    }
-  });
-}
-
-/**
  * Render tất cả danh sách sản phẩm theo từng vị trí trên DOM
  */
 export function renderProducts() {
-  setupAddToCartListener();
-  setupFavoriteListener();
+  // Gắn sự kiện toàn cục một lần cho nút thêm vào giỏ.
+  if (!isCartListenerAttached) {
+    isCartListenerAttached = true;
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-add-to-cart]');
+      if (!btn) return;
+
+      // Không xử lý nếu là nút trong trang product-detail (trang detail tự quản lý ô số lượng)
+      if (btn.closest('.detail__actions')) return;
+
+      const productId = btn.getAttribute('data-id');
+      if (!productId) return;
+
+      const result = cartService.addToCart(productId, 1);
+      if (result.success) {
+        showToast(result.message);
+      } else {
+        showToast(result.message, 'error');
+      }
+    });
+  }
+
+  // Gắn sự kiện toàn cục một lần cho nút yêu thích.
+  if (!isFavListenerAttached && typeof document !== 'undefined') {
+    isFavListenerAttached = true;
+    document.addEventListener('click', (e) => {
+      const favBtn = e.target.closest('[data-favorite-toggle], [data-wishlist]');
+      if (!favBtn) return;
+      e.preventDefault();
+
+      const productId = favBtn.getAttribute('data-id');
+      if (!productId) return;
+
+      const result = favoriteService.toggleFavorite(productId);
+      if (result.success) {
+        showToast(result.message);
+        const buttons = document.querySelectorAll(
+          `[data-favorite-toggle][data-id="${productId}"], [data-wishlist][data-id="${productId}"]`
+        );
+        buttons.forEach(btn => {
+          btn.setAttribute('aria-pressed', result.isFavorite ? 'true' : 'false');
+          const label = result.isFavorite ? 'Bỏ yêu thích' : 'Thêm vào yêu thích';
+          btn.setAttribute('aria-label', label);
+          btn.setAttribute('title', label);
+          btn.classList.toggle('is-active', result.isFavorite);
+        });
+      } else {
+        showToast(result.message, 'error');
+      }
+    });
+  }
 
   // Trang chủ và các trang khác
   const flashList = document.querySelector('[data-list="flash"]');
@@ -168,8 +147,11 @@ export function renderProducts() {
     newList.innerHTML = newProducts.map(createProductCard).join('');
   }
 
-  const skinList = document.querySelector('[data-list="skin"]');
-  if (skinList) {
-    skinList.innerHTML = products.slice(0, 5).map(createProductCard).join('');
+  const categoryList = document.querySelector('[data-list="category-recommendations"]');
+  if (categoryList) {
+    const activeChip = document.querySelector('[data-category-filter] [data-category][aria-pressed="true"]');
+    const category = activeChip?.getAttribute('data-category') || 'lam-sach';
+    const recommendations = products.filter(p => p.category === category).slice(0, 5);
+    categoryList.innerHTML = recommendations.map(createProductCard).join('');
   }
 }

@@ -6,8 +6,6 @@ import path from 'node:path';
 import { cartService } from '../js/services/cartService.js';
 import { processCheckout, validateAndSanitizeOrder } from '../js/services/checkoutService.js';
 import { storage } from '../js/services/storage.js';
-import { renderHomeVouchers } from '../js/modules/ui.js';
-import { setCachedCoupons, loadCoupons } from '../js/services/couponService.js';
 
 // Setup Mock cho window / localStorage
 const memoryStore = new Map();
@@ -51,7 +49,7 @@ test('9. REGRESSION: Clear Cart Fail -> Simulated Reload/New Token -> Same Cart 
   let clearAttemptCount = 0;
   const mockCartService = {
     getCartDetails: () => cartService.getCartDetails(),
-    getCartTotals: (coupon) => cartService.getCartTotals(coupon),
+    getCartTotals: () => cartService.getCartTotals(),
     clearCart: () => {
       clearAttemptCount++;
       return false; // Thất bại!
@@ -202,46 +200,6 @@ test('12. REGRESSION: validateAndSanitizeOrder guard malformed orders', () => {
   assert.strictEqual(corruptedItemsOrder.items[0].quantity, 1); // float bị fallback
 });
 
-test('13. REGRESSION: Voucher Parity đầy đủ 5 mã khuyến mãi', () => {
-  memoryStore.clear();
-  cartService.addToCart('p1', 1); // 165k
-  cartService.addToCart('p2', 1); // 289k
-  cartService.addToCart('p4', 1); // 295k
-  // subtotal = 165 + 289 + 295 = 749k
-
-  // 1. LASEN30 (đơn từ 299k)
-  const t1 = cartService.getCartTotals('LASEN30');
-  assert.strictEqual(t1.discount, 30000);
-  assert.strictEqual(t1.coupon.code, 'LASEN30');
-
-  // 2. SEN50 (đơn từ 300k)
-  const t2 = cartService.getCartTotals('SEN50');
-  assert.strictEqual(t2.discount, 50000);
-  assert.strictEqual(t2.coupon.code, 'SEN50');
-
-  // 3. SEN10 (giảm 10% tối đa 80k đơn từ 500k)
-  const t3 = cartService.getCartTotals('SEN10');
-  assert.strictEqual(t3.discount, Math.min(80000, Math.round(749000 * 0.1)));
-  assert.strictEqual(t3.coupon.code, 'SEN10');
-
-  // 4. CHAOBAN (giảm 50k đơn từ 250k)
-  const t4 = cartService.getCartTotals('CHAOBAN');
-  assert.strictEqual(t4.discount, 50000);
-  assert.strictEqual(t4.coupon.code, 'CHAOBAN');
-
-  // 5. FREESHIP (đơn dưới 500k có phí ship 30k)
-  cartService.clearCart();
-  cartService.addToCart('p2', 1); // 289k -> chưa đủ 350k
-  const t5_not_qualified = cartService.getCartTotals('FREESHIP');
-  assert.strictEqual(t5_not_qualified.discount, 0);
-
-  cartService.addToCart('p1', 1); // thêm 165k -> subtotal = 454k (> 350k, < 500k có ship 30k)
-  const t5_qualified = cartService.getCartTotals('FREESHIP');
-  assert.strictEqual(t5_qualified.shipping, 30000);
-  assert.strictEqual(t5_qualified.discount, 30000); // miễn phí vận chuyển
-  assert.strictEqual(t5_qualified.total, 454000);
-});
-
 test('14. REGRESSION: Callers Failure and DOM Stub Test', () => {
   memoryStore.clear();
 
@@ -281,91 +239,9 @@ test('14. REGRESSION: Callers Failure and DOM Stub Test', () => {
   storage.set = originalSet;
 });
 
-test('25. REGRESSION: UI Voucher Visibility & Safe Fallback', async (t) => {
-  const projectRoot = path.resolve(process.cwd());
-
-  await t.test('app.js khởi tạo initUI() để kích hoạt luồng giao diện voucher', () => {
-    const appPath = path.join(projectRoot, 'js', 'app.js');
-    const appContent = fs.readFileSync(appPath, 'utf8');
-    assert.ok(appContent.includes("import { initUI } from './modules/ui.js';") || appContent.includes('import { initUI }'), 'app.js phải import initUI');
-    assert.ok(appContent.includes('initUI();'), 'app.js phải gọi initUI()');
-  });
-
-  await t.test('renderHomeVouchers nạp và hiển thị đầy đủ 5 voucher hợp lệ từ coupons.json', async () => {
-    // Mock container
-    let containerInnerHtml = '';
-    const mockContainer = {
-      get innerHTML() { return containerInnerHtml; },
-      set innerHTML(val) { containerInnerHtml = val; }
-    };
-
-    const prevDoc = globalThis.document;
-    globalThis.document = {
-      querySelector(selector) {
-        if (selector === '[data-list="vouchers"]') return mockContainer;
-        return null;
-      }
-    };
-
-    try {
-      await renderHomeVouchers();
-
-      // Kiểm tra đầy đủ 5 mã
-      const expectedCodes = ['LASEN30', 'SEN50', 'SEN10', 'FREESHIP', 'CHAOBAN'];
-      for (const code of expectedCodes) {
-        assert.ok(containerInnerHtml.includes(code), `UI voucher phải chứa mã ${code}`);
-        assert.ok(containerInnerHtml.includes(`data-copy-code="${code}"`), `UI voucher phải có nút copy cho mã ${code}`);
-      }
-
-      // Kiểm tra cấu trúc phần tử và class CSS
-      assert.ok(containerInnerHtml.includes('class="voucher"'), 'Phải có thẻ li class="voucher"');
-      assert.ok(containerInnerHtml.includes('class="voucher__value"'), 'Phải có badge voucher__value');
-      assert.ok(containerInnerHtml.includes('class="voucher__title"'), 'Phải có voucher__title');
-      assert.ok(containerInnerHtml.includes('class="voucher__code"'), 'Phải có button voucher__code');
-    } finally {
-      globalThis.document = prevDoc;
-    }
-  });
-
-  await t.test('Trạng thái lỗi/rỗng không che mất dữ liệu voucher hợp lệ đã hiển thị', async () => {
-    const existingHtml = '<li class="voucher"><span class="voucher__title">Mã đã có</span></li>';
-    let containerInnerHtml = existingHtml;
-    const mockContainer = {
-      get innerHTML() { return containerInnerHtml; },
-      set innerHTML(val) { containerInnerHtml = val; }
-    };
-
-    const prevDoc = globalThis.document;
-    globalThis.document = {
-      querySelector(selector) {
-        if (selector === '[data-list="vouchers"]') return mockContainer;
-        return null;
-      }
-    };
-
-    try {
-      // 1. Giả lập loader lỗi mạng và cache rỗng
-      setCachedCoupons([]);
-      await renderHomeVouchers(async () => { throw new Error('Network offline'); });
-
-      // Dữ liệu hợp lệ cũ không bị xóa hay che mất
-      assert.strictEqual(containerInnerHtml, existingHtml, 'Không được ghi đè làm mất dữ liệu voucher hợp lệ khi mạng lỗi');
-
-      // 2. Giả lập loader trả về rỗng
-      await renderHomeVouchers(async () => []);
-      assert.strictEqual(containerInnerHtml, existingHtml, 'Không được ghi đè làm mất dữ liệu voucher hợp lệ khi danh sách rỗng');
-
-      // 3. Khi loader lỗi nhưng cache có sẵn voucher, vẫn hiển thị được voucher từ cache
-      setCachedCoupons([
-        { code: 'CACHED10', badge: '10K', title: 'Giảm 10K Cache', description: 'Đơn từ 100K' }
-      ]);
-      await renderHomeVouchers(async () => { throw new Error('Offline'); });
-      assert.ok(containerInnerHtml.includes('CACHED10'), 'Phục hồi hiển thị từ cache khi mạng lỗi');
-    } finally {
-      // Khôi phục cache coupons từ file thật
-      try { await loadCoupons(); } catch {}
-      globalThis.document = prevDoc;
-    }
-  });
+test('25. REGRESSION: Khởi tạo tương tác giao diện chung', () => {
+  const appPath = path.join(process.cwd(), 'js', 'app.js');
+  const appContent = fs.readFileSync(appPath, 'utf8');
+  assert.ok(appContent.includes('import { initUI }'), 'app.js phải import initUI');
+  assert.ok(appContent.includes('initUI();'), 'app.js phải gọi initUI()');
 });
-

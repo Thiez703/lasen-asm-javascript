@@ -3,7 +3,7 @@
 Môn học: WEB1044 — Lập trình cơ sở với JavaScript (FPT Polytechnic Cần Thơ).
 
 ## 1. Cách chạy ứng dụng qua máy chủ HTTP
-Vì ứng dụng sử dụng chuẩn **ES Modules** (`<script type="module">`) và nạp dữ liệu động từ các file JSON thực tế (`js/data/coupons.json`, `js/data/order-statuses.json`), trình duyệt yêu cầu chạy trên máy chủ HTTP (không mở trực tiếp file `file:///` để tránh lỗi CORS):
+Vì ứng dụng sử dụng chuẩn **ES Modules** (`<script type="module">`) và nạp dữ liệu động từ các file JSON thực tế (`js/data/products.json`, `js/data/order-statuses.json`), trình duyệt yêu cầu chạy trên máy chủ HTTP (không mở trực tiếp file `file:///` để tránh lỗi CORS):
 
 ### Cách 1: Sử dụng VS Code Live Server (Khuyên dùng)
 1. Mở thư mục dự án trong VS Code.
@@ -45,14 +45,12 @@ node --check js/app.js
    - `js/data/categories.json`: Danh sách 5 danh mục sản phẩm.
    - `js/data/reviews.json`: Các đánh giá sản phẩm.
    - `js/data/users.json`: Dữ liệu người dùng mẫu.
-   - `js/data/coupons.json`: Danh sách 5 mã ưu đãi (`LASEN30`, `SEN50`, `SEN10`, `FREESHIP`, `CHAOBAN`) dùng chung cho render trang chủ, giỏ hàng và thanh toán. Không duplicate hằng số coupon trong mã nguồn.
    - `js/data/order-statuses.json`: Metadata 5 trạng thái đơn hàng (`tat-ca`, `cho-xac-nhan`, `dang-giao`, `da-giao`, `da-huy`) dùng để render động bộ lọc trên hồ sơ cá nhân.
    - `js/data/sample-orders.json`: Danh sách các đơn hàng mẫu minh họa mang cờ `isDemo: true`, chỉ hiển thị khi người dùng chưa có đơn hàng thực tế.
    - Thư mục `js/data` chỉ chứa JSON. `js/services/dataService.js` nạp dữ liệu trước khi các module sử dụng và cung cấp hàm tra cứu sản phẩm, đánh giá; `js/services/orderService.js` nạp đơn hàng mẫu.
-2. **Luồng mã giảm giá (Coupon)**:
-   - Nút sao chép mã (Copy) trên giao diện trang chủ hoạt động bằng Clipboard API + fallback `execCommand`.
-   - Giỏ hàng (`cart.html`) và Thanh toán (`checkout.html`) đều hỗ trợ nhập mã, áp dụng và gỡ bỏ mã với thông báo tiếng Việt cụ thể.
-   - Mã giảm giá được đồng bộ qua `localStorage` (`lasen_applied_coupon`), tự động revalidate khi giỏ hàng thay đổi và tự động xóa sau khi đặt hàng thành công.
+2. **Giỏ hàng và tính tiền**:
+   - Sản phẩm được tính theo giá bán hiện tại, số lượng được giới hạn theo tồn kho.
+   - Tổng thanh toán gồm tiền sản phẩm và phí vận chuyển 30.000đ; đơn từ 500.000đ tự động miễn phí vận chuyển.
 3. **Cơ chế chống trùng lặp & Phục hồi đơn hàng (Idempotency & Resilience)**:
    - Chống nhân bản đơn hàng bằng `idempotencyToken`.
    - Cơ chế phục hồi dọn giỏ hàng lỗi (Pending Cleanup Recovery) được giới hạn phạm vi phiên qua marker `lasen_pending_cart_cleanup` và cờ `pendingCartCleanup` của đơn vừa đặt, tuyệt đối không chặn các đơn mua lại hợp lệ (legitimate repeat order) từ lịch sử.
@@ -60,6 +58,9 @@ node --check js/app.js
    - Bộ lọc trạng thái đơn hàng được render động từ JSON, hoạt động đầy đủ trên 5 trạng thái với xử lý giao diện rỗng (empty state).
    - Biểu mẫu hồ sơ cá nhân có kiểm tra tính hợp lệ (Validation) và lưu trữ bền vững (`lasen_user_profile`).
    - Tự động điền (Autofill) địa chỉ mặc định từ Sổ địa chỉ sang biểu mẫu thanh toán theo cấu trúc tầng (Cascading: Tỉnh -> Huyện).
+5. **Tìm và lọc sản phẩm**:
+   - Chọn một hoặc nhiều loại sản phẩm, kết hợp khoảng giá theo giá bán hiện tại.
+   - Danh sách hỗ trợ tìm kiếm, sắp xếp và phân trang; trên điện thoại, mở nút Bộ lọc để chọn loại và giá.
 
 ---
 
@@ -77,6 +78,8 @@ Luồng chính để theo dõi: **xem sản phẩm → thêm vào giỏ → than
 
 Mọi trang HTML đều nạp `app.js`. Các hàm khởi tạo kiểm tra phần tử DOM của chức năng trước khi xử lý, nên hãy chú ý các đoạn `querySelector(...)` và `if (!element) return`.
 
+Các bước chỉ chạy một lần được viết trực tiếp trong hàm chính của từng chức năng, có chú thích để đọc từ trên xuống. Chỉ giữ hàm riêng cho phần được dùng lại như lưu trữ, định dạng, kiểm tra dữ liệu và cập nhật giao diện theo sự kiện.
+
 ### 4.2. Dữ liệu và các hàm dùng chung
 
 - [ ] [js/data/products.json](js/data/products.json) — Hiểu cấu trúc một sản phẩm: `id`, giá, giá giảm, danh mục, loại da và tồn kho.
@@ -90,19 +93,17 @@ Mọi trang HTML đều nạp `app.js`. Các hàm khởi tạo kiểm tra phần
 
 ### 4.3. Danh sách và chi tiết sản phẩm
 
-- [ ] [products.html](products.html) — Xác định vùng danh sách, bộ lọc, tìm kiếm, sắp xếp và phân trang.
+- [ ] [products.html](products.html) — Xác định vùng danh sách, bộ lọc loại sản phẩm và khoảng giá, tìm kiếm, sắp xếp và phân trang.
 - [ ] [js/services/favoriteService.js](js/services/favoriteService.js) — Hiểu cách lưu, thêm và bỏ sản phẩm yêu thích.
 - [ ] [js/render/products.js](js/render/products.js) — Bắt đầu từ `createProductCard()` và `renderProducts()`; theo dõi sự kiện thêm giỏ và yêu thích.
-- [ ] [js/modules/filter.js](js/modules/filter.js) — Bắt đầu từ `filterAndSortProducts()` và `initProductFilters()`; hiểu cách render danh sách trên `products.html`.
+- [ ] [js/modules/filter.js](js/modules/filter.js) — Bắt đầu từ `filterAndSortProducts()` và `initProductFilters()`; theo dõi lọc loại sản phẩm kết hợp giá, đồng bộ URL và render danh sách trên `products.html`.
 - [ ] [product-detail.html](product-detail.html) — Xác định thông tin sản phẩm, thư viện ảnh, ô số lượng, các tab và đánh giá.
 - [ ] [js/render/detail.js](js/render/detail.js) — Bắt đầu từ `renderProductDetail()`; theo dõi lấy `id` từ URL, tra cứu sản phẩm và thêm số lượng đã chọn vào giỏ.
 
-### 4.4. Giỏ hàng và mã giảm giá
+### 4.4. Giỏ hàng
 
-- [ ] [js/data/coupons.json](js/data/coupons.json) — Hiểu cấu trúc mã giảm giá và điều kiện áp dụng.
-- [ ] [js/services/couponService.js](js/services/couponService.js) — Theo dõi nạp mã, kiểm tra điều kiện, lưu mã đang áp dụng và kiểm tra lại khi giỏ thay đổi.
 - [ ] [js/services/cartService.js](js/services/cartService.js) — Theo dõi `addToCart()` → `saveCart()`; hiểu chuẩn hóa giỏ, giới hạn tồn kho, tính tiền và phát sự kiện `cart:updated`.
-- [ ] [cart.html](cart.html) — Xác định bảng giỏ hàng, ô số lượng, mã giảm giá, tổng tiền và giao diện giỏ rỗng.
+- [ ] [cart.html](cart.html) — Xác định bảng giỏ hàng, ô số lượng, tổng tiền và giao diện giỏ rỗng.
 - [ ] [js/render/cart.js](js/render/cart.js) — Bắt đầu từ `renderCart()` và `updateCartUI()`; hiểu cách hiển thị giỏ và xử lý đổi số lượng, xóa sản phẩm.
 
 ### 4.5. Thanh toán và tạo đơn hàng
@@ -120,11 +121,11 @@ Mọi trang HTML đều nạp `app.js`. Các hàm khởi tạo kiểm tra phần
 - [ ] [js/data/sample-orders.json](js/data/sample-orders.json) — Hiểu cấu trúc đơn mẫu và cờ `isDemo`.
 - [ ] [js/services/orderService.js](js/services/orderService.js) — Hiểu cách nạp và lưu cache đơn mẫu để minh họa khi chưa có đơn thực tế.
 - [ ] [profile.html](profile.html) — Xác định các tab thông tin cá nhân, đơn hàng, địa chỉ và sản phẩm yêu thích.
-- [ ] [js/render/profile.js](js/render/profile.js) — Bắt đầu từ `renderProfile()` → `initProfilePage()`; sau đó đọc `renderUserOrders()`, `initAddressBook()`, `initAccountTabs()` và `renderWishlist()`.
+- [ ] [js/render/profile.js](js/render/profile.js) — Bắt đầu từ `renderProfile()`; đọc lần lượt phần hồ sơ, sổ địa chỉ và chuyển tab trong hàm này, sau đó xem `renderUserOrders()` và `renderWishlist()` để hiểu cập nhật danh sách theo sự kiện.
 
 ### 4.7. Giao diện chung và các trang phụ
 
-- [ ] [js/modules/ui.js](js/modules/ui.js) — Bắt đầu từ `initUI()`; hiểu cập nhật giỏ trên header, tìm kiếm, menu mobile, voucher và các tương tác chung.
+- [ ] [js/modules/ui.js](js/modules/ui.js) — Bắt đầu từ `initUI()`; hiểu cập nhật giỏ trên header, tìm kiếm, menu mobile và các tương tác chung.
 - [ ] [contact.html](contact.html) — Xác định form liên hệ và vùng câu hỏi thường gặp.
 - [ ] [js/render/contact.js](js/render/contact.js) — Hiểu mở/gập câu hỏi và kiểm tra form liên hệ.
 - [ ] [about.html](about.html) — Hiểu cấu trúc trang giới thiệu và các thành phần dùng chung.

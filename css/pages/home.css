@@ -1,6 +1,6 @@
 /* =========================================================
    LÁ SEN — home.css
-   Riêng cho trang chủ: banner, voucher, danh mục, flash sale,
+   Riêng cho trang chủ: banner, danh mục, flash sale,
    dải sản phẩm, thương hiệu, bài viết.
    ========================================================= */
 
@@ -122,103 +122,6 @@
 
 .policy-row {
   padding-top: var(--sp-4);
-}
-
-/* =========================================================
-   3. Mã giảm giá
-   ========================================================= */
-
-.vouchers {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(240px, 1fr);
-  gap: var(--sp-3);
-  overflow-x: auto;
-  padding-bottom: var(--sp-2);
-  scrollbar-width: thin;
-}
-
-.voucher {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-3) var(--sp-4);
-  border: 1px dashed var(--c-primary-soft);
-  border-radius: var(--radius);
-  background: linear-gradient(135deg, var(--c-primary-tint) 0%, var(--c-surface) 70%);
-}
-
-/* Hai khuyết tròn hai bên cho giống phiếu giảm giá */
-.voucher::before,
-.voucher::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  background-color: var(--c-paper);
-  border: 1px dashed var(--c-primary-soft);
-  transform: translateY(-50%);
-}
-
-.voucher::before {
-  left: -8px;
-  clip-path: inset(0 0 0 50%);
-}
-
-.voucher::after {
-  right: -8px;
-  clip-path: inset(0 50% 0 0);
-}
-
-.voucher__value {
-  flex: none;
-  font-size: var(--fs-lg);
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--c-primary);
-}
-
-.voucher__body {
-  flex: 1;
-  min-width: 0;
-}
-
-.voucher__title {
-  font-family: var(--f-body);
-  font-size: var(--fs-sm);
-  font-weight: 700;
-  color: var(--c-ink);
-}
-
-.voucher__cond {
-  font-size: var(--fs-xs);
-  color: var(--c-ink-muted);
-}
-
-.voucher__code {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-1);
-  margin-top: var(--sp-1);
-  padding: 2px var(--sp-2);
-  border: 1px solid var(--c-primary-soft);
-  border-radius: var(--radius-sm);
-  background-color: var(--c-surface);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: var(--c-primary-dark);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.voucher__code:hover {
-  background-color: var(--c-primary);
-  border-color: var(--c-primary);
-  color: var(--c-surface);
 }
 
 /* =========================================================
@@ -494,10 +397,10 @@
 }
 
 /* =========================================================
-   7. Chọn theo loại da
+   7. Chọn theo loại sản phẩm
    ========================================================= */
 
-.skin-filter {
+.category-filter {
   margin-bottom: var(--sp-6);
 }
 
@@ -520,13 +423,6 @@
   border-radius: var(--radius);
   background-color: var(--c-surface);
   text-align: center;
-  transition: border-color 0.25s ease, transform 0.25s var(--ease-out), box-shadow 0.25s ease;
-}
-
-.brand:hover {
-  border-color: var(--c-primary-soft);
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-sm);
 }
 
 .brand__name {

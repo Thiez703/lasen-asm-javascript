@@ -12,29 +12,25 @@ export async function loadIcons() {
     const res = await fetch(iconUrl);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const svgText = await res.text();
-    injectSprite(svgText);
+    if (document.getElementById('i-lotus')) return;
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgText, 'image/svg+xml');
+    const svgElem = doc.querySelector('svg');
+
+    if (svgElem) {
+      svgElem.classList.add('sprite');
+      svgElem.style.display = 'none';
+      svgElem.setAttribute('aria-hidden', 'true');
+      document.body.insertBefore(document.importNode(svgElem, true), document.body.firstChild);
+    } else {
+      const container = document.createElement('div');
+      container.style.display = 'none';
+      container.setAttribute('aria-hidden', 'true');
+      container.innerHTML = svgText;
+      document.body.insertBefore(container, document.body.firstChild);
+    }
   } catch (err) {
     console.error('Lỗi khi nạp kho icon từ js/utils/icons.svg:', err);
-  }
-}
-
-function injectSprite(svgContent) {
-  if (document.getElementById('i-lotus')) return;
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(svgContent, 'image/svg+xml');
-  const svgElem = doc.querySelector('svg');
-
-  if (svgElem) {
-    svgElem.classList.add('sprite');
-    svgElem.style.display = 'none';
-    svgElem.setAttribute('aria-hidden', 'true');
-    document.body.insertBefore(document.importNode(svgElem, true), document.body.firstChild);
-  } else {
-    const container = document.createElement('div');
-    container.style.display = 'none';
-    container.setAttribute('aria-hidden', 'true');
-    container.innerHTML = svgContent;
-    document.body.insertBefore(container, document.body.firstChild);
   }
 }

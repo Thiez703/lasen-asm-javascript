@@ -8,7 +8,6 @@ import { validation } from '../modules/validation.js';
 import { showToast } from '../services/toast.js';
 import { processCheckout, generateCartFingerprint, validateAndSanitizeOrder, ORDERS_KEY, COMPLETED_CHECKOUT_KEY, PENDING_CLEANUP_KEY, validatePendingCleanupMarker } from '../services/checkoutService.js';
 import { storage } from '../services/storage.js';
-import { loadCoupons, getCoupons, validateCoupon, getAppliedCoupon, setAppliedCoupon, clearAppliedCoupon, revalidateAppliedCoupon } from '../services/couponService.js';
 
 // Dữ liệu Tỉnh/Thành phố và Quận/Huyện demo
 const locationData = {
@@ -110,24 +109,8 @@ export async function renderCheckout() {
   const form = document.querySelector('[data-checkout-form]');
   if (!form) return;
 
-  // Nạp dữ liệu coupon từ JSON trước khi tính toán tóm tắt đơn
-  let isCouponUnavailable = false;
-  try {
-    await loadCoupons();
-  } catch (err) {
-    console.warn('Lỗi khi nạp coupons.json tại checkout:', err);
-    isCouponUnavailable = true;
-  }
-
   const items = cartService.getCartDetails();
-  const appliedCode = getAppliedCoupon();
-
-  if (appliedCode && !isCouponUnavailable) {
-    const curTotals = cartService.getCartTotals('');
-    revalidateAppliedCoupon(curTotals.subtotal, curTotals.shipping);
-  }
-
-  const totals = cartService.getCartTotals(appliedCode);
+  const totals = cartService.getCartTotals();
   const currentFingerprint = generateCartFingerprint(items);
 
   const rawOrders = storage.get(ORDERS_KEY, []);
@@ -156,7 +139,6 @@ export async function renderCheckout() {
         storage.set(ORDERS_KEY, ordersList);
       }
       const warning = cleared ? '' : 'Đơn hàng đã được lưu thành công nhưng giỏ hàng chưa thể dọn sạch tự động.';
-      clearAppliedCoupon();
       renderOrderSuccessView(matchingOrder, warning);
       return;
     } else {
@@ -173,54 +155,26 @@ export async function renderCheckout() {
   if (items.length === 0) {
     if (lastCompleted) {
       // Người dùng vừa reload sau khi đặt hàng thành công -> hiển thị đơn vừa đặt
-      clearAppliedCoupon();
       renderOrderSuccessView(lastCompleted);
       return;
     }
-    handleEmptyCheckout();
+    const checkoutContainer = document.querySelector('.checkout');
+    if (checkoutContainer) {
+      checkoutContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: var(--c-surface, #fff); border-radius: var(--radius-md, 8px); box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.1));">
+          <svg class="icon" style="width: 56px; height: 56px; color: var(--c-muted, #999); margin-bottom: 16px;" aria-hidden="true">
+            <use href="#i-cart"></use>
+          </svg>
+          <h2 style="font-size: 20px; margin-bottom: 8px;">Giỏ hàng của bạn đang trống</h2>
+          <p style="color: var(--c-muted, #666); margin-bottom: 24px;">Bạn chưa chọn sản phẩm nào để thanh toán. Vui lòng thêm sản phẩm vào giỏ hàng trước.</p>
+          <a class="btn btn--primary" href="products.html">Khám phá sản phẩm ngay</a>
+        </div>
+      `;
+    }
     return;
   }
 
   // 3. Giỏ hàng mới hợp lệ -> Render Order Summary đồng bộ với giỏ hàng
-  renderOrderSummary(items, totals);
-
-  // 4. Khởi tạo chọn Tỉnh / Huyện cascading
-  initLocationCascading();
-
-  // 5. Tự động điền thông tin người nhận và địa chỉ mặc định từ Sổ địa chỉ & Hồ sơ
-  autofillDefaultAddressAndProfile(form);
-
-  // 6. Khởi tạo chức năng nhập và gỡ mã giảm giá tại Checkout
-  initCheckoutCoupon(items);
-
-  // 7. Khởi tạo xử lý nộp form và đặt hàng an toàn với token
-  const idempotencyToken = `tok_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  initCheckoutFormSubmit(form, idempotencyToken);
-}
-
-/**
- * Xử lý khi giỏ hàng rỗng lúc vào trang checkout
- */
-function handleEmptyCheckout() {
-  const checkoutContainer = document.querySelector('.checkout');
-  if (checkoutContainer) {
-    checkoutContainer.innerHTML = `
-      <div style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: var(--c-surface, #fff); border-radius: var(--radius-md, 8px); box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.1));">
-        <svg class="icon" style="width: 56px; height: 56px; color: var(--c-muted, #999); margin-bottom: 16px;" aria-hidden="true">
-          <use href="#i-cart"></use>
-        </svg>
-        <h2 style="font-size: 20px; margin-bottom: 8px;">Giỏ hàng của bạn đang trống</h2>
-        <p style="color: var(--c-muted, #666); margin-bottom: 24px;">Bạn chưa chọn sản phẩm nào để thanh toán. Vui lòng thêm sản phẩm vào giỏ hàng trước.</p>
-        <a class="btn btn--primary" href="products.html">Khám phá sản phẩm ngay</a>
-      </div>
-    `;
-  }
-}
-
-/**
- * Render danh sách sản phẩm và tổng tiền trong khối tóm tắt đơn hàng
- */
-function renderOrderSummary(items, totals) {
   const orderList = document.querySelector('[data-list="order"]');
   if (orderList) {
     orderList.innerHTML = items.map(item => {
@@ -249,59 +203,39 @@ function renderOrderSummary(items, totals) {
     shippingEl.textContent = totals.shipping === 0 ? 'Miễn phí' : formatPrice(totals.shipping);
   }
 
-  const discountRow = document.querySelector('.checkout__aside [data-cart-discount]');
-  if (discountRow) {
-    if (totals.discount > 0) {
-      discountRow.textContent = `−${formatPrice(totals.discount)}`;
-      discountRow.closest('.summary__row').style.display = '';
-    } else {
-      discountRow.closest('.summary__row').style.display = 'none';
-    }
-  }
-
   const totalEl = document.querySelector('.checkout__aside [data-cart-total]');
   if (totalEl) totalEl.textContent = formatPrice(totals.total);
-}
 
-/**
- * Xử lý cascading dropdown Tỉnh / Thành phố và Quận / Huyện
- */
-function initLocationCascading() {
+  // 4. Khởi tạo chọn Tỉnh / Huyện cascading
   const provinceSelect = document.querySelector('[data-province]');
   const districtSelect = document.querySelector('[data-district]');
-  if (!provinceSelect || !districtSelect) return;
+  if (provinceSelect && districtSelect) {
+    const updateDistricts = () => {
+      const provKey = provinceSelect.value;
+      validation.clearError(provinceSelect);
+      validation.clearError(districtSelect);
 
-  const updateDistricts = () => {
-    const provKey = provinceSelect.value;
-    validation.clearError(provinceSelect);
-    validation.clearError(districtSelect);
+      if (!provKey || !locationData[provKey]) {
+        districtSelect.innerHTML = '<option value="">Chọn tỉnh / thành phố trước</option>';
+        districtSelect.disabled = true;
+        return;
+      }
 
-    if (!provKey || !locationData[provKey]) {
-      districtSelect.innerHTML = '<option value="">Chọn tỉnh / thành phố trước</option>';
-      districtSelect.disabled = true;
-      return;
+      const { districts } = locationData[provKey];
+      districtSelect.disabled = false;
+      districtSelect.innerHTML = [
+        '<option value="">Chọn quận / huyện</option>',
+        ...districts.map(d => `<option value="${escapeHTML(d.id)}">${escapeHTML(d.name)}</option>`)
+      ].join('');
+    };
+
+    provinceSelect.addEventListener('change', updateDistricts);
+    if (provinceSelect.value) {
+      updateDistricts();
     }
-
-    const { districts } = locationData[provKey];
-    districtSelect.disabled = false;
-    districtSelect.innerHTML = [
-      '<option value="">Chọn quận / huyện</option>',
-      ...districts.map(d => `<option value="${escapeHTML(d.id)}">${escapeHTML(d.name)}</option>`)
-    ].join('');
-  };
-
-  provinceSelect.addEventListener('change', updateDistricts);
-  if (provinceSelect.value) {
-    updateDistricts();
   }
-}
 
-/**
- * Tự động điền thông tin người nhận và địa chỉ từ sổ địa chỉ / hồ sơ
- */
-function autofillDefaultAddressAndProfile(form) {
-  if (!form) return;
-
+  // 5. Tự động điền thông tin người nhận và địa chỉ mặc định từ Sổ địa chỉ & Hồ sơ
   const hoTenInput = form.querySelector('[data-input="hoTen"]');
   const sdtInput = form.querySelector('[data-input="soDienThoai"]');
   const emailInput = form.querySelector('[data-input="email"]');
@@ -324,128 +258,53 @@ function autofillDefaultAddressAndProfile(form) {
     ? (addresses.find(a => a.isDefault) || addresses[0])
     : null;
 
-  if (!defaultAddr) return;
+  if (defaultAddr) {
+    if (hoTenInput && !hoTenInput.value && defaultAddr.name) hoTenInput.value = defaultAddr.name;
+    if (sdtInput && !sdtInput.value && defaultAddr.phone) sdtInput.value = defaultAddr.phone;
+    if (ghiChuInput && !ghiChuInput.value && defaultAddr.note) ghiChuInput.value = defaultAddr.note;
 
-  if (hoTenInput && !hoTenInput.value && defaultAddr.name) hoTenInput.value = defaultAddr.name;
-  if (sdtInput && !sdtInput.value && defaultAddr.phone) sdtInput.value = defaultAddr.phone;
-  if (ghiChuInput && !ghiChuInput.value && defaultAddr.note) ghiChuInput.value = defaultAddr.note;
+    const fullAddr = defaultAddr.address || '';
+    const addrStr = fullAddr.toLowerCase();
 
-  const fullAddr = defaultAddr.address || '';
-  const addrStr = fullAddr.toLowerCase();
-
-  // Nhận diện Tỉnh / Thành phố
-  if (tinhInput && !tinhInput.value) {
-    let matchedProv = '';
-    for (const [key, val] of Object.entries(locationData)) {
-      const cleanName = val.name.toLowerCase().replace('tp.', '').trim();
-      if (addrStr.includes(cleanName) || addrStr.includes(key.replace(/-/g, ' '))) {
-        matchedProv = key;
-        break;
+    // Nhận diện Tỉnh / Thành phố
+    if (tinhInput && !tinhInput.value) {
+      let matchedProv = '';
+      for (const [key, val] of Object.entries(locationData)) {
+        const cleanName = val.name.toLowerCase().replace('tp.', '').trim();
+        if (addrStr.includes(cleanName) || addrStr.includes(key.replace(/-/g, ' '))) {
+          matchedProv = key;
+          break;
+        }
       }
-    }
 
-    if (matchedProv) {
-      tinhInput.value = matchedProv;
-      // Kích hoạt change để cập nhật dropdown Quận / Huyện đúng cascading
-      tinhInput.dispatchEvent(new Event('change'));
+      if (matchedProv) {
+        tinhInput.value = matchedProv;
+        // Kích hoạt change để cập nhật dropdown Quận / Huyện đúng cascading
+        tinhInput.dispatchEvent(new Event('change'));
 
-      // Nhận diện Quận / Huyện
-      if (huyenInput && locationData[matchedProv]) {
-        for (const dist of locationData[matchedProv].districts) {
-          const cleanDist = dist.name.toLowerCase().replace(/quận|huyện|thị xã|tp\./g, '').trim();
-          if (addrStr.includes(cleanDist) || addrStr.includes(dist.id)) {
-            huyenInput.value = dist.id;
-            huyenInput.dispatchEvent(new Event('change'));
-            break;
+        // Nhận diện Quận / Huyện
+        if (huyenInput && locationData[matchedProv]) {
+          for (const dist of locationData[matchedProv].districts) {
+            const cleanDist = dist.name.toLowerCase().replace(/quận|huyện|thị xã|tp\./g, '').trim();
+            if (addrStr.includes(cleanDist) || addrStr.includes(dist.id)) {
+              huyenInput.value = dist.id;
+              huyenInput.dispatchEvent(new Event('change'));
+              break;
+            }
           }
         }
       }
     }
+
+    // Điền địa chỉ chi tiết
+    if (diaChiInput && !diaChiInput.value && fullAddr) {
+      diaChiInput.value = fullAddr;
+    }
   }
 
-  // Điền địa chỉ chi tiết
-  if (diaChiInput && !diaChiInput.value && fullAddr) {
-    diaChiInput.value = fullAddr;
-  }
-}
-
-/**
- * Quản lý nhập, áp dụng và gỡ bỏ mã giảm giá ngay tại màn hình thanh toán
- */
-function initCheckoutCoupon(items) {
-  const couponForm = document.querySelector('[data-checkout-coupon-form]');
-  if (!couponForm) return;
-
-  const input = couponForm.querySelector('[data-coupon-input]');
-  const errSpan = couponForm.querySelector('[data-error-for="checkout-coupon"]');
-  const appliedBox = couponForm.querySelector('[data-coupon-applied-box]');
-  const okMsg = couponForm.querySelector('[data-coupon-ok]');
-  const removeBtn = couponForm.querySelector('[data-coupon-remove]');
-
-  const updateCouponUI = () => {
-    const appliedCode = getAppliedCoupon();
-    const totals = cartService.getCartTotals(appliedCode);
-    renderOrderSummary(items, totals);
-
-    if (appliedCode && totals.coupon) {
-      if (input) input.value = appliedCode;
-      if (okMsg) okMsg.textContent = `Đã áp dụng ${totals.coupon.code} (${totals.coupon.desc})`;
-      if (appliedBox) appliedBox.classList.remove('is-hidden');
-      if (errSpan) errSpan.textContent = '';
-    } else if (appliedCode && getCoupons().length === 0) {
-      if (input) input.value = appliedCode;
-      if (okMsg) okMsg.textContent = `Đang lưu mã ${appliedCode} (chờ nạp dữ liệu xác thực...)`;
-      if (appliedBox) appliedBox.classList.remove('is-hidden');
-      if (errSpan) errSpan.textContent = 'Mã ưu đãi chưa thể xác thực do kết nối chậm. Vui lòng thử lại trước khi bấm Đặt hàng.';
-    } else {
-      if (appliedBox) appliedBox.classList.add('is-hidden');
-    }
-  };
-
-  updateCouponUI();
-
-  couponForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!input) return;
-
-    const code = input.value.trim().toUpperCase();
-    if (!code) {
-      if (errSpan) errSpan.textContent = 'Vui lòng nhập mã giảm giá.';
-      return;
-    }
-
-    const currentTotals = cartService.getCartTotals('');
-    const validationRes = validateCoupon(code, currentTotals.subtotal, currentTotals.shipping);
-
-    if (!validationRes.valid) {
-      clearAppliedCoupon();
-      if (errSpan) errSpan.textContent = validationRes.message;
-      updateCouponUI();
-      showToast(validationRes.message, 'error');
-      return;
-    }
-
-    setAppliedCoupon(code);
-    if (errSpan) errSpan.textContent = '';
-    updateCouponUI();
-    showToast(validationRes.message);
-  });
-
-  if (removeBtn) {
-    removeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      clearAppliedCoupon();
-      if (input) input.value = '';
-      if (errSpan) errSpan.textContent = '';
-      updateCouponUI();
-      const submitBtn = document.querySelector('[data-place-order]');
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Đặt hàng';
-      }
-      showToast('Đã gỡ bỏ mã giảm giá.');
-    });
-  }
+  // 6. Khởi tạo xử lý nộp form và đặt hàng an toàn với token
+  const idempotencyToken = `tok_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  initCheckoutFormSubmit(form, idempotencyToken);
 }
 
 /**
@@ -526,20 +385,6 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
     const fullAddress = `${diaChiInput.value.trim()}, ${districtName}, ${provinceName}`;
 
     const submitBtn = document.querySelector('[data-place-order]');
-    const resetSubmitBtn = () => {
-      isSubmitting = false;
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Đặt hàng';
-      }
-    };
-
-    // GUARD TRƯỚC KHI KHÓA NÚT: Kiểm tra nếu có mã giảm giá đang lưu nhưng dữ liệu chưa tải được
-    const appliedCode = getAppliedCoupon();
-    if (appliedCode && getCoupons().length === 0) {
-      showToast(`Mã ưu đãi "${appliedCode}" chưa thể xác thực do dữ liệu chưa tải xong. Vui lòng gỡ mã hoặc thử lại sau giây lát để không bị tính giá chưa giảm.`, 'error');
-      return; // Không bật isSubmitting, form và nút Đặt hàng vẫn hoạt động bình thường
-    }
 
     // Khóa nút để chặn double click / double submit
     isSubmitting = true;
@@ -550,7 +395,6 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
 
     const orderInput = {
       idempotencyToken,
-      couponCode: appliedCode || '',
       customer: {
         name: hoTenInput.value.trim(),
         phone: sdtInput.value.trim(),
@@ -564,14 +408,13 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
     const checkoutResult = processCheckout(orderInput);
 
     if (!checkoutResult.success) {
-      resetSubmitBtn();
+      isSubmitting = false;
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Đặt hàng';
+      }
       showToast(checkoutResult.message, 'error');
       return;
-    }
-
-    // Đặt hàng thành công: xóa mã coupon đang lưu mà không phá snapshot hay retry/idempotency
-    if (!checkoutResult.alreadyProcessed) {
-      clearAppliedCoupon();
     }
 
     if (checkoutResult.warning) {

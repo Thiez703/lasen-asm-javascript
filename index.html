@@ -23,12 +23,12 @@
     <div class="container topbar__inner">
       <p class="topbar__promo">
         <span class="topbar__track">
-          <span class="topbar__code">Nhập mã ưu đãi ở bước thanh toán để nhận ngay giảm giá</span>
-          <span class="topbar__code">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
-          <span class="topbar__code">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
-          <span class="topbar__code" aria-hidden="true">Nhập mã ưu đãi ở bước thanh toán để nhận ngay giảm giá</span>
-          <span class="topbar__code" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
-          <span class="topbar__code" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__message">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__message" aria-hidden="true">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
         </span>
       </p>
 
@@ -174,7 +174,7 @@
             <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
             Mua ngay
           </a>
-          <a class="btn btn--outline btn--lg" href="products.html?sale=1">
+          <a class="btn btn--outline btn--lg" href="#flash-sale">
             Xem ưu đãi
             <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
           </a>
@@ -182,7 +182,7 @@
         <ul class="hero-banner__perks">
           <li class="hero-banner__perk">
             <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-            Freeship từ 299k
+            Freeship từ 500k
           </li>
           <li class="hero-banner__perk">
             <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
@@ -249,32 +249,6 @@
       </div>
     </section>
 
-    <!-- ----- 3. Mã giảm giá ----- -->
-    <section class="section section--tight" aria-labelledby="voucher-title">
-      <div class="container">
-        <div class="section-title">
-          <h2 class="section-title__text" id="voucher-title">
-            <svg class="icon" aria-hidden="true">
-              <use href="#i-gift"></use>
-            </svg>
-            Mã giảm giá tháng này
-          </h2>
-          <a class="section-title__link" href="contact.html">
-            Điều kiện áp dụng
-            <svg class="icon" aria-hidden="true">
-              <use href="#i-arrow-right"></use>
-            </svg>
-          </a>
-          <p class="section-title__sub">Nhập mã ở bước thanh toán. Mỗi đơn dùng được một mã, không cộng dồn với ưu đãi
-            combo.</p>
-        </div>
-
-        <ul class="vouchers" data-list="vouchers">
-          <!-- JS tự động tải dữ liệu từ js/data/coupons.json và render 5 mã ưu đãi thực tế tại đây -->
-        </ul>
-      </div>
-    </section>
-
     <!-- ----- 4. Danh mục nổi bật ----- -->
     <section class="section section--tight" aria-labelledby="cat-title">
       <div class="container">
@@ -329,7 +303,7 @@
     </section>
 
     <!-- ----- 5. Flash Sale ----- -->
-    <section class="section flash" aria-labelledby="flash-title">
+    <section class="section flash" id="flash-sale" aria-labelledby="flash-title">
       <div class="container">
         <div class="flash__head">
           <h2 class="flash__title" id="flash-title">
@@ -466,28 +440,28 @@
       </div>
     </section>
 
-    <!-- ----- 9. Chọn theo loại da ----- -->
-    <section class="section" aria-labelledby="skin-title">
+    <!-- ----- 9. Chọn theo loại sản phẩm ----- -->
+    <section class="section" aria-labelledby="category-recommendations-title">
       <div class="container">
         <div class="section-title">
-          <h2 class="section-title__text" id="skin-title">
+          <h2 class="section-title__text" id="category-recommendations-title">
             <svg class="icon" aria-hidden="true">
               <use href="#i-heart"></use>
             </svg>
-            Chọn theo loại da của bạn
+            Chọn theo loại sản phẩm
           </h2>
-          <p class="section-title__sub">Chưa rõ da mình thuộc loại nào? Rửa mặt xong để yên 30 phút — vùng chữ T bóng
-            dầu là da dầu hoặc hỗn hợp, cả mặt căng rát là da khô.</p>
+          <p class="section-title__sub">Tìm sản phẩm cho từng bước chăm da: làm sạch, dưỡng ẩm, chống nắng, đặc trị và mặt nạ.</p>
         </div>
 
-        <div class="chip-row skin-filter" role="group" aria-label="Lọc sản phẩm theo loại da" data-skin-filter>
-          <button class="chip is-active" type="button" aria-pressed="true" data-skin="da-dau">Da dầu</button>
-          <button class="chip" type="button" aria-pressed="false" data-skin="da-kho">Da khô</button>
-          <button class="chip" type="button" aria-pressed="false" data-skin="da-hon-hop">Da hỗn hợp</button>
-          <button class="chip" type="button" aria-pressed="false" data-skin="da-nhay-cam">Da nhạy cảm</button>
+        <div class="chip-row category-filter" role="group" aria-label="Lọc sản phẩm theo loại sản phẩm" data-category-filter>
+          <button class="chip is-active" type="button" aria-pressed="true" data-category="lam-sach">Làm sạch da</button>
+          <button class="chip" type="button" aria-pressed="false" data-category="duong-am">Dưỡng ẩm</button>
+          <button class="chip" type="button" aria-pressed="false" data-category="chong-nang">Chống nắng</button>
+          <button class="chip" type="button" aria-pressed="false" data-category="dac-tri">Đặc trị</button>
+          <button class="chip" type="button" aria-pressed="false" data-category="mat-na">Mặt nạ</button>
         </div>
 
-        <div class="grid grid--5" data-list="skin">
+        <div class="grid grid--5" data-list="category-recommendations">
           
           
           
@@ -507,23 +481,22 @@
             </svg>
             Thương hiệu bán tại Lá Sen
           </h2>
-          <p class="section-title__sub">Bốn thương hiệu Việt và hai thương hiệu bạn, đều có giấy công bố sản phẩm đầy
-            đủ.</p>
+          <p class="section-title__sub">Các thương hiệu đang có trong danh mục sản phẩm của Lá Sen.</p>
         </div>
 
         <div class="brands">
-          <a class="brand" href="products.html?brand=la-sen">
+          <div class="brand">
             <span class="brand__name">Lá Sen<span class="brand__sub">Cần Thơ</span></span>
-          </a>
-          <a class="brand" href="products.html?brand=sen-viet">
+          </div>
+          <div class="brand">
             <span class="brand__name">Sen Việt<span class="brand__sub">Đồng Tháp</span></span>
-          </a>
-          <a class="brand" href="products.html?brand=thao-moc-xanh">
+          </div>
+          <div class="brand">
             <span class="brand__name">Thảo Mộc Xanh<span class="brand__sub">Long An</span></span>
-          </a>
-          <a class="brand" href="products.html?brand=pure-lotus">
+          </div>
+          <div class="brand">
             <span class="brand__name">Pure Lotus<span class="brand__sub">TP.HCM</span></span>
-          </a>
+          </div>
         </div>
       </div>
     </section>
@@ -720,7 +693,7 @@
 
       <div class="footer__col">
         <h2 class="footer__title">Thư chăm da hằng tháng</h2>
-        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và ưu đãi dành riêng cho khách quen.
+        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và cập nhật sản phẩm mới.
         </p>
         <form class="footer__form" data-newsletter-form novalidate>
           <div class="field field--inline">

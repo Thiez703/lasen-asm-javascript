@@ -4,21 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { products, categories } from '../js/services/dataService.js';
+import { categories } from '../js/services/dataService.js';
 import { loadSampleOrders } from '../js/services/orderService.js';
 import { cartService } from '../js/services/cartService.js';
 import { processCheckout, PENDING_CLEANUP_KEY, validatePendingCleanupMarker, MAX_PENDING_CLEANUP_AGE } from '../js/services/checkoutService.js';
 import { initCheckoutFormSubmit } from '../js/render/checkout.js';
 import { storage } from '../js/services/storage.js';
-import {
-  validateCoupon,
-  getAppliedCoupon,
-  setAppliedCoupon,
-  clearAppliedCoupon,
-  revalidateAppliedCoupon,
-  setCachedCoupons,
-  loadCoupons
-} from '../js/services/couponService.js';
 import { normalizeOrderStatus, loadOrderStatuses, PROFILE_KEY } from '../js/render/profile.js';
 import { validation } from '../js/modules/validation.js';
 
@@ -42,127 +33,6 @@ globalThis.CustomEvent = class CustomEvent {
     this.detail = opts?.detail;
   }
 };
-
-test('15. COUPON DATA JSON & SERVICE INTEGRATION (R1 FIX)', async (t) => {
-  await t.test('File js/data/coupons.json tồn tại và có đủ 5 mã hợp lệ', () => {
-    const jsonPath = path.join(projectRoot, 'js', 'data', 'coupons.json');
-    assert.ok(fs.existsSync(jsonPath), 'js/data/coupons.json phải tồn tại');
-    const content = fs.readFileSync(jsonPath, 'utf8');
-    const data = JSON.parse(content);
-    assert.ok(Array.isArray(data), 'Dữ liệu coupon phải là mảng JSON');
-    assert.strictEqual(data.length, 5, 'Phải có đủ 5 mã coupon');
-    const codes = data.map(c => c.code);
-    assert.deepStrictEqual(codes.sort(), ['CHAOBAN', 'FREESHIP', 'LASEN30', 'SEN10', 'SEN50'].sort());
-  });
-
-  await t.test('couponService.js không chứa DEFAULT_COUPONS hardcode 5 mã', () => {
-    const svcPath = path.join(projectRoot, 'js', 'services', 'couponService.js');
-    const svcContent = fs.readFileSync(svcPath, 'utf8');
-    assert.strictEqual(svcContent.includes('const DEFAULT_COUPONS'), false, 'Không được hardcode DEFAULT_COUPONS trong couponService.js');
-  });
-
-  await t.test('Validation Coupon: kiểm tra mã sai, mã rỗng, min subtotal và tính tiền từ JSON', () => {
-    // Đảm bảo cache được nạp từ file JSON thật
-    loadCoupons();
-
-    // Mã rỗng
-    const emptyRes = validateCoupon('', 500000);
-    assert.strictEqual(emptyRes.valid, false);
-    assert.strictEqual(emptyRes.error, 'EMPTY');
-
-    // Mã không tồn tại
-    const fakeRes = validateCoupon('KHONGTONTAI', 500000);
-    assert.strictEqual(fakeRes.valid, false);
-    assert.strictEqual(fakeRes.error, 'INVALID_CODE');
-
-    // Mã chưa đủ điều kiện
-    const underRes = validateCoupon('LASEN30', 200000);
-    assert.strictEqual(underRes.valid, false);
-    assert.strictEqual(underRes.error, 'MIN_NOT_MET');
-
-    // Mã LASEN30 đủ điều kiện
-    const ok30 = validateCoupon('lasen30', 300000);
-    assert.strictEqual(ok30.valid, true);
-    assert.strictEqual(ok30.discount, 30000);
-
-    // Mã SEN10: giảm 10% tối đa 80k cho đơn từ 500k
-    const okSen10 = validateCoupon('SEN10', 600000);
-    assert.strictEqual(okSen10.valid, true);
-    assert.strictEqual(okSen10.discount, 60000);
-
-    const capSen10 = validateCoupon('SEN10', 900000);
-    assert.strictEqual(capSen10.valid, true);
-    assert.strictEqual(capSen10.discount, 80000); // capped
-
-    // Mã FREESHIP: miễn phí vận chuyển
-    const okShip = validateCoupon('FREESHIP', 400000, 30000);
-    assert.strictEqual(okShip.valid, true);
-    assert.strictEqual(okShip.discount, 30000);
-  });
-
-  await t.test('Failure state: khi coupons rỗng thì báo lỗi rõ ràng, không silently dùng fallback', () => {
-    setCachedCoupons([]);
-    const res = validateCoupon('LASEN30', 500000);
-    assert.strictEqual(res.valid, false);
-    assert.strictEqual(res.error, 'COUPONS_UNAVAILABLE');
-    assert.ok(res.message.includes('không khả dụng') || res.message.includes('chưa tải xong'));
-
-    // Khôi phục lại cache từ file JSON thật
-    loadCoupons();
-  });
-
-  await t.test('Coupon Persistence & Revalidation khi giỏ hàng thay đổi', () => {
-    memoryStore.clear();
-    setAppliedCoupon('SEN50');
-    assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-    // Subtotal 400k -> đủ điều kiện (min 300k)
-    const check1 = revalidateAppliedCoupon(400000, 30000);
-    assert.strictEqual(check1.valid, true);
-    assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-    // Subtotal giảm còn 200k -> không đủ điều kiện -> tự động clear
-    const check2 = revalidateAppliedCoupon(200000, 30000);
-    assert.strictEqual(check2.valid, false);
-    assert.strictEqual(getAppliedCoupon(), '');
-  });
-
-  await t.test('CartService tự động revalidate coupon khi thay đổi số lượng giỏ hàng', () => {
-    memoryStore.clear();
-    cartService.clearCart();
-    // p2 = 289k. Thêm 2 sp = 578k
-    cartService.addToCart('p2', 2);
-    setAppliedCoupon('SEN10'); // min 500k
-    assert.strictEqual(getAppliedCoupon(), 'SEN10');
-
-    // Giảm số lượng xuống 1 sp = 289k (< 500k)
-    cartService.updateQuantity('p2', 1);
-    assert.strictEqual(getAppliedCoupon(), '', 'Coupon phải bị clear khi subtotal không còn đủ điều kiện');
-  });
-
-  await t.test('ProcessCheckout lưu snapshot coupon và clear coupon sau khi hoàn tất', () => {
-    memoryStore.clear();
-    cartService.clearCart();
-    cartService.addToCart('p2', 2); // 578k
-    setAppliedCoupon('SEN50');
-
-    const token = 'tok_test_coupon_1';
-    const orderInput = {
-      idempotencyToken: token,
-      couponCode: getAppliedCoupon(),
-      customer: { name: 'Nguyễn Văn A', phone: '0901234567', email: 'test@lasen.vn' },
-      shippingAddress: '128 Trần Hưng Đạo, Cần Thơ',
-      paymentMethod: 'COD'
-    };
-
-    const res = processCheckout(orderInput);
-    assert.strictEqual(res.success, true);
-    assert.strictEqual(res.order.totals.discount, 50000);
-    assert.strictEqual(res.order.totals.coupon.code, 'SEN50');
-    assert.strictEqual(res.order.totals.total, 528000);
-    assert.strictEqual(getAppliedCoupon(), '', 'Coupon áp dụng phải được clear sau khi đặt hàng thành công');
-  });
-});
 
 test('16. IDEMPOTENCY & REPEAT CHECKOUT (R2 FIX)', async (t) => {
   await t.test('LEGITIMATE REPEAT ORDER: mua lại cùng sản phẩm với token mới phải tạo đơn mới thành công', () => {
@@ -217,7 +87,7 @@ test('16. IDEMPOTENCY & REPEAT CHECKOUT (R2 FIX)', async (t) => {
       shippingAddress: 'Cần Thơ',
       paymentMethod: 'COD',
       items: [{ productId: 'p1', name: 'Sản phẩm 1', price: 165000, quantity: 1 }],
-      totals: { subtotal: 165000, shipping: 30000, discount: 0, total: 195000 }
+      totals: { subtotal: 165000, shipping: 30000, total: 195000 }
     };
     storage.set('lasen_orders', [oldOrder]);
     storage.set('lasen_last_completed_order', oldOrder);
@@ -278,7 +148,7 @@ test('16. IDEMPOTENCY & REPEAT CHECKOUT (R2 FIX)', async (t) => {
     let clearFail = true;
     const mockCartService = {
       getCartDetails: () => cartService.getCartDetails(),
-      getCartTotals: (coupon) => cartService.getCartTotals(coupon),
+      getCartTotals: () => cartService.getCartTotals(),
       clearCart: () => {
         if (clearFail) return false;
         return cartService.clearCart();
@@ -401,7 +271,7 @@ test('18. SAMPLE ORDERS JSON & USER ORDER DISTINCTION (R4 FIX)', async (t) => {
       status: 'Chờ xác nhận',
       customer: { name: 'Lan', phone: '0912345678', email: 'lan@gmail.com' },
       items: [{ productId: 'p1', name: 'Sản phẩm', price: 165000, quantity: 1 }],
-      totals: { subtotal: 165000, shipping: 30000, discount: 0, total: 195000 }
+      totals: { subtotal: 165000, shipping: 30000, total: 195000 }
     };
     storage.set('lasen_orders', [realUserOrder]);
 
@@ -463,30 +333,32 @@ test('20. AUDIT CHECKS: COMPARE REMOVAL, HOMEPAGE WHITELIST & LOGIN LINKS', asyn
     }
   });
 
-  await t.test('index.html không chứa danh mục và thương hiệu ảo ngoài whitelist', () => {
+  await t.test('Liên kết bộ lọc trang chủ dùng danh mục hợp lệ', () => {
     const indexContent = fs.readFileSync(path.join(projectRoot, 'index.html'), 'utf8');
     assert.strictEqual(indexContent.includes('cat=xit-khoang'), false, 'index.html không được chứa cat=xit-khoang');
-    assert.strictEqual(indexContent.includes('brand=huong-tram'), false, 'index.html không được chứa brand=huong-tram');
-    assert.strictEqual(indexContent.includes('brand=an-nhien'), false, 'index.html không được chứa brand=an-nhien');
 
     // Mọi category slug tham chiếu trong index.html phải thuộc categories.json
     const catMatches = [...indexContent.matchAll(/products\.html\?cat=([a-z0-9-]+)/g)].map(m => m[1]);
+    assert.ok(catMatches.length > 0);
     const validCatSlugs = new Set(categories.map(c => c.slug));
     for (const slug of catMatches) {
       assert.ok(validCatSlugs.has(slug), `Category slug ${slug} phải có trong categories.json`);
     }
 
-    // Mọi brand slug tham chiếu trong index.html phải thuộc products.json
-    const brandMatches = [...indexContent.matchAll(/products\.html\?brand=([a-z0-9-]+)/g)].map(m => m[1]);
-    const validBrandSlugs = new Set(products.map(p => p.brand));
-    for (const slug of brandMatches) {
-      assert.ok(validBrandSlugs.has(slug), `Brand slug ${slug} phải có trong products.json`);
-    }
+    assert.doesNotMatch(indexContent, /products\.html\?[^"']*(?:brand|skin|sale)=/);
   });
 
-  await t.test('products.html có điều khiển lọc sản phẩm khuyến mãi sale=1', () => {
+  await t.test('products.html chỉ có bộ lọc loại sản phẩm và giá, giữ công cụ xem danh sách', () => {
     const productsHtml = fs.readFileSync(path.join(projectRoot, 'products.html'), 'utf8');
-    assert.ok(productsHtml.includes('data-filter="sale"'), 'products.html phải có control filter cho sale');
+    const filterTypes = [...productsHtml.matchAll(/data-filter="([^"]+)"/g)].map(m => m[1]);
+    assert.strictEqual(filterTypes.length, categories.length);
+    assert.deepStrictEqual([...new Set(filterTypes)], ['category']);
+    for (const control of [
+      'data-price-min', 'data-price-max', 'data-price-apply', 'data-search',
+      'data-sort', 'data-pagination', 'data-filters-open', 'data-filters-close'
+    ]) {
+      assert.ok(productsHtml.includes(control), `products.html phải giữ ${control}`);
+    }
   });
 });
 
@@ -569,74 +441,7 @@ test('21. BOUNDED RECOVERY & MARKER INVALIDATION (C2-R3 FIX)', async (t) => {
   });
 });
 
-test('22. ASYNC LOADING RACE & REVALIDATION PERSISTENCE (C2-R1 FIX)', async (t) => {
-  await t.test('Mã hợp lệ SEN50 trong storage được bảo toàn (persist) khi fetch pending/delayed', () => {
-    memoryStore.clear();
-    setAppliedCoupon('SEN50');
-    assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-    // Giả lập trạng thái dữ liệu chưa tải xong hoặc mạng ngắt kết nối (coupons rỗng)
-    setCachedCoupons([]);
-
-    // revalidateAppliedCoupon chạy lúc dữ liệu chưa có
-    const checkRes = revalidateAppliedCoupon(500000, 30000);
-    assert.strictEqual(checkRes.valid, false);
-    assert.strictEqual(checkRes.unavailable, true);
-
-    // MÃ PHẢI ĐƯỢC GIỮ NGUYÊN TRONG STORAGE, KHÔNG BỊ XÓA
-    assert.strictEqual(getAppliedCoupon(), 'SEN50', 'Mã SEN50 phải được giữ nguyên khi network failure');
-  });
-
-  await t.test('Sau khi nạp xong dữ liệu coupon từ JSON, revalidate tính đúng nếu đủ và xóa nếu không đủ', async () => {
-    // Nạp lại dữ liệu từ JSON thật
-    await loadCoupons();
-    assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-    // 1. Khi subtotal đủ điều kiện (500k >= 300k)
-    const validCheck = revalidateAppliedCoupon(500000, 30000);
-    assert.strictEqual(validCheck.valid, true);
-    assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-    // 2. Khi subtotal thực sự không đủ điều kiện (100k < 300k)
-    const invalidCheck = revalidateAppliedCoupon(100000, 30000);
-    assert.strictEqual(invalidCheck.valid, false);
-    assert.strictEqual(invalidCheck.unavailable, undefined);
-    assert.strictEqual(getAppliedCoupon(), '', 'Chỉ xóa mã khi subtotal thực sự không đủ điều kiện');
-  });
-});
-
-test('23. TOPBAR & PLACEHOLDER CLEANUP (C2-R2 FIX)', async (t) => {
-  const htmlFiles = [
-    'about.html',
-    'cart.html',
-    'checkout.html',
-    'contact.html',
-    'index.html',
-    'product-detail.html',
-    'products.html',
-    'profile.html'
-  ];
-
-  await t.test('Không còn dòng nào trong 8 file HTML chứa hardcode LASEN30 hay 299.000', () => {
-    for (const file of htmlFiles) {
-      const content = fs.readFileSync(path.join(projectRoot, file), 'utf8');
-      assert.strictEqual(content.includes('LASEN30'), false, `${file} không được chứa hardcode LASEN30`);
-      assert.strictEqual(content.includes('299.000'), false, `${file} không được chứa hardcode 299.000`);
-    }
-  });
-
-  await t.test('Placeholder nhập mã trong cart.html và checkout.html là generic', () => {
-    const cartHtml = fs.readFileSync(path.join(projectRoot, 'cart.html'), 'utf8');
-    const checkoutHtml = fs.readFileSync(path.join(projectRoot, 'checkout.html'), 'utf8');
-
-    assert.ok(cartHtml.includes('placeholder="Nhập mã giảm giá..."'));
-    assert.ok(checkoutHtml.includes('placeholder="Nhập mã giảm giá..."'));
-    assert.strictEqual(cartHtml.includes('placeholder="Ví dụ: SEN50"'), false);
-    assert.strictEqual(checkoutHtml.includes('placeholder="Mã giảm giá (ví dụ: SEN50)"'), false);
-  });
-});
-
-test('24. BEHAVIORAL REGRESSION: CHECKOUT SUBMIT GUARD & UNBLOCK ON REMOVE COUPON (C3-R1 FIX)', async () => {
+test('24. BEHAVIORAL REGRESSION: CHECKOUT VALIDATION & DOUBLE SUBMIT GUARD', async (t) => {
   memoryStore.clear();
   cartService.clearCart();
   cartService.addToCart('p1', 1);
@@ -707,6 +512,8 @@ test('24. BEHAVIORAL REGRESSION: CHECKOUT SUBMIT GUARD & UNBLOCK ON REMOVE COUPO
     setAttribute() {}
   };
 
+  const previousDocument = globalThis.document;
+  t.after(() => { globalThis.document = previousDocument; });
   globalThis.document = {
     body: { appendChild() {} },
     querySelector(selector) {
@@ -734,29 +541,29 @@ test('24. BEHAVIORAL REGRESSION: CHECKOUT SUBMIT GUARD & UNBLOCK ON REMOVE COUPO
   initCheckoutFormSubmit(mockForm, token);
   assert.ok(typeof formListeners['submit'] === 'function', 'Phải đăng ký submit listener');
 
-  // Case 1: Giả lập load coupon fail / cache rỗng + có saved coupon code
-  setCachedCoupons([]);
-  setAppliedCoupon('SEN50');
-  assert.strictEqual(getAppliedCoupon(), 'SEN50');
-
-  // Người dùng bấm đặt hàng
+  // Thông tin không hợp lệ phải giữ form hoạt động để người dùng sửa.
+  fields.soDienThoai.value = '123';
   let defaultPrevented = false;
   formListeners['submit']({ preventDefault() { defaultPrevented = true; } });
 
-  // Kiểm tra: Bị chặn nhưng nút KHÔNG bị khóa, form vẫn hoàn toàn usable
-  assert.strictEqual(mockSubmitBtn.disabled, false, 'Nút đặt hàng không được bị disabled khi bị chặn bởi guard');
-  assert.strictEqual(mockSubmitBtn.textContent, 'Đặt hàng', 'Text nút phải được giữ nguyên');
-  assert.strictEqual(storage.get('lasen_orders', []).length, 0, 'Chưa có đơn hàng nào được tạo');
+  assert.strictEqual(defaultPrevented, true);
+  assert.strictEqual(mockSubmitBtn.disabled, false);
+  assert.strictEqual(mockSubmitBtn.textContent, 'Đặt hàng');
+  assert.strictEqual(storage.get('lasen_orders', []).length, 0);
 
-  // Case 2: Người dùng gỡ mã coupon
-  clearAppliedCoupon();
-  assert.strictEqual(getAppliedCoupon(), '');
-
-  // Nộp lại form sau khi gỡ mã
+  fields.soDienThoai.value = '0912345678';
   formListeners['submit']({ preventDefault() {} });
 
-  // Kiểm tra: Đặt hàng thành công! Không bị nhân bản
   const ordersDb = storage.get('lasen_orders', []);
-  assert.strictEqual(ordersDb.length, 1, 'Đơn hàng mới được tạo thành công');
-  assert.strictEqual(ordersDb[0].totals.discount, 0, 'Đơn không có giảm giá do đã gỡ mã');
+  assert.strictEqual(ordersDb.length, 1, 'Đơn hàng được tạo sau khi sửa thông tin');
+  assert.deepStrictEqual(ordersDb[0].totals, {
+    subtotal: 165000,
+    shipping: 30000,
+    total: 195000
+  });
+  assert.strictEqual(mockSubmitBtn.disabled, true, 'Khóa nút sau khi gửi thành công');
+  assert.strictEqual(cartService.getCartDetails().length, 0);
+
+  formListeners['submit']({ preventDefault() {} });
+  assert.strictEqual(storage.get('lasen_orders', []).length, 1, 'Gửi lại không tạo đơn trùng');
 });

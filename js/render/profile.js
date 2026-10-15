@@ -18,24 +18,6 @@ const ADDRESSES_KEY = 'lasen_addresses';
 export const PROFILE_KEY = 'lasen_user_profile';
 
 /**
- * Đọc dữ liệu JSON trạng thái đơn trong môi trường Node.js (phục vụ test runner)
- * @returns {Array|null}
- */
-function readOrderStatusesInNode() {
-  try {
-    if (typeof process !== 'undefined' && process.getBuiltinModule) {
-      const fs = process.getBuiltinModule('node:fs');
-      const path = process.getBuiltinModule('node:path');
-      const jsonPath = path.resolve(process.cwd(), 'js', 'data', 'order-statuses.json');
-      if (fs.existsSync(jsonPath)) {
-        return JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      }
-    }
-  } catch (err) {}
-  return null;
-}
-
-/**
  * Chuẩn hóa trạng thái đơn hàng sang canonical key và nhãn tiếng Việt chuẩn
  * Xử lý an toàn conservative cho mọi trường hợp dữ liệu
  * @param {string} rawStatus
@@ -75,10 +57,19 @@ export function normalizeOrderStatus(rawStatus) {
 export async function loadOrderStatuses(url = 'js/data/order-statuses.json') {
   const isNode = typeof process !== 'undefined' && Boolean(process.versions?.node);
   if (isNode) {
-    const nodeData = readOrderStatusesInNode();
-    if (Array.isArray(nodeData) && nodeData.length > 0) {
-      return nodeData;
-    }
+    try {
+      if (process.getBuiltinModule) {
+        const fs = process.getBuiltinModule('node:fs');
+        const path = process.getBuiltinModule('node:path');
+        const jsonPath = path.resolve(process.cwd(), 'js', 'data', 'order-statuses.json');
+        if (fs.existsSync(jsonPath)) {
+          const nodeData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+          if (Array.isArray(nodeData) && nodeData.length > 0) {
+            return nodeData;
+          }
+        }
+      }
+    } catch (err) {}
     return [];
   }
 
@@ -115,62 +106,6 @@ let isLastReadFailed = false;
 let isSeedPersisted = true;
 
 /**
- * Helper nội bộ an toàn để đọc chuỗi raw từ window.localStorage
- * Bọc try/catch cả getter window.localStorage lẫn hàm getItem
- * @param {string} key
- * @returns {{ ok: boolean, value: string | null, reason?: string, error?: any }}
- */
-function safeGetRawStorage(key) {
-  try {
-    if (typeof window === 'undefined') {
-      return { ok: false, value: null, reason: 'NO_WINDOW' };
-    }
-    const ls = window.localStorage;
-    if (!ls) {
-      return { ok: false, value: null, reason: 'NO_STORAGE' };
-    }
-    const val = ls.getItem(key);
-    return { ok: true, value: val };
-  } catch (err) {
-    return { ok: false, value: null, reason: 'READ_FAIL', error: err };
-  }
-}
-
-function getAddressState() {
-  return {
-    isReadFailure: isLastReadFailed,
-    isSeedPersisted
-  };
-}
-
-/**
- * Chuẩn hoá và làm sạch 1 đối tượng địa chỉ
- */
-function sanitizeAddress(item) {
-  if (!item || typeof item !== 'object') return null;
-  const name = typeof item.name === 'string' ? item.name.trim() : '';
-  const phone = typeof item.phone === 'string' ? item.phone.trim() : '';
-  const address = typeof item.address === 'string' ? item.address.trim() : '';
-  const note = typeof item.note === 'string' ? item.note.trim() : '';
-  const isDefault = Boolean(item.isDefault);
-
-  if (!name || !phone || !address) return null;
-
-  const id = (typeof item.id === 'string' && item.id.trim().length > 0)
-    ? item.id.trim()
-    : `addr-${Date.now()}`;
-
-  return {
-    id,
-    name,
-    phone,
-    address,
-    note,
-    isDefault
-  };
-}
-
-/**
  * Chuẩn hoá danh sách địa chỉ, lọc item lỗi, xử lý trùng lặp id ổn định và đảm bảo semantics default
  * Không truncate danh sách nếu dữ liệu có sẵn đã vượt quá 5
  */
@@ -181,8 +116,18 @@ function sanitizeAddressList(rawList) {
   let hasDefault = false;
 
   for (const raw of rawList) {
-    const clean = sanitizeAddress(raw);
-    if (!clean) continue;
+    if (!raw || typeof raw !== 'object') continue;
+    const name = typeof raw.name === 'string' ? raw.name.trim() : '';
+    const phone = typeof raw.phone === 'string' ? raw.phone.trim() : '';
+    const address = typeof raw.address === 'string' ? raw.address.trim() : '';
+    const note = typeof raw.note === 'string' ? raw.note.trim() : '';
+    const isDefault = Boolean(raw.isDefault);
+    if (!name || !phone || !address) continue;
+
+    const id = (typeof raw.id === 'string' && raw.id.trim().length > 0)
+      ? raw.id.trim()
+      : `addr-${Date.now()}`;
+    const clean = { id, name, phone, address, note, isDefault };
 
     // Xử lý duplicate ID ổn định (deterministic & stable)
     if (seenIds.has(clean.id)) {
@@ -220,7 +165,22 @@ function sanitizeAddressList(rawList) {
  * Phân biệt rõ missing vs read fail để không seed/overwrite dữ liệu không đọc được
  */
 function getAddresses() {
-  const readRes = safeGetRawStorage(ADDRESSES_KEY);
+  // Đọc raw an toàn, kể cả khi getter localStorage hoặc getItem ném lỗi.
+  let readRes;
+  try {
+    if (typeof window === 'undefined') {
+      readRes = { ok: false, value: null, reason: 'NO_WINDOW' };
+    } else {
+      const ls = window.localStorage;
+      if (!ls) {
+        readRes = { ok: false, value: null, reason: 'NO_STORAGE' };
+      } else {
+        readRes = { ok: true, value: ls.getItem(ADDRESSES_KEY) };
+      }
+    }
+  } catch (err) {
+    readRes = { ok: false, value: null, reason: 'READ_FAIL', error: err };
+  }
 
   // 1. Trường hợp đọc thất bại (SecurityError / Blocked / Throw): không seed, không overwrite
   if (!readRes.ok) {
@@ -442,253 +402,10 @@ function renderAddressList(addresses) {
   `).join('');
 }
 
-/**
- * Khởi tạo tính năng quản lý sổ địa chỉ (Thêm, Sửa, Xoá)
- */
-function initAddressBook() {
-  const addressPanel = document.querySelector('[data-account-panel="dia-chi"]');
-  if (!addressPanel) return;
-
-  let addresses = getAddresses();
-  const addressState = getAddressState();
-
-  if (addressState.isReadFailure) {
-    showToast('Không thể truy cập dữ liệu sổ địa chỉ do lỗi bộ nhớ trình duyệt.', 'error');
-  } else if (!addressState.isSeedPersisted) {
-    showToast('Không thể lưu dữ liệu địa chỉ mẫu ban đầu do lỗi bộ nhớ trình duyệt.', 'error');
-  }
-
-  renderAddressList(addresses);
-
-  const formBox = addressPanel.querySelector('[data-address-form-box]');
-  const formTitle = addressPanel.querySelector('[data-address-form-title]');
-  const form = addressPanel.querySelector('[data-address-form]');
-  const idInput = form?.querySelector('[data-address-input="id"]');
-  const nameInput = form?.querySelector('[data-address-input="name"]');
-  const phoneInput = form?.querySelector('[data-address-input="phone"]');
-  const addressInput = form?.querySelector('[data-address-input="address"]');
-  const noteInput = form?.querySelector('[data-address-input="note"]');
-  const defaultInput = form?.querySelector('[data-address-input="isDefault"]');
-  const cancelBtn = form?.querySelector('[data-address-cancel]');
-  const listContainer = addressPanel.querySelector('[data-list="addresses"]');
-
-  function openForm(editItem = null) {
-    if (!formBox) return;
-
-    if (isLastReadFailed) {
-      showToast('Không thể mở biểu mẫu do không đọc được bộ nhớ trình duyệt.', 'error');
-      return;
-    }
-
-    if (!editItem && addresses.length >= 5) {
-      showToast('Bạn chỉ có thể lưu tối đa 5 địa chỉ.', 'error');
-      return;
-    }
-
-    if (form) {
-      validation.clearAllErrors(form);
-    }
-
-    if (editItem) {
-      if (formTitle) formTitle.textContent = 'Chỉnh sửa địa chỉ';
-      if (idInput) idInput.value = editItem.id;
-      if (nameInput) nameInput.value = editItem.name;
-      if (phoneInput) phoneInput.value = editItem.phone;
-      if (addressInput) addressInput.value = editItem.address;
-      if (noteInput) noteInput.value = editItem.note || '';
-      if (defaultInput) {
-        defaultInput.checked = Boolean(editItem.isDefault);
-        defaultInput.disabled = (addresses.length <= 1);
-      }
-    } else {
-      if (formTitle) formTitle.textContent = 'Thêm địa chỉ mới';
-      if (idInput) idInput.value = '';
-      if (nameInput) nameInput.value = '';
-      if (phoneInput) phoneInput.value = '';
-      if (addressInput) addressInput.value = '';
-      if (noteInput) noteInput.value = '';
-      if (defaultInput) {
-        defaultInput.checked = (addresses.length === 0);
-        defaultInput.disabled = (addresses.length === 0);
-      }
-    }
-
-    formBox.classList.remove('is-hidden');
-    nameInput?.focus();
-  }
-
-  function closeForm() {
-    if (!formBox) return;
-    formBox.classList.add('is-hidden');
-    if (form) {
-      validation.clearAllErrors(form);
-      if (typeof form.reset === 'function') {
-        form.reset();
-      }
-    }
-  }
-
-  // Gắn sự kiện nút Thêm địa chỉ (ở tiêu đề panel hoặc empty state)
-  const addBtns = addressPanel.querySelectorAll('[data-address-add], [data-address-add-empty]');
-  addBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      openForm(null);
-    });
-  });
-
-  // Gắn sự kiện nút Huỷ form
-  if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-      closeForm();
-    });
-  }
-
-  // Xoá thông báo lỗi khi người dùng gõ
-  if (form) {
-    [nameInput, phoneInput, addressInput].forEach(inp => {
-      if (inp) {
-        inp.addEventListener('input', () => {
-          validation.clearError(inp);
-        });
-      }
-    });
-  }
-
-  // Submit form Thêm / Sửa địa chỉ
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      validation.clearAllErrors(form);
-
-      if (isLastReadFailed) {
-        showToast('Không thể lưu địa chỉ do không đọc được bộ nhớ lưu trữ.', 'error');
-        return;
-      }
-
-      const nameVal = nameInput ? nameInput.value.trim() : '';
-      const phoneVal = phoneInput ? phoneInput.value.trim() : '';
-      const addressVal = addressInput ? addressInput.value.trim() : '';
-      const noteVal = noteInput ? noteInput.value.trim() : '';
-      const isDefaultVal = defaultInput ? defaultInput.checked : false;
-      const currentId = idInput ? idInput.value.trim() : '';
-
-      let hasError = false;
-      let firstErrorField = null;
-
-      if (!validation.isRequired(nameVal) || nameVal.length < 2) {
-        validation.showError(nameInput, 'Vui lòng nhập họ và tên người nhận (tối thiểu 2 ký tự).');
-        if (!firstErrorField) firstErrorField = nameInput;
-        hasError = true;
-      }
-
-      if (!validation.isValidPhone(phoneVal)) {
-        validation.showError(phoneInput, 'Vui lòng nhập số điện thoại Việt Nam hợp lệ (10 chữ số).');
-        if (!firstErrorField) firstErrorField = phoneInput;
-        hasError = true;
-      }
-
-      if (!validation.isRequired(addressVal) || addressVal.length < 5) {
-        validation.showError(addressInput, 'Vui lòng nhập địa chỉ nhận hàng chi tiết (tối thiểu 5 ký tự).');
-        if (!firstErrorField) firstErrorField = addressInput;
-        hasError = true;
-      }
-
-      if (hasError) {
-        if (firstErrorField) firstErrorField.focus();
-        return;
-      }
-
-      const res = saveOrUpdateAddress({
-        id: currentId,
-        name: nameVal,
-        phone: phoneVal,
-        address: addressVal,
-        note: noteVal,
-        isDefault: isDefaultVal
-      }, addresses);
-
-      if (!res.success) {
-        if (res.error === 'READ_FAILED') {
-          showToast('Không thể lưu do lỗi đọc bộ nhớ lưu trữ ban đầu.', 'error');
-        } else if (res.error === 'LIMIT_REACHED') {
-          showToast('Bạn chỉ có thể lưu tối đa 5 địa chỉ.', 'error');
-        } else {
-          showToast('Không thể lưu địa chỉ do bộ nhớ trình duyệt gặp lỗi.', 'error');
-        }
-        return;
-      }
-
-      addresses = res.addresses;
-      renderAddressList(addresses);
-      closeForm();
-      showToast(res.isEditing ? 'Đã cập nhật địa chỉ thành công!' : 'Đã thêm địa chỉ mới thành công!');
-    });
-  }
-
-  // Event delegation cho Sửa và Xoá
-  if (listContainer) {
-    listContainer.addEventListener('click', (e) => {
-      const editBtn = e.target.closest('[data-address-edit]');
-      if (editBtn) {
-        const id = editBtn.getAttribute('data-id');
-        const target = addresses.find(a => a.id === id);
-        if (target) {
-          openForm(target);
-        }
-        return;
-      }
-
-      const deleteBtn = e.target.closest('[data-address-delete]');
-      if (deleteBtn) {
-        if (isLastReadFailed) {
-          showToast('Không thể xoá địa chỉ do không đọc được bộ nhớ lưu trữ.', 'error');
-          return;
-        }
-
-        const id = deleteBtn.getAttribute('data-id');
-        const target = addresses.find(a => a.id === id);
-        if (!target) return;
-
-        const confirmMsg = `Bạn có chắc chắn muốn xoá địa chỉ của "${target.name}" không?`;
-        if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
-          if (!window.confirm(confirmMsg)) return;
-        }
-
-        const res = deleteAddressById(id, addresses);
-        if (!res.success) {
-          if (res.error === 'READ_FAILED') {
-            showToast('Không thể xoá do lỗi đọc bộ nhớ lưu trữ.', 'error');
-          } else {
-            showToast('Không thể xoá địa chỉ do bộ nhớ trình duyệt gặp lỗi.', 'error');
-          }
-          return;
-        }
-
-        addresses = res.addresses;
-        renderAddressList(addresses);
-
-        if (idInput && idInput.value === id) {
-          closeForm();
-        }
-
-        showToast('Đã xoá địa chỉ thành công!');
-      }
-    });
-  }
-}
-
 export function renderProfile() {
-  const currentUser = users[0];
+  const user = users[0];
+  if (!document.querySelector('[data-account-tabs]')) return;
 
-  if (document.querySelector('[data-account-tabs]')) {
-    initProfilePage(currentUser);
-  }
-}
-
-/**
- * Khởi tạo dữ liệu và sự kiện trên trang profile.html
- */
-function initProfilePage(user) {
   // Đọc thông tin đã lưu từ storage (nếu có)
   const savedProfile = storage.get(PROFILE_KEY, null);
   const effectiveUser = savedProfile ? { ...user, ...savedProfile } : user;
@@ -743,7 +460,37 @@ function initProfilePage(user) {
   renderUserOrders(user);
 
   // 4. Khởi tạo chuyển Tabs (Hồ sơ, Đơn hàng, Sổ địa chỉ, Yêu thích)
-  initAccountTabs();
+  {
+    const tabList = document.querySelector('[data-account-tabs]');
+    if (tabList) {
+      const tabBtns = tabList.querySelectorAll('[data-account-tab]');
+      const panels = document.querySelectorAll('[data-account-panel]');
+
+      tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const tabId = btn.getAttribute('data-account-tab');
+
+          tabBtns.forEach(b => {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+
+          panels.forEach(panel => {
+            const panelId = panel.getAttribute('data-account-panel');
+            if (panelId === tabId) {
+              panel.style.display = 'block';
+              panel.classList.remove('is-hidden');
+            } else {
+              panel.style.display = 'none';
+              panel.classList.add('is-hidden');
+            }
+          });
+        });
+      });
+    }
+  }
 
   // 5. Xử lý nộp và hoàn tác form hồ sơ kèm validation & persistence
   const profileForm = document.querySelector('[data-profile-form]');
@@ -840,7 +587,234 @@ function initProfilePage(user) {
 
   // 6. Khởi tạo sổ địa chỉ (Thêm, Sửa, Xoá)
   try {
-    initAddressBook();
+    const addressPanel = document.querySelector('[data-account-panel="dia-chi"]');
+    if (addressPanel) {
+      let addresses = getAddresses();
+
+      if (isLastReadFailed) {
+        showToast('Không thể truy cập dữ liệu sổ địa chỉ do lỗi bộ nhớ trình duyệt.', 'error');
+      } else if (!isSeedPersisted) {
+        showToast('Không thể lưu dữ liệu địa chỉ mẫu ban đầu do lỗi bộ nhớ trình duyệt.', 'error');
+      }
+
+      renderAddressList(addresses);
+
+      const formBox = addressPanel.querySelector('[data-address-form-box]');
+      const formTitle = addressPanel.querySelector('[data-address-form-title]');
+      const form = addressPanel.querySelector('[data-address-form]');
+      const idInput = form?.querySelector('[data-address-input="id"]');
+      const nameInput = form?.querySelector('[data-address-input="name"]');
+      const phoneInput = form?.querySelector('[data-address-input="phone"]');
+      const addressInput = form?.querySelector('[data-address-input="address"]');
+      const noteInput = form?.querySelector('[data-address-input="note"]');
+      const defaultInput = form?.querySelector('[data-address-input="isDefault"]');
+      const cancelBtn = form?.querySelector('[data-address-cancel]');
+      const listContainer = addressPanel.querySelector('[data-list="addresses"]');
+
+      function openForm(editItem = null) {
+        if (!formBox) return;
+
+        if (isLastReadFailed) {
+          showToast('Không thể mở biểu mẫu do không đọc được bộ nhớ trình duyệt.', 'error');
+          return;
+        }
+
+        if (!editItem && addresses.length >= 5) {
+          showToast('Bạn chỉ có thể lưu tối đa 5 địa chỉ.', 'error');
+          return;
+        }
+
+        if (form) {
+          validation.clearAllErrors(form);
+        }
+
+        if (editItem) {
+          if (formTitle) formTitle.textContent = 'Chỉnh sửa địa chỉ';
+          if (idInput) idInput.value = editItem.id;
+          if (nameInput) nameInput.value = editItem.name;
+          if (phoneInput) phoneInput.value = editItem.phone;
+          if (addressInput) addressInput.value = editItem.address;
+          if (noteInput) noteInput.value = editItem.note || '';
+          if (defaultInput) {
+            defaultInput.checked = Boolean(editItem.isDefault);
+            defaultInput.disabled = (addresses.length <= 1);
+          }
+        } else {
+          if (formTitle) formTitle.textContent = 'Thêm địa chỉ mới';
+          if (idInput) idInput.value = '';
+          if (nameInput) nameInput.value = '';
+          if (phoneInput) phoneInput.value = '';
+          if (addressInput) addressInput.value = '';
+          if (noteInput) noteInput.value = '';
+          if (defaultInput) {
+            defaultInput.checked = (addresses.length === 0);
+            defaultInput.disabled = (addresses.length === 0);
+          }
+        }
+
+        formBox.classList.remove('is-hidden');
+        nameInput?.focus();
+      }
+
+      function closeForm() {
+        if (!formBox) return;
+        formBox.classList.add('is-hidden');
+        if (form) {
+          validation.clearAllErrors(form);
+          if (typeof form.reset === 'function') {
+            form.reset();
+          }
+        }
+      }
+
+      // Gắn sự kiện nút Thêm địa chỉ (ở tiêu đề panel hoặc empty state)
+      const addBtns = addressPanel.querySelectorAll('[data-address-add], [data-address-add-empty]');
+      addBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          openForm(null);
+        });
+      });
+
+      // Gắn sự kiện nút Huỷ form
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+          closeForm();
+        });
+      }
+
+      // Xoá thông báo lỗi khi người dùng gõ
+      if (form) {
+        [nameInput, phoneInput, addressInput].forEach(inp => {
+          if (inp) {
+            inp.addEventListener('input', () => {
+              validation.clearError(inp);
+            });
+          }
+        });
+      }
+
+      // Submit form Thêm / Sửa địa chỉ
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          validation.clearAllErrors(form);
+
+          if (isLastReadFailed) {
+            showToast('Không thể lưu địa chỉ do không đọc được bộ nhớ lưu trữ.', 'error');
+            return;
+          }
+
+          const nameVal = nameInput ? nameInput.value.trim() : '';
+          const phoneVal = phoneInput ? phoneInput.value.trim() : '';
+          const addressVal = addressInput ? addressInput.value.trim() : '';
+          const noteVal = noteInput ? noteInput.value.trim() : '';
+          const isDefaultVal = defaultInput ? defaultInput.checked : false;
+          const currentId = idInput ? idInput.value.trim() : '';
+
+          let hasError = false;
+          let firstErrorField = null;
+
+          if (!validation.isRequired(nameVal) || nameVal.length < 2) {
+            validation.showError(nameInput, 'Vui lòng nhập họ và tên người nhận (tối thiểu 2 ký tự).');
+            if (!firstErrorField) firstErrorField = nameInput;
+            hasError = true;
+          }
+
+          if (!validation.isValidPhone(phoneVal)) {
+            validation.showError(phoneInput, 'Vui lòng nhập số điện thoại Việt Nam hợp lệ (10 chữ số).');
+            if (!firstErrorField) firstErrorField = phoneInput;
+            hasError = true;
+          }
+
+          if (!validation.isRequired(addressVal) || addressVal.length < 5) {
+            validation.showError(addressInput, 'Vui lòng nhập địa chỉ nhận hàng chi tiết (tối thiểu 5 ký tự).');
+            if (!firstErrorField) firstErrorField = addressInput;
+            hasError = true;
+          }
+
+          if (hasError) {
+            if (firstErrorField) firstErrorField.focus();
+            return;
+          }
+
+          const res = saveOrUpdateAddress({
+            id: currentId,
+            name: nameVal,
+            phone: phoneVal,
+            address: addressVal,
+            note: noteVal,
+            isDefault: isDefaultVal
+          }, addresses);
+
+          if (!res.success) {
+            if (res.error === 'READ_FAILED') {
+              showToast('Không thể lưu do lỗi đọc bộ nhớ lưu trữ ban đầu.', 'error');
+            } else if (res.error === 'LIMIT_REACHED') {
+              showToast('Bạn chỉ có thể lưu tối đa 5 địa chỉ.', 'error');
+            } else {
+              showToast('Không thể lưu địa chỉ do bộ nhớ trình duyệt gặp lỗi.', 'error');
+            }
+            return;
+          }
+
+          addresses = res.addresses;
+          renderAddressList(addresses);
+          closeForm();
+          showToast(res.isEditing ? 'Đã cập nhật địa chỉ thành công!' : 'Đã thêm địa chỉ mới thành công!');
+        });
+      }
+
+      // Event delegation cho Sửa và Xoá
+      if (listContainer) {
+        listContainer.addEventListener('click', (e) => {
+          const editBtn = e.target.closest('[data-address-edit]');
+          if (editBtn) {
+            const id = editBtn.getAttribute('data-id');
+            const target = addresses.find(a => a.id === id);
+            if (target) {
+              openForm(target);
+            }
+            return;
+          }
+
+          const deleteBtn = e.target.closest('[data-address-delete]');
+          if (deleteBtn) {
+            if (isLastReadFailed) {
+              showToast('Không thể xoá địa chỉ do không đọc được bộ nhớ lưu trữ.', 'error');
+              return;
+            }
+
+            const id = deleteBtn.getAttribute('data-id');
+            const target = addresses.find(a => a.id === id);
+            if (!target) return;
+
+            const confirmMsg = `Bạn có chắc chắn muốn xoá địa chỉ của "${target.name}" không?`;
+            if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+              if (!window.confirm(confirmMsg)) return;
+            }
+
+            const res = deleteAddressById(id, addresses);
+            if (!res.success) {
+              if (res.error === 'READ_FAILED') {
+                showToast('Không thể xoá do lỗi đọc bộ nhớ lưu trữ.', 'error');
+              } else {
+                showToast('Không thể xoá địa chỉ do bộ nhớ trình duyệt gặp lỗi.', 'error');
+              }
+              return;
+            }
+
+            addresses = res.addresses;
+            renderAddressList(addresses);
+
+            if (idInput && idInput.value === id) {
+              closeForm();
+            }
+
+            showToast('Đã xoá địa chỉ thành công!');
+          }
+        });
+      }
+    }
   } catch (err) {
     console.warn('Lỗi khi khởi tạo sổ địa chỉ:', err);
   }
@@ -1039,41 +1013,6 @@ async function renderUserOrders(user) {
     } else {
       showToast('Không thể thêm sản phẩm do hết hàng hoặc lỗi dữ liệu.', 'error');
     }
-  });
-}
-
-/**
- * Điều khiển chuyển đổi các tab trong trang tài khoản
- */
-function initAccountTabs() {
-  const tabList = document.querySelector('[data-account-tabs]');
-  if (!tabList) return;
-
-  const tabBtns = tabList.querySelectorAll('[data-account-tab]');
-  const panels = document.querySelectorAll('[data-account-panel]');
-
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabId = btn.getAttribute('data-account-tab');
-
-      tabBtns.forEach(b => {
-        b.classList.remove('is-active');
-        b.setAttribute('aria-selected', 'false');
-      });
-      btn.classList.add('is-active');
-      btn.setAttribute('aria-selected', 'true');
-
-      panels.forEach(panel => {
-        const panelId = panel.getAttribute('data-account-panel');
-        if (panelId === tabId) {
-          panel.style.display = 'block';
-          panel.classList.remove('is-hidden');
-        } else {
-          panel.style.display = 'none';
-          panel.classList.add('is-hidden');
-        }
-      });
-    });
   });
 }
 

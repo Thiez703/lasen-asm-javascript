@@ -28,22 +28,6 @@ test('7. filterAndSortProducts production function', async (t) => {
     }
   });
 
-  await t.test('Lọc theo Thương hiệu (Brand)', () => {
-    const res = filterAndSortProducts(products, { brands: ['la-sen'] });
-    assert.ok(res.length > 0);
-    for (const p of res) {
-      assert.strictEqual(p.brand, 'la-sen');
-    }
-  });
-
-  await t.test('Lọc theo Loại da (Skin)', () => {
-    const res = filterAndSortProducts(products, { skins: ['da-dau'] });
-    assert.ok(res.length > 0);
-    for (const p of res) {
-      assert.ok(p.skin.includes('da-dau'));
-    }
-  });
-
   await t.test('Lọc theo Khoảng giá (Price min - max)', () => {
     const res = filterAndSortProducts(products, { priceMin: 200000, priceMax: 300000 });
     assert.ok(res.length > 0);
@@ -53,31 +37,46 @@ test('7. filterAndSortProducts production function', async (t) => {
     }
   });
 
-  await t.test('Lọc sản phẩm khuyến mãi (saleOnly)', () => {
-    const res = filterAndSortProducts(products, { saleOnly: true });
-    assert.ok(res.length > 0);
-    for (const p of res) {
-      assert.ok(typeof p.salePrice === 'number' && p.salePrice < p.price);
-    }
-  });
-
   await t.test('Tìm kiếm từ khóa (Search theo tên hoặc mô tả)', () => {
     const res = filterAndSortProducts(products, { search: 'vitamin c' });
     assert.ok(res.length > 0);
     assert.ok(res.some(p => p.name.toLowerCase().includes('vitamin c') || p.description.toLowerCase().includes('vitamin c')));
   });
 
-  await t.test('Kết hợp AND giữa các nhóm tiêu chí', () => {
-    const res = filterAndSortProducts(products, {
-      categories: ['lam-sach'],
-      brands: ['la-sen'],
-      skins: ['da-dau']
+  await t.test('Chọn nhiều loại sản phẩm kết hợp khoảng giá, gồm hai giá biên và dùng giá bán', () => {
+    const list = [
+      { id: 'p1', category: 'lam-sach', price: 300000, salePrice: 200000 },
+      { id: 'p2', category: 'dac-tri', price: 250000 },
+      { id: 'p3', category: 'duong-am', price: 220000 },
+      { id: 'p4', category: 'lam-sach', price: 260000 },
+      { id: 'p5', category: 'dac-tri', price: 190000 }
+    ];
+    const res = filterAndSortProducts(list, {
+      categories: ['lam-sach', 'dac-tri'],
+      priceMin: 200000,
+      priceMax: 250000,
+      sort: 'price-asc'
     });
-    for (const p of res) {
-      assert.strictEqual(p.category, 'lam-sach');
-      assert.strictEqual(p.brand, 'la-sen');
-      assert.ok(p.skin.includes('da-dau'));
-    }
+    assert.deepStrictEqual(res.map(p => p.id), ['p1', 'p2']);
+  });
+
+  await t.test('Sắp xếp không thay đổi dữ liệu đầu vào', () => {
+    const list = Object.freeze([
+      Object.freeze({ id: 'p1', category: 'lam-sach', price: 300000 }),
+      Object.freeze({ id: 'p2', category: 'dac-tri', price: 100000 }),
+      Object.freeze({ id: 'p3', category: 'duong-am', price: 200000 })
+    ]);
+    const res = filterAndSortProducts(list, { sort: 'price-asc' });
+    assert.notStrictEqual(res, list);
+    assert.deepStrictEqual(res.map(p => p.id), ['p2', 'p3', 'p1']);
+    assert.deepStrictEqual(list.map(p => p.id), ['p1', 'p2', 'p3']);
+  });
+
+  await t.test('Không có sản phẩm thỏa loại và giá trả về danh sách rỗng', () => {
+    assert.deepStrictEqual(filterAndSortProducts(products, {
+      categories: ['lam-sach'],
+      priceMin: 1000000
+    }), []);
   });
 
   await t.test('Sắp xếp giá tăng dần (price-asc)', () => {
@@ -137,6 +136,12 @@ test('8. processCheckout production function & resilience cases', async (t) => {
     assert.strictEqual(res.clearedCart, true);
     assert.ok(res.order.id.startsWith('ORD-'));
     assert.strictEqual(res.order.items.length, 2);
+    assert.deepStrictEqual(res.order.totals, {
+      subtotal: 743000,
+      shipping: 0,
+      total: 743000
+    });
+    assert.deepStrictEqual(res.order.items.map(item => item.price), [165000, 289000]);
 
     // Kiểm tra giỏ hàng đã được xóa sạch
     assert.strictEqual(cartService.getCartDetails().length, 0);

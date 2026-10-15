@@ -134,7 +134,7 @@
   min-height: 36px;
 }
 
-/* Dải mã giảm giá chạy ngang — trên mobile chỉ còn dải này */
+/* Dải thông tin cửa hàng chạy ngang — trên mobile chỉ còn dải này */
 .topbar__promo {
   position: relative;
   flex: 1;
@@ -156,14 +156,14 @@
   animation-play-state: paused;
 }
 
-.topbar__code {
+.topbar__message {
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
   font-weight: 500;
 }
 
-.topbar__code b {
+.topbar__message b {
   padding: 1px var(--sp-2);
   border-radius: var(--radius-sm);
   background-color: rgba(255, 255, 255, 0.22);
@@ -1493,10 +1493,6 @@
 .summary__value {
   font-weight: 600;
   text-align: right;
-}
-
-.summary__value--minus {
-  color: var(--c-sale);
 }
 
 .summary__row--total {

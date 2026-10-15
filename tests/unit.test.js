@@ -199,22 +199,57 @@ test('5. cartService luồng chuẩn với storage bình thường', async (t) =
     assert.strictEqual(details[0].quantity, p1.stock);
   });
 
-  await t.test('Cập nhật số lượng và tính tổng tiền, coupon', () => {
+  await t.test('Cập nhật số lượng và tính tổng tiền theo giá bán sản phẩm', () => {
     cartService.clearCart();
-    cartService.addToCart('p2', 2); // p2 salePrice = 289000, 2*289000 = 578000
+    cartService.addToCart('p2', 1);
 
-    let totals = cartService.getCartTotals();
-    assert.strictEqual(totals.subtotal, 578000);
-    assert.strictEqual(totals.shipping, 0); // >= 500k freeship
-    assert.strictEqual(totals.total, 578000);
+    const product = getProductById('p2');
+    assert.ok(product.salePrice < product.price);
+    assert.strictEqual(cartService.getCartDetails()[0].lineTotal, product.salePrice);
+    assert.strictEqual(cartService.getCartTotals().total, product.salePrice + 30000);
 
-    totals = cartService.getCartTotals('LASEN30');
-    assert.strictEqual(totals.discount, 30000);
-    assert.strictEqual(totals.total, 548000);
+    assert.strictEqual(cartService.updateQuantity('p2', 2).success, true);
+    assert.deepStrictEqual(cartService.getCartTotals(), {
+      itemCount: 1,
+      totalQuantity: 2,
+      subtotal: 578000,
+      shipping: 0,
+      total: 578000,
+      isEmpty: false
+    });
+  });
 
-    totals = cartService.getCartTotals('SEN50');
-    assert.strictEqual(totals.discount, 50000);
-    assert.strictEqual(totals.total, 528000);
+  await t.test('Đơn dưới 500.000đ có phí vận chuyển 30.000đ', () => {
+    cartService.clearCart();
+    cartService.addToCart('p1', 3);
+
+    const totals = cartService.getCartTotals();
+    assert.strictEqual(totals.subtotal, 495000);
+    assert.strictEqual(totals.shipping, 30000);
+    assert.strictEqual(totals.total, 525000);
+  });
+
+  await t.test('Đơn đúng 500.000đ tự động miễn phí vận chuyển', () => {
+    cartService.clearCart();
+    cartService.addToCart('p19', 2);
+
+    const totals = cartService.getCartTotals();
+    assert.strictEqual(totals.subtotal, 500000);
+    assert.strictEqual(totals.shipping, 0);
+    assert.strictEqual(totals.total, 500000);
+  });
+
+  await t.test('Giỏ hàng rỗng có tổng tiền và phí vận chuyển bằng 0', () => {
+    cartService.clearCart();
+
+    assert.deepStrictEqual(cartService.getCartTotals(), {
+      itemCount: 0,
+      totalQuantity: 0,
+      subtotal: 0,
+      shipping: 0,
+      total: 0,
+      isEmpty: true
+    });
   });
 });
 

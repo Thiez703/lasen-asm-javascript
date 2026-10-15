@@ -4,8 +4,7 @@
  */
 
 import { storage } from './storage.js';
-import { products, getProductById } from './dataService.js';
-import { validateCoupon, getAppliedCoupon, clearAppliedCoupon, revalidateAppliedCoupon } from './couponService.js';
+import { products } from './dataService.js';
 import { PENDING_CLEANUP_KEY } from './checkoutService.js';
 
 const STORAGE_KEY = 'lasen_cart';
@@ -100,15 +99,6 @@ export const cartService = {
         storage.set(PENDING_CLEANUP_KEY, null);
       }
 
-      if (normalized.length === 0) {
-        clearAppliedCoupon();
-      } else {
-        const details = this.getCartDetails();
-        const subtotal = details.reduce((sum, item) => sum + item.lineTotal, 0);
-        const shipping = subtotal >= 500000 ? 0 : 30000;
-        revalidateAppliedCoupon(subtotal, shipping);
-      }
-
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('cart:updated', { detail: { cart: normalized } }));
       }
@@ -125,7 +115,7 @@ export const cartService = {
     const details = [];
 
     for (const item of items) {
-      const product = getProductById(item.productId);
+      const product = products.find(p => p.id === item.productId);
       if (!product) continue;
 
       const price = (typeof product.salePrice === 'number' && product.salePrice > 0)
@@ -151,7 +141,7 @@ export const cartService = {
    * @returns {{success: boolean, message: string}}
    */
   addToCart(productId, qtyToAdd = 1) {
-    const product = getProductById(productId);
+    const product = products.find(p => p.id === productId);
     if (!product) {
       return { success: false, message: 'Sản phẩm không tồn tại.' };
     }
@@ -218,7 +208,7 @@ export const cartService = {
    * @returns {{success: boolean, message: string, finalQty: number}}
    */
   updateQuantity(productId, newQuantity) {
-    const product = getProductById(productId);
+    const product = products.find(p => p.id === productId);
     if (!product) {
       return { success: false, message: 'Sản phẩm không tồn tại.', finalQty: 0 };
     }
@@ -298,22 +288,23 @@ export const cartService = {
 
   /**
    * Tính toán tổng giá trị đơn hàng
-   * @param {string} couponCode 
    * @returns {{
    *   itemCount: number,
    *   totalQuantity: number,
    *   subtotal: number,
    *   shipping: number,
-   *   discount: number,
-   *   coupon: {code: string, desc: string}|null,
    *   total: number,
    *   isEmpty: boolean
    * }}
    */
-  getCartTotals(couponCode = '') {
+  getCartTotals() {
     const details = this.getCartDetails();
-    const totalQuantity = details.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = details.reduce((sum, item) => sum + item.lineTotal, 0);
+    let totalQuantity = 0;
+    let subtotal = 0;
+    for (const item of details) {
+      totalQuantity += item.quantity;
+      subtotal += item.lineTotal;
+    }
     const isEmpty = details.length === 0;
 
     let shipping = 0;
@@ -321,27 +312,13 @@ export const cartService = {
       shipping = subtotal >= 500000 ? 0 : 30000;
     }
 
-    let discount = 0;
-    let coupon = null;
-    const cleanCoupon = String(couponCode !== undefined && couponCode !== null && String(couponCode).trim() !== '' ? couponCode : getAppliedCoupon()).trim().toUpperCase();
-
-    if (cleanCoupon) {
-      const validationRes = validateCoupon(cleanCoupon, subtotal, shipping);
-      if (validationRes.valid) {
-        discount = validationRes.discount;
-        coupon = validationRes.coupon;
-      }
-    }
-
-    const total = Math.max(0, subtotal + shipping - discount);
+    const total = subtotal + shipping;
 
     return {
       itemCount: details.length,
       totalQuantity,
       subtotal,
       shipping,
-      discount,
-      coupon,
       total,
       isEmpty
     };
