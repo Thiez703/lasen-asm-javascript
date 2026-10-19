@@ -83,8 +83,8 @@ export function generateCartFingerprint(items) {
 export function validateAndSanitizeOrder(order) {
   if (!order || typeof order !== 'object') return null;
 
-  const id = typeof order.id === 'string' && order.id.trim() 
-    ? order.id.trim() 
+  const id = typeof order.id === 'string' && order.id.trim()
+    ? order.id.trim()
     : `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
 
   const customerRaw = order.customer && typeof order.customer === 'object' ? order.customer : {};

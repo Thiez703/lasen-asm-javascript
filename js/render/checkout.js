@@ -8,6 +8,7 @@ import { validation } from '../modules/validation.js';
 import { showToast } from '../services/toast.js';
 import { processCheckout, generateCartFingerprint, validateAndSanitizeOrder, ORDERS_KEY, COMPLETED_CHECKOUT_KEY, PENDING_CLEANUP_KEY, validatePendingCleanupMarker } from '../services/checkoutService.js';
 import { storage } from '../services/storage.js';
+import { getAccountProfile, getCurrentUser, getAccountStorageKey } from '../services/accountService.js';
 
 // Dữ liệu Tỉnh/Thành phố và Quận/Huyện demo
 const locationData = {
@@ -109,6 +110,20 @@ export async function renderCheckout() {
   const form = document.querySelector('[data-checkout-form]');
   if (!form) return;
 
+  const currentUserId = getCurrentUser()?.id ?? null;
+  const belongsToCurrentAccount = order => order && String(order.userId ?? '') === String(currentUserId ?? '');
+  const completedKey = getAccountStorageKey(COMPLETED_CHECKOUT_KEY);
+  const pendingCleanupKey = getAccountStorageKey(PENDING_CLEANUP_KEY);
+
+  const refreshChangedAccount = () => {
+    if (String(getCurrentUser()?.id ?? '') !== String(currentUserId ?? '')) {
+      window.location.reload();
+    }
+  };
+  window.addEventListener('pageshow', refreshChangedAccount);
+  window.addEventListener('storage', refreshChangedAccount);
+  window.addEventListener('auth:changed', refreshChangedAccount);
+
   const items = cartService.getCartDetails();
   const totals = cartService.getCartTotals();
   const currentFingerprint = generateCartFingerprint(items);
@@ -118,22 +133,24 @@ export async function renderCheckout() {
     ? rawOrders.map(validateAndSanitizeOrder).filter(Boolean)
     : [];
 
-  const lastCompletedRaw = storage.get(COMPLETED_CHECKOUT_KEY, null);
-  const lastCompleted = validateAndSanitizeOrder(lastCompletedRaw);
+  const lastCompletedRaw = storage.get(completedKey, null);
+  const completedOrder = validateAndSanitizeOrder(lastCompletedRaw);
+  const lastCompleted = belongsToCurrentAccount(completedOrder) ? completedOrder : null;
 
   // 1. Kiểm tra nếu có Pending cleanup recovery marker scoped phiên hợp lệ và còn hạn
-  const pendingRecovery = storage.get(PENDING_CLEANUP_KEY, null);
-  if (pendingRecovery && currentFingerprint && items.length > 0) {
-    const checkRes = validatePendingCleanupMarker(pendingRecovery, currentFingerprint, ordersList);
+  const pendingRecovery = storage.get(pendingCleanupKey, null);
+  const recoveryOwner = ordersList.find(order => order.id === pendingRecovery?.orderId);
+  if (pendingRecovery && (!recoveryOwner || belongsToCurrentAccount(recoveryOwner)) && currentFingerprint && items.length > 0) {
+    const checkRes = validatePendingCleanupMarker(pendingRecovery, currentFingerprint, ordersList.filter(belongsToCurrentAccount));
     if (checkRes.isValid && checkRes.order) {
       const matchingOrder = checkRes.order;
       // Đơn hàng cho giỏ hàng này đã hoàn tất, thử dọn dẹp lại giỏ hàng (recovery cleanup)
       const cleared = cartService.clearCart();
       if (cleared) {
         if (storage && typeof storage.remove === 'function') {
-          storage.remove(PENDING_CLEANUP_KEY);
+          storage.remove(pendingCleanupKey);
         } else if (storage && typeof storage.set === 'function') {
-          storage.set(PENDING_CLEANUP_KEY, null);
+          storage.set(pendingCleanupKey, null);
         }
         delete matchingOrder.pendingCartCleanup;
         storage.set(ORDERS_KEY, ordersList);
@@ -144,9 +161,9 @@ export async function renderCheckout() {
     } else {
       // Marker stale / expired / fake -> dọn dẹp để không chặn giỏ hàng
       if (storage && typeof storage.remove === 'function') {
-        storage.remove(PENDING_CLEANUP_KEY);
+        storage.remove(pendingCleanupKey);
       } else if (storage && typeof storage.set === 'function') {
-        storage.set(PENDING_CLEANUP_KEY, null);
+        storage.set(pendingCleanupKey, null);
       }
     }
   }
@@ -245,15 +262,15 @@ export async function renderCheckout() {
   const ghiChuInput = form.querySelector('[data-input="ghiChu"]');
 
   // Đọc thông tin hồ sơ
-  const profile = storage.get('lasen_user_profile', null);
+  const profile = getAccountProfile();
   if (profile) {
-    if (hoTenInput && !hoTenInput.value && profile.hoTen) hoTenInput.value = profile.hoTen;
-    if (sdtInput && !sdtInput.value && profile.soDienThoai) sdtInput.value = profile.soDienThoai;
+    if (hoTenInput && !hoTenInput.value && (profile.name || profile.hoTen)) hoTenInput.value = profile.name || profile.hoTen;
+    if (sdtInput && !sdtInput.value && (profile.phone || profile.soDienThoai)) sdtInput.value = profile.phone || profile.soDienThoai;
     if (emailInput && !emailInput.value && profile.email) emailInput.value = profile.email;
   }
 
   // Đọc sổ địa chỉ
-  const addresses = storage.get('lasen_addresses', []);
+  const addresses = getCurrentUser() ? storage.get(getAccountStorageKey('lasen_addresses'), []) : [];
   const defaultAddr = (Array.isArray(addresses) && addresses.length > 0)
     ? (addresses.find(a => a.isDefault) || addresses[0])
     : null;
@@ -312,6 +329,7 @@ export async function renderCheckout() {
  */
 export function initCheckoutFormSubmit(form, idempotencyToken) {
   let isSubmitting = false;
+  const initialUserId = getCurrentUser()?.id ?? null;
 
   form.querySelectorAll('input, select, textarea').forEach(field => {
     field.addEventListener('input', () => validation.clearError(field));
@@ -321,6 +339,10 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (isSubmitting) return;
+    if (String(getCurrentUser()?.id ?? '') !== String(initialUserId ?? '')) {
+      window.location.reload();
+      return;
+    }
 
     validation.clearAllErrors(form);
 
@@ -395,6 +417,7 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
 
     const orderInput = {
       idempotencyToken,
+      userId: getCurrentUser()?.id ?? null,
       customer: {
         name: hoTenInput.value.trim(),
         phone: sdtInput.value.trim(),

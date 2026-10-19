@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập — Lá Sen</title>
+  <meta name="description" content="Tạo tài khoản hoặc đăng nhập Lá Sen để cập nhật hồ sơ, theo dõi đơn hàng và lưu sản phẩm yêu thích.">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/auth.css">
+</head>
+<body>
+
+  <!-- Kho icon SVG dùng chung được nạp tự động từ js/utils/icons.svg qua js/app.js -->
+
+<a class="skip-link" href="#main">Bỏ qua tới nội dung chính</a>
+
+  <!-- ===== THANH KHUYẾN MÃI ===== -->
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <p class="topbar__promo">
+        <span class="topbar__track">
+          <span class="topbar__message">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+          <span class="topbar__message" aria-hidden="true">Mỹ phẩm từ sen và thảo mộc Việt, giao hàng toàn quốc</span>
+          <span class="topbar__message" aria-hidden="true">Miễn phí giao hàng toàn quốc cho đơn từ <b>500.000đ</b></span>
+          <span class="topbar__message" aria-hidden="true">Đổi trả trong <b>7 ngày</b>, kể cả khi lọ đã mở nắp</span>
+        </span>
+      </p>
+
+      <ul class="topbar__links">
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
+          Cửa hàng Cần Thơ
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
+          Tra cứu đơn hàng
+        </a></li>
+        <li><a class="topbar__link" href="contact.html">
+          <svg class="icon" aria-hidden="true"><use href="#i-chat"></use></svg>
+          Hỏi đáp
+        </a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="header" data-header>
+    <div class="container header__inner">
+      <button class="header__toggle" type="button" aria-label="Mở menu danh mục" aria-expanded="false"
+        aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon" aria-hidden="true">
+          <use href="#i-menu"></use>
+        </svg>
+      </button>
+
+      <a class="logo" href="index.html">
+        <svg class="logo__mark" aria-hidden="true">
+          <use href="#i-lotus"></use>
+        </svg>
+        <span class="logo__name">
+          <span class="logo__text">Lá Sen</span>
+          <span class="logo__sub">Mỹ phẩm sen Việt</span>
+        </span>
+      </a>
+
+      <form class="search" role="search" action="products.html" method="get" data-search-form>
+        <label class="sr-only" for="site-search">Tìm sản phẩm</label>
+        <div class="search__control">
+          <input class="search__input" type="search" id="site-search" name="q" autocomplete="off"
+            placeholder="Tìm sữa rửa mặt, serum, kem chống nắng…" data-search-input>
+          <button class="search__btn" type="submit" aria-label="Tìm kiếm">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-search"></use>
+            </svg>
+          </button>
+        </div>
+        <!-- JS đổ danh sách gợi ý vào đây -->
+        <div class="search__suggest" data-search-suggest></div>
+      </form>
+
+      <div class="header__actions">
+        <button class="header__search-toggle" type="button" aria-label="Mở ô tìm kiếm" data-search-toggle>
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-search"></use>
+          </svg>
+        </button>
+
+        <a class="header__act header__phone" href="tel:02923812345">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-phone"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tư vấn miễn phí</span>
+            <span class="header__act-val">0292 381 2345</span>
+          </span>
+        </a>
+
+        <!-- Tên tài khoản được đồng bộ với header trên các trang khác. -->
+        <a class="header__act" href="login.html">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-user"></use>
+            </svg>
+          </span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Tài khoản</span>
+            <span class="header__act-val" data-account-name>Đăng nhập</span>
+          </span>
+        </a>
+
+        <a class="header__act cart-btn" href="cart.html" aria-label="Giỏ hàng của bạn">
+          <span class="header__act-ico">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-cart"></use>
+            </svg>
+          </span>
+          <span class="cart-btn__count" data-cart-count>0</span>
+          <span class="header__act-txt">
+            <span class="header__act-lbl">Giỏ hàng</span>
+            <span class="header__act-val" data-cart-total>0đ</span>
+          </span>
+        </a>
+      </div>
+    </div>
+
+    <nav class="catnav" id="site-nav" aria-label="Danh mục sản phẩm" data-nav>
+      <div class="container catnav__inner">
+        <ul class="catnav__list">
+          <li class="catnav__item"><a class="catnav__link" href="index.html" data-nav-key="home">Trang chủ</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html" data-nav-key="products">Tất cả sản
+              phẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="products.html?cat=dac-tri">Đặc trị
+              <span class="catnav__tag">Sale</span></a></li>
+          <li class="catnav__item"><a class="catnav__link" href="about.html" data-nav-key="about">Giới thiệu</a></li>
+          <li class="catnav__item"><a class="catnav__link" href="contact.html" data-nav-key="contact">Liên hệ</a></li>
+        </ul>
+
+        <p class="catnav__note">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-truck"></use>
+          </svg>
+          Freeship từ 500.000đ
+        </p>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== NỘI DUNG ===== -->
+<main id="main">
+  <div class="container">
+    <nav aria-label="Đường dẫn trang">
+      <ol class="breadcrumb">
+        <li class="breadcrumb__item"><a class="breadcrumb__link" href="index.html">Trang chủ</a></li>
+        <li class="breadcrumb__item" aria-current="page">Đăng nhập</li>
+      </ol>
+    </nav>
+
+    <div class="auth">
+      <aside class="auth__intro" aria-label="Lá Sen — Mỹ phẩm sen Việt">
+        <svg class="auth__lotus" aria-hidden="true"><use href="#i-lotus"></use></svg>
+        <div>
+          <p class="auth__eyebrow">Lá Sen · Mỹ phẩm sen Việt</p>
+          <p class="auth__slogan">Chút dịu lành, cho làn da bạn.</p>
+        </div>
+        <p class="auth__intro-copy">Chăm da từ những điều giản dị, cùng sen và thảo mộc Việt. Lá Sen luôn ở đây để đồng hành cùng bạn.</p>
+        <a class="auth__back" href="products.html">Khám phá sản phẩm <span aria-hidden="true">→</span></a>
+      </aside>
+
+      <section class="auth__body" aria-labelledby="auth-title">
+        <h1 class="auth__title" id="auth-title">Đăng nhập</h1>
+        <p class="auth__subtitle">Chào bạn trở lại! Đăng nhập để tiếp tục chăm sóc làn da của mình.</p>
+        <p class="auth__notice auth__notice--success" role="status" data-registration-success hidden>Đăng ký thành công! Bạn có thể đăng nhập bằng tài khoản vừa tạo.</p>
+        <noscript><p class="auth__notice">Vui lòng bật JavaScript trong trình duyệt để sử dụng tính năng đăng nhập.</p></noscript>
+        <form class="auth__form" data-auth-form="login" novalidate>
+          <p class="auth__notice auth__notice--error" role="alert" tabindex="-1" data-auth-message hidden></p>
+          <div class="field">
+            <label class="field__label" for="auth-email">Email <span class="field__req" aria-hidden="true">*</span></label>
+            <input class="field__input" type="email" id="auth-email" name="email" autocomplete="email" placeholder="email@cuaban.com" required aria-describedby="auth-error-email" data-auth-input>
+            
+            <span class="field__error" id="auth-error-email"></span>
+          </div>
+          <div class="field">
+            <label class="field__label" for="auth-password">Mật khẩu <span class="field__req" aria-hidden="true">*</span></label>
+            <div class="auth__password"><input class="field__input" type="password" id="auth-password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required aria-describedby="auth-error-password" data-auth-input><button class="auth__password-toggle" type="button" aria-label="Hiện mật khẩu" aria-controls="auth-password" aria-pressed="false" data-password-toggle="auth-password">Hiện</button></div>
+            
+            <span class="field__error" id="auth-error-password"></span>
+          </div>
+          <button class="btn btn--primary btn--block auth__submit" type="submit" data-auth-submit>Đăng nhập</button>
+        </form>
+        <p class="auth__switch">Chưa có tài khoản? <a class="auth__link" href="register.html">Đăng ký ngay</a></p>
+        <aside class="auth__demo" aria-labelledby="demo-title">
+          <h2 class="auth__demo-title" id="demo-title">Tài khoản mẫu để trải nghiệm</h2>
+          <p>Email: <strong data-demo-email>nguyenvana@gmail.com</strong></p>
+          <p>Mật khẩu: <strong data-demo-password>password123</strong></p>
+          <button class="btn btn--outline btn--sm" type="button" data-fill-demo>Điền tài khoản mẫu</button>
+        </aside>
+      </section>
+    </div>
+  </div>
+</main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__col">
+        <a class="logo" href="index.html">
+          <svg class="logo__mark" aria-hidden="true">
+            <use href="#i-lotus"></use>
+          </svg>
+          <span class="logo__name">
+            <span class="logo__text">Lá Sen</span>
+            <span class="logo__sub">Mỹ phẩm sen Việt</span>
+          </span>
+        </a>
+        <p class="footer__desc">Mỹ phẩm chăm sóc da lành tính, chiết xuất từ sen và thảo mộc trồng tại đồng bằng sông
+          Cửu Long. Cửa hàng ở Cần Thơ, giao hàng toàn quốc.</p>
+
+        <a class="footer__hotline" href="tel:02923812345">
+          <svg class="icon" aria-hidden="true">
+            <use href="#i-phone"></use>
+          </svg>
+          0292 381 2345
+        </a>
+
+        <ul class="footer__social">
+          <li><a href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-chat"></use>
+            </svg>
+          </a></li>
+          <li><a href="mailto:xinchao@lasen.vn" aria-label="Gửi email cho Lá Sen">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+          </a></li>
+          <li><a href="contact.html" aria-label="Xem đường đi tới cửa hàng">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+          </a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Danh mục</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="products.html?cat=lam-sach">Làm sạch da</a></li>
+          <li><a class="footer__link" href="products.html?cat=duong-am">Dưỡng ẩm</a></li>
+          <li><a class="footer__link" href="products.html?cat=chong-nang">Chống nắng</a></li>
+          <li><a class="footer__link" href="products.html?cat=dac-tri">Đặc trị</a></li>
+          <li><a class="footer__link" href="products.html?cat=mat-na">Mặt nạ</a></li>
+          <li><a class="footer__link" href="products.html">Xem tất cả sản phẩm</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Hỗ trợ khách hàng</h2>
+        <ul class="footer__list">
+          <li><a class="footer__link" href="profile.html">Tài khoản của tôi</a></li>
+          <li><a class="footer__link" href="about.html">Câu chuyện Lá Sen</a></li>
+          <li><a class="footer__link" href="contact.html">Liên hệ &amp; hỏi đáp</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách đổi trả 7 ngày</a></li>
+          <li><a class="footer__link" href="contact.html">Chính sách bảo mật</a></li>
+        </ul>
+      </div>
+
+      <div class="footer__col">
+        <h2 class="footer__title">Thư chăm da hằng tháng</h2>
+        <p class="footer__desc">Mỗi tháng một lá thư ngắn về cách chăm da theo mùa và cập nhật sản phẩm mới.
+        </p>
+        <form class="footer__form" data-newsletter-form novalidate>
+          <div class="field field--inline">
+            <label class="sr-only" for="footer-email">Email nhận thư</label>
+            <input class="field__input" type="email" id="footer-email" name="email" placeholder="email@cuaban.com"
+              data-newsletter-email>
+            <button class="btn btn--primary" type="submit">Đăng ký</button>
+          </div>
+          <span class="field__error" data-error-for="newsletterEmail"></span>
+        </form>
+
+        <address class="footer__address">
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-pin"></use>
+            </svg>
+            128 Trần Hưng Đạo, phường An Phú, quận Ninh Kiều, TP. Cần Thơ
+          </span>
+          <span>
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-clock"></use>
+            </svg>
+            Mở cửa 8:00 – 21:00 tất cả các ngày
+          </span>
+          <a class="footer__link" href="mailto:xinchao@lasen.vn">
+            <svg class="icon" aria-hidden="true">
+              <use href="#i-mail"></use>
+            </svg>
+            xinchao@lasen.vn
+          </a>
+        </address>
+
+        <h3 class="footer__title">Thanh toán</h3>
+        <ul class="footer__pay">
+          <li>COD</li>
+          <li>Chuyển khoản</li>
+          <li>Momo</li>
+          <li>ZaloPay</li>
+          <li>Thẻ ATM</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <div class="container">
+        <p>© 2026 Lá Sen Cosmetics — 128 Trần Hưng Đạo, Ninh Kiều, Cần Thơ.</p>
+        <p>Bài tập môn WEB1044 — Lập trình cơ sở với JavaScript, FPT Polytechnic Cần Thơ.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Nút nổi: gọi nhanh, nhắn tin, lên đầu trang -->
+  <div class="floaties">
+    <a class="floaty floaty--call" href="tel:02923812345" aria-label="Gọi tư vấn 0292 381 2345">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-phone"></use>
+      </svg>
+    </a>
+    <a class="floaty" href="contact.html" aria-label="Nhắn tin cho Lá Sen">
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-chat"></use>
+      </svg>
+    </a>
+    <button class="floaty floaty--top" type="button" aria-label="Lên đầu trang" data-back-to-top>
+      <svg class="icon" aria-hidden="true">
+        <use href="#i-arrow-up"></use>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Nơi JS chèn thông báo ngắn -->
+  <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toast></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
+
+

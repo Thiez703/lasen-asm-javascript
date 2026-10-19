@@ -100,9 +100,8 @@
           </span>
         </a>
 
-        <!-- Đang đăng nhập nên ô này trỏ về trang tài khoản thay vì login.html.
-             Khi có JS, phần tên sẽ do data-account-name đổ vào. -->
-        <a class="header__act" href="profile.html" aria-current="page">
+        <!-- Tên tài khoản được đồng bộ với header trên các trang khác. -->
+        <a class="header__act" href="login.html" data-account-link aria-current="page">
           <span class="header__act-ico">
             <svg class="icon" aria-hidden="true">
               <use href="#i-user"></use>
@@ -110,7 +109,7 @@
           </span>
           <span class="header__act-txt">
             <span class="header__act-lbl">Tài khoản</span>
-            <span class="header__act-val" data-account-name>Nguyễn Thị Lan</span>
+            <span class="header__act-val" data-account-name>Đăng nhập</span>
           </span>
         </a>
 
@@ -176,12 +175,12 @@
       <aside class="account__side">
 
         <div class="account-card">
-          <span class="account-card__avatar" aria-hidden="true">L</span>
-          <p class="account-card__name" data-account-name>Nguyễn Thị Lan</p>
-          <p class="account-card__email" data-account-email>lan.nguyen@email.com</p>
+          <span class="account-card__avatar" aria-hidden="true" data-account-avatar>?</span>
+          <p class="account-card__name" data-account-name>Hồ sơ</p>
+          <p class="account-card__email" data-account-email></p>
           <p class="account-card__since">
             <svg class="icon" aria-hidden="true"><use href="#i-clock"></use></svg>
-            Thành viên từ tháng 3/2025
+            <span data-account-since></span>
           </p>
         </div>
 
@@ -196,13 +195,13 @@
               aria-controls="panel-don-hang" aria-selected="false" data-account-tab="don-hang">
               <svg class="icon" aria-hidden="true"><use href="#i-box"></use></svg>
               Đơn hàng
-              <span class="account-nav__count" data-orders-count>5</span>
+              <span class="account-nav__count" data-orders-count>0</span>
             </button>
             <button class="account-nav__btn" type="button" role="tab" id="tab-dia-chi"
               aria-controls="panel-dia-chi" aria-selected="false" data-account-tab="dia-chi">
               <svg class="icon" aria-hidden="true"><use href="#i-pin"></use></svg>
               Sổ địa chỉ
-              <span class="account-nav__count" data-addresses-count>3</span>
+              <span class="account-nav__count" data-addresses-count>0</span>
             </button>
             <button class="account-nav__btn" type="button" role="tab" id="tab-yeu-thich"
               aria-controls="panel-yeu-thich" aria-selected="false" data-account-tab="yeu-thich">
@@ -237,14 +236,14 @@
               <div class="field">
                 <label class="field__label" for="pf-name">Họ và tên <span class="field__req" aria-hidden="true">*</span></label>
                 <input class="field__input" type="text" id="pf-name" name="hoTen" autocomplete="name"
-                  value="Nguyễn Thị Lan" required aria-describedby="err-pf-name" data-input="hoTen">
+                  required aria-describedby="err-pf-name" data-input="hoTen">
                 <span class="field__error" id="err-pf-name" data-error-for="profileHoTen"></span>
               </div>
 
               <div class="field">
                 <label class="field__label" for="pf-phone">Số điện thoại <span class="field__req" aria-hidden="true">*</span></label>
                 <input class="field__input" type="tel" id="pf-phone" name="soDienThoai" autocomplete="tel"
-                  inputmode="numeric" value="0912 345 678" required aria-describedby="err-pf-phone"
+                  inputmode="numeric" required aria-describedby="err-pf-phone"
                   data-input="soDienThoai">
                 <span class="field__error" id="err-pf-phone" data-error-for="profileSoDienThoai"></span>
               </div>
@@ -252,7 +251,7 @@
               <div class="field">
                 <label class="field__label" for="pf-email">Email <span class="field__req" aria-hidden="true">*</span></label>
                 <input class="field__input" type="email" id="pf-email" name="email" autocomplete="email"
-                  value="lan.nguyen@email.com" required aria-describedby="hint-pf-email err-pf-email"
+                  required aria-describedby="hint-pf-email err-pf-email"
                   data-input="email">
                 <span class="field__hint" id="hint-pf-email">Email này cũng là tên đăng nhập của bạn.</span>
                 <span class="field__error" id="err-pf-email" data-error-for="profileEmail"></span>
@@ -260,7 +259,7 @@
 
               <div class="field">
                 <label class="field__label" for="pf-birth">Ngày sinh</label>
-                <input class="field__input" type="date" id="pf-birth" name="ngaySinh" value="1999-04-17"
+                <input class="field__input" type="date" id="pf-birth" name="ngaySinh"
                   aria-describedby="hint-pf-birth" data-input="ngaySinh">
                 <span class="field__hint" id="hint-pf-birth">Ngày sinh giúp Lá Sen hiểu thêm về bạn khi tư vấn chăm sóc da.</span>
               </div>
@@ -271,7 +270,7 @@
                   <option value="">Chưa xác định</option>
                   <option value="da-dau">Da dầu</option>
                   <option value="da-kho">Da khô</option>
-                  <option value="da-hon-hop" selected>Da hỗn hợp</option>
+                  <option value="da-hon-hop">Da hỗn hợp</option>
                   <option value="da-nhay-cam">Da nhạy cảm</option>
                   <option value="moi-loai-da">Mọi loại da</option>
                 </select>

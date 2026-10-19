@@ -301,6 +301,12 @@
   white-space: nowrap;
 }
 
+.header [data-account-name] {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .header__phone {
   display: none;
 }

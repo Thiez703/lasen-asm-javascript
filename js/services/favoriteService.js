@@ -4,6 +4,7 @@
  */
 
 import { storage } from './storage.js';
+import { getAccountStorageKey } from './accountService.js';
 import { products, getProductById } from './dataService.js';
 
 const FAVORITES_KEY = 'lasen_favorites';
@@ -50,7 +51,7 @@ export const favoriteService = {
    * @returns {Array<string>}
    */
   getFavoriteIds() {
-    const raw = storage.get(FAVORITES_KEY, []);
+    const raw = storage.get(getAccountStorageKey(FAVORITES_KEY), []);
     return normalizeFavorites(raw, products);
   },
 
@@ -73,7 +74,7 @@ export const favoriteService = {
    */
   saveFavorites(ids) {
     const normalized = normalizeFavorites(ids, products);
-    const success = storage.set(FAVORITES_KEY, normalized);
+    const success = storage.set(getAccountStorageKey(FAVORITES_KEY), normalized);
 
     if (success && typeof window !== 'undefined') {
       try {

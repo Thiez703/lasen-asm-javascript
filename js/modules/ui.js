@@ -8,8 +8,63 @@ import { showToast } from '../services/toast.js';
 import { products } from '../services/dataService.js';
 import { validation } from './validation.js';
 import { createProductCard } from '../render/products.js';
+import { getCurrentUser, PROFILE_KEY, ACCOUNTS_KEY, SESSION_KEY } from '../services/accountService.js';
 
 export function initUI() {
+  // Đếm ngược giờ vàng và bắt đầu lại 5 tiếng mỗi khi hết giờ.
+  const countdown = document.querySelector('[data-countdown]');
+  if (countdown) {
+    const hours = countdown.querySelector('[data-countdown-hours]');
+    const minutes = countdown.querySelector('[data-countdown-minutes]');
+    const seconds = countdown.querySelector('[data-countdown-seconds]');
+    const duration = 5 * 60 * 60 * 1000;
+    let endTime = Date.now() + duration;
+
+    const updateCountdown = () => {
+      const now = Date.now();
+      if (now >= endTime) endTime = now + duration;
+
+      const remaining = Math.ceil((endTime - now) / 1000);
+      hours.textContent = String(Math.floor(remaining / 3600)).padStart(2, '0');
+      minutes.textContent = String(Math.floor((remaining % 3600) / 60)).padStart(2, '0');
+      seconds.textContent = String(remaining % 60).padStart(2, '0');
+    };
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
+
+  // Đồng bộ tài khoản trên mọi trang, khi lưu hồ sơ và khi quay lại trang cũ.
+  const updateAccount = () => {
+    const user = getCurrentUser();
+    const name = user?.name || 'Đăng nhập';
+    document.querySelectorAll('[data-account-name]').forEach(el => {
+      el.textContent = name;
+      el.title = name;
+    });
+    document.querySelectorAll('[data-account-email]').forEach(el => {
+      el.textContent = user?.email || '';
+    });
+    document.querySelectorAll('[data-account-avatar]').forEach(el => {
+      el.textContent = user?.name.split(/\s+/).pop()?.charAt(0).toLocaleUpperCase('vi') || '?';
+    });
+    document.querySelectorAll('[data-account-link]').forEach(link => {
+      link.href = user ? 'profile.html' : 'login.html';
+    });
+    const memberSince = document.querySelector('[data-account-since]');
+    if (memberSince && user?.createdAt) {
+      const date = new Date(user.createdAt);
+      memberSince.textContent = `Thành viên từ tháng ${date.getMonth() + 1}/${date.getFullYear()}`;
+    }
+  };
+  updateAccount();
+  window.addEventListener('profile:updated', updateAccount);
+  window.addEventListener('auth:changed', updateAccount);
+  window.addEventListener('pageshow', updateAccount);
+  window.addEventListener('storage', (event) => {
+    if ([PROFILE_KEY, ACCOUNTS_KEY, SESSION_KEY, null].includes(event.key)) updateAccount();
+  });
+
   // Cập nhật header lúc khởi tạo và mỗi lần giỏ hàng thay đổi
   const updateHeaderCart = () => {
     const totals = cartService.getCartTotals();

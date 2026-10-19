@@ -1,9 +1,10 @@
 /**
  * Render trang Tài khoản cá nhân (profile.html)
- * Thể hiện rõ tài khoản demo thử nghiệm và xử lý tương tác các tab
+ * Hiển thị hồ sơ của tài khoản đang đăng nhập và xử lý tương tác các tab
  */
 
-import { users, getProductById } from '../services/dataService.js';
+import { getProductById } from '../services/dataService.js';
+import { getAccountProfile, getCurrentUser, getAccountStorageKey, updateAccountProfile, logoutAccount, PROFILE_KEY } from '../services/accountService.js';
 import { loadSampleOrders, getSampleOrders } from '../services/orderService.js';
 import { formatPrice, escapeHTML } from '../utils/format.js';
 import { storage } from '../services/storage.js';
@@ -14,8 +15,17 @@ import { createProductCard } from './products.js';
 import { favoriteService } from '../services/favoriteService.js';
 import { validation } from '../modules/validation.js';
 
-const ADDRESSES_KEY = 'lasen_addresses';
-export const PROFILE_KEY = 'lasen_user_profile';
+export { PROFILE_KEY };
+
+const getAddressesKey = () => getAccountStorageKey('lasen_addresses');
+
+function requireProfileAccount() {
+  const user = getCurrentUser();
+  if (!user) {
+    window.location.replace('login.html?redirect=profile.html');
+  }
+  return user;
+}
 
 /**
  * Chuẩn hóa trạng thái đơn hàng sang canonical key và nhãn tiếng Việt chuẩn
@@ -104,6 +114,7 @@ const DEFAULT_ADDRESSES = [
  */
 let isLastReadFailed = false;
 let isSeedPersisted = true;
+let addressOwnerId = null;
 
 /**
  * Chuẩn hoá danh sách địa chỉ, lọc item lỗi, xử lý trùng lặp id ổn định và đảm bảo semantics default
@@ -165,6 +176,7 @@ function sanitizeAddressList(rawList) {
  * Phân biệt rõ missing vs read fail để không seed/overwrite dữ liệu không đọc được
  */
 function getAddresses() {
+  addressOwnerId = getCurrentUser()?.id ?? null;
   // Đọc raw an toàn, kể cả khi getter localStorage hoặc getItem ném lỗi.
   let readRes;
   try {
@@ -175,7 +187,7 @@ function getAddresses() {
       if (!ls) {
         readRes = { ok: false, value: null, reason: 'NO_STORAGE' };
       } else {
-        readRes = { ok: true, value: ls.getItem(ADDRESSES_KEY) };
+        readRes = { ok: true, value: ls.getItem(getAddressesKey()) };
       }
     }
   } catch (err) {
@@ -194,8 +206,10 @@ function getAddresses() {
 
   // 2. Trường hợp missing thực sự: key chưa từng tồn tại
   if (readRes.value === null) {
-    const seeded = DEFAULT_ADDRESSES.map(a => ({ ...a }));
-    const writeOk = storage.set(ADDRESSES_KEY, seeded);
+    const seeded = String(getCurrentUser()?.id) === '1'
+      ? DEFAULT_ADDRESSES.map(a => ({ ...a }))
+      : [];
+    const writeOk = storage.set(getAddressesKey(), seeded);
     if (!writeOk) {
       isSeedPersisted = false;
       console.warn('Seed địa chỉ mặc định không thể ghi vào storage.');
@@ -227,7 +241,10 @@ function getAddresses() {
  */
 function saveAddresses(addresses) {
   const sanitized = sanitizeAddressList(addresses);
-  const success = storage.set(ADDRESSES_KEY, sanitized);
+  if (String(getCurrentUser()?.id ?? '') !== String(addressOwnerId ?? '')) {
+    return { success: false, addresses: sanitized };
+  }
+  const success = storage.set(getAddressesKey(), sanitized);
   return { success, addresses: sanitized };
 }
 
@@ -403,39 +420,42 @@ function renderAddressList(addresses) {
 }
 
 export function renderProfile() {
-  const user = users[0];
   if (!document.querySelector('[data-account-tabs]')) return;
 
-  // Đọc thông tin đã lưu từ storage (nếu có)
-  const savedProfile = storage.get(PROFILE_KEY, null);
-  const effectiveUser = savedProfile ? { ...user, ...savedProfile } : user;
+  const account = requireProfileAccount();
+  if (!account) return;
 
-  // 1. Điền thông tin vào thẻ tài khoản
-  const nameInputs = document.querySelectorAll('[data-account-name]');
-  nameInputs.forEach(el => el.textContent = `${effectiveUser.name || effectiveUser.hoTen} (Demo)`);
+  // Khôi phục từ back/forward cache hoặc thay phiên ở tab khác cũng phải kiểm tra lại.
+  const checkAccount = () => {
+    const current = requireProfileAccount();
+    if (!current) return false;
+    if (String(current.id) !== String(account.id)) {
+      window.location.reload();
+      return false;
+    }
+    return true;
+  };
+  window.addEventListener('pageshow', checkAccount);
+  window.addEventListener('storage', checkAccount);
+  window.addEventListener('auth:changed', checkAccount);
 
-  const emailInputs = document.querySelectorAll('[data-account-email]');
-  emailInputs.forEach(el => el.textContent = effectiveUser.email);
+  const effectiveUser = getAccountProfile();
 
-  // Điền vào form hồ sơ (prefill)
+  // 1. Điền vào form từ cùng nguồn dữ liệu với header và thẻ tài khoản.
   const hoTenInput = document.querySelector('[data-input="hoTen"]');
-  if (hoTenInput) hoTenInput.value = effectiveUser.name || effectiveUser.hoTen || '';
+  if (hoTenInput) hoTenInput.value = effectiveUser.name;
 
   const sdtInput = document.querySelector('[data-input="soDienThoai"]');
-  if (sdtInput) sdtInput.value = effectiveUser.phone || effectiveUser.soDienThoai || '';
+  if (sdtInput) sdtInput.value = effectiveUser.phone;
 
   const emailInput = document.querySelector('[data-input="email"]');
   if (emailInput) emailInput.value = effectiveUser.email || '';
 
   const birthInput = document.querySelector('[data-input="ngaySinh"]');
-  if (birthInput && (effectiveUser.birth || effectiveUser.ngaySinh)) {
-    birthInput.value = effectiveUser.birth || effectiveUser.ngaySinh;
-  }
+  if (birthInput) birthInput.value = effectiveUser.birth || effectiveUser.ngaySinh || '';
 
   const skinSelect = document.querySelector('[data-input="loaiDa"]');
-  if (skinSelect && (effectiveUser.skin || effectiveUser.loaiDa)) {
-    skinSelect.value = effectiveUser.skin || effectiveUser.loaiDa;
-  }
+  if (skinSelect) skinSelect.value = effectiveUser.skin || effectiveUser.loaiDa || '';
 
   const genderVal = effectiveUser.gender || effectiveUser.gioiTinh || 'nu';
   const genderRadio = document.querySelector(`input[name="gioiTinh"][value="${genderVal}"]`);
@@ -457,7 +477,7 @@ export function renderProfile() {
   }
 
   // 3. Render danh sách đơn hàng và gắn bộ lọc trạng thái
-  renderUserOrders(user);
+  renderUserOrders(effectiveUser);
 
   // 4. Khởi tạo chuyển Tabs (Hồ sơ, Đơn hàng, Sổ địa chỉ, Yêu thích)
   {
@@ -503,6 +523,7 @@ export function renderProfile() {
 
     profileForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      if (!checkAccount()) return;
       validation.clearAllErrors(profileForm);
 
       const nameVal = hoTenInput ? hoTenInput.value.trim() : '';
@@ -555,14 +576,23 @@ export function renderProfile() {
         nhanBanTin: curNews
       };
 
-      const saved = storage.set(PROFILE_KEY, updated);
-      if (!saved) {
-        showToast('Không thể lưu thông tin hồ sơ do lỗi bộ nhớ trình duyệt.', 'error');
+      const result = updateAccountProfile(updated);
+      if (!result.success) {
+        const fields = { name: hoTenInput, phone: sdtInput, email: emailInput };
+        let firstInvalid = null;
+        Object.entries(result.errors || {}).forEach(([key, message]) => {
+          if (fields[key]) {
+            validation.showError(fields[key], message);
+            if (!firstInvalid) firstInvalid = fields[key];
+          }
+        });
+        firstInvalid?.focus();
+        showToast(result.error || (firstInvalid
+          ? 'Vui lòng kiểm tra lại thông tin hồ sơ.'
+          : 'Không thể lưu thông tin hồ sơ do lỗi bộ nhớ trình duyệt.'), 'error');
         return;
       }
 
-      nameInputs.forEach(el => el.textContent = `${nameVal} (Demo)`);
-      emailInputs.forEach(el => el.textContent = emailVal);
       showToast('Đã lưu thông tin hồ sơ thành công!');
     });
 
@@ -570,10 +600,11 @@ export function renderProfile() {
     if (resetBtn) {
       resetBtn.addEventListener('click', (e) => {
         e.preventDefault();
+        if (!checkAccount()) return;
         validation.clearAllErrors(profileForm);
-        const curr = storage.get(PROFILE_KEY, user);
-        if (hoTenInput) hoTenInput.value = curr.name || curr.hoTen || '';
-        if (sdtInput) sdtInput.value = curr.phone || curr.soDienThoai || '';
+        const curr = getAccountProfile();
+        if (hoTenInput) hoTenInput.value = curr.name;
+        if (sdtInput) sdtInput.value = curr.phone;
         if (emailInput) emailInput.value = curr.email || '';
         if (birthInput) birthInput.value = curr.birth || curr.ngaySinh || '';
         if (skinSelect) skinSelect.value = curr.skin || curr.loaiDa || '';
@@ -819,11 +850,16 @@ export function renderProfile() {
     console.warn('Lỗi khi khởi tạo sổ địa chỉ:', err);
   }
 
-  // 7. Nút đăng xuất demo
+  // 7. Kết thúc phiên đăng nhập hiện tại.
   const logoutBtn = document.querySelector('[data-logout]');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      showToast('Hệ thống đang chạy chế độ demo. Bạn không cần đăng xuất!');
+      const result = logoutAccount();
+      if (!result.success) {
+        showToast(result.error || 'Không thể đăng xuất do lỗi bộ nhớ trình duyệt.', 'error');
+        return;
+      }
+      window.location.replace('login.html');
     });
   }
 }
@@ -842,6 +878,7 @@ async function renderUserOrders(user) {
 
   // 1. Nạp metadata trạng thái từ JSON và render các nút lọc động (R3)
   const statuses = await loadOrderStatuses();
+  if (String(getCurrentUser()?.id) !== String(user.id)) return;
   if (chipsContainer) {
     if (Array.isArray(statuses) && statuses.length > 0) {
       chipsContainer.innerHTML = statuses.map(s => `
@@ -858,7 +895,7 @@ async function renderUserOrders(user) {
   // Ưu tiên hiển thị đơn thực tế của người dùng, chỉ hiển thị đơn mẫu khi chưa có đơn
   const rawLocal = storage.get(ORDERS_KEY, []);
   const userOrders = Array.isArray(rawLocal)
-    ? rawLocal.map(validateAndSanitizeOrder).filter(Boolean)
+    ? rawLocal.map(validateAndSanitizeOrder).filter(order => order && String(order.userId) === String(user.id))
     : [];
 
   let displayOrders = [];
@@ -867,10 +904,11 @@ async function renderUserOrders(user) {
   if (userOrders.length > 0) {
     displayOrders = userOrders;
     isDemoMode = false;
-  } else {
+  } else if (String(user.id) === '1') {
     const samples = await loadSampleOrders();
+    if (String(getCurrentUser()?.id) !== String(user.id)) return;
     displayOrders = (Array.isArray(samples) ? samples : getSampleOrders())
-      .filter(o => o.userId === user.id)
+      .filter(o => String(o.userId) === String(user.id))
       .map(validateAndSanitizeOrder)
       .filter(Boolean);
     isDemoMode = true;

@@ -6,6 +6,7 @@
 import { storage } from './storage.js';
 import { products } from './dataService.js';
 import { PENDING_CLEANUP_KEY } from './checkoutService.js';
+import { getAccountStorageKey } from './accountService.js';
 
 const STORAGE_KEY = 'lasen_cart';
 
@@ -94,9 +95,9 @@ export const cartService = {
     if (success) {
       // Khi người dùng chủ động sửa đổi giỏ hàng, hủy bỏ marker pending cleanup cũ (nếu có)
       if (storage && typeof storage.remove === 'function') {
-        storage.remove(PENDING_CLEANUP_KEY);
+        storage.remove(getAccountStorageKey(PENDING_CLEANUP_KEY));
       } else if (storage && typeof storage.set === 'function') {
-        storage.set(PENDING_CLEANUP_KEY, null);
+        storage.set(getAccountStorageKey(PENDING_CLEANUP_KEY), null);
       }
 
       if (typeof window !== 'undefined') {
