@@ -1,96 +1,53 @@
-/**
- * Render và xử lý sự kiện trang Liên hệ & FAQ (contact.html)
- */
-
-import { validation } from '../modules/validation.js';
-import { showToast } from '../services/toast.js';
+import { isValidEmail, showError, clearErrors, clearErrorWhenTyping, showToast } from '../utils/helpers.js';
 
 export function renderContact() {
-  // Mở/gập các câu hỏi thường gặp
-  {
-    const accordion = document.querySelector('[data-accordion]');
+  const form = document.querySelector('[data-contact-form]');
+  if (!form) return;
 
-    if (accordion) {
-      const items = accordion.querySelectorAll('[data-accordion-item]');
+  document.querySelectorAll('[data-accordion-item]').forEach(item => {
+    const button = item.querySelector('[data-accordion-btn]');
+    const answer = item.querySelector('[data-accordion-panel]');
 
-      items.forEach(item => {
-        const btn = item.querySelector('[data-accordion-btn]');
-        const panel = item.querySelector('[data-accordion-panel]');
-        if (!btn || !panel) return;
+    button.addEventListener('click', () => {
+      const isOpen = item.classList.toggle('is-open');
+      answer.classList.toggle('is-hidden', !isOpen);
+      button.setAttribute('aria-expanded', isOpen);
+    });
+  });
 
-        btn.addEventListener('click', () => {
-          const isOpen = item.classList.contains('is-open');
+  clearErrorWhenTyping(form);
 
-          // Nếu muốn chế độ toggle độc lập:
-          if (isOpen) {
-            item.classList.remove('is-open');
-            panel.classList.add('is-hidden');
-            btn.setAttribute('aria-expanded', 'false');
-          } else {
-            item.classList.add('is-open');
-            panel.classList.remove('is-hidden');
-            btn.setAttribute('aria-expanded', 'true');
-          }
-        });
-      });
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    clearErrors(form);
+
+    const name = document.getElementById('contact-name').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+    const subject = document.getElementById('contact-subject').value;
+    const message = document.getElementById('contact-message').value.trim();
+
+    let isValid = true;
+    if (name === '') {
+      showError('hoTen', 'Vui lòng nhập họ và tên của bạn.');
+      isValid = false;
     }
-  }
-
-  // Kiểm tra và gửi biểu mẫu liên hệ
-  {
-    const form = document.querySelector('.contact-card__form, form[data-contact-form]');
-
-    if (form) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        validation.clearAllErrors(form);
-
-        const nameInput = form.querySelector('[data-input="hoTen"]');
-        const emailInput = form.querySelector('[data-input="email"]');
-        const subjectSelect = form.querySelector('[data-input="chuDe"]');
-        const messageInput = form.querySelector('[data-input="noiDung"]');
-
-        let hasError = false;
-        let firstError = null;
-
-        if (!nameInput || !validation.isRequired(nameInput.value)) {
-          validation.showError(nameInput, 'Vui lòng nhập họ và tên của bạn.');
-          hasError = true;
-          if (!firstError) firstError = nameInput;
-        }
-
-        if (!emailInput || !validation.isValidEmail(emailInput.value)) {
-          validation.showError(emailInput, 'Vui lòng nhập địa chỉ email hợp lệ.');
-          hasError = true;
-          if (!firstError) firstError = emailInput;
-        }
-
-        if (!subjectSelect || !validation.isRequired(subjectSelect.value)) {
-          validation.showError(subjectSelect, 'Vui lòng chọn chủ đề bạn cần hỗ trợ.');
-          hasError = true;
-          if (!firstError) firstError = subjectSelect;
-        }
-
-        if (!messageInput || !validation.isRequired(messageInput.value)) {
-          validation.showError(messageInput, 'Vui lòng nhập nội dung câu hỏi hoặc phản hồi.');
-          hasError = true;
-          if (!firstError) firstError = messageInput;
-        }
-
-        if (hasError) {
-          if (firstError) firstError.focus();
-          return;
-        }
-
-        // Gửi thành công mô phỏng
-        showToast('Cảm ơn bạn đã gửi liên hệ! Lá Sen sẽ phản hồi qua email trong 24 giờ.');
-        form.reset();
-
-        const statusNote = document.querySelector('[data-contact-status]');
-        if (statusNote) {
-          statusNote.innerHTML = '<span style="color: #27ae60; font-weight: 500;">✓ Đã gửi thông điệp thành công. Nhân viên sẽ liên hệ với bạn sớm!</span>';
-        }
-      });
+    if (!isValidEmail(email)) {
+      showError('email', 'Vui lòng nhập địa chỉ email hợp lệ.');
+      isValid = false;
     }
-  }
+    if (subject === '') {
+      showError('chuDe', 'Vui lòng chọn chủ đề bạn cần hỗ trợ.');
+      isValid = false;
+    }
+    if (message === '') {
+      showError('noiDung', 'Vui lòng nhập nội dung câu hỏi.');
+      isValid = false;
+    }
+    if (!isValid) return;
+
+    form.reset();
+    showToast('Cảm ơn bạn đã gửi liên hệ! Lá Sen sẽ phản hồi qua email trong 24 giờ.');
+    document.querySelector('[data-contact-status]').innerHTML =
+      '<span style="color: #27ae60; font-weight: 500;">✓ Đã gửi thành công. Nhân viên sẽ liên hệ với bạn sớm!</span>';
+  });
 }

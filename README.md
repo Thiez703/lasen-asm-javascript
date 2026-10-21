@@ -3,7 +3,7 @@
 Môn học: WEB1044 — Lập trình cơ sở với JavaScript (FPT Polytechnic Cần Thơ).
 
 ## 1. Cách chạy ứng dụng qua máy chủ HTTP
-Vì ứng dụng sử dụng chuẩn **ES Modules** (`<script type="module">`) và nạp dữ liệu động từ các file JSON thực tế (`js/data/products.json`, `js/data/order-statuses.json`), trình duyệt yêu cầu chạy trên máy chủ HTTP (không mở trực tiếp file `file:///` để tránh lỗi CORS):
+Vì ứng dụng sử dụng chuẩn **ES Modules** (`<script type="module">`) và nạp dữ liệu từ các file JSON (`js/data/*.json`) bằng `fetch`, trình duyệt yêu cầu chạy trên máy chủ HTTP (không mở trực tiếp file `file:///` để tránh lỗi CORS):
 
 ### Cách 1: Sử dụng VS Code Live Server (Khuyên dùng)
 1. Mở thư mục dự án trong VS Code.
@@ -27,140 +27,116 @@ Truy cập: `http://localhost:8000`.
 
 ---
 
-## 2. Cách chạy kiểm thử tự động (Unit & Regression Tests)
-Dự án tích hợp sẵn bộ kiểm thử chạy với Node.js native test runner (không cần cài thêm dependencies):
-```bash
-node --test tests/*.test.js
+## 2. Cấu trúc thư mục JavaScript
+
 ```
-Kiểm tra cú pháp JavaScript:
-```bash
-node --check js/app.js
+js/
+├── app.js                   Điểm khởi động: nạp icon rồi gọi hàm của từng trang
+├── data/*.json              Dữ liệu: sản phẩm, danh mục, đánh giá, tài khoản mẫu, trạng thái đơn, đơn mẫu
+├── utils/
+│   ├── helpers.js           Hàm dùng chung: định dạng giá, đọc/ghi localStorage, thông báo, kiểm tra form
+│   └── icons.svg            Kho icon SVG
+├── services/                Xử lý dữ liệu
+│   ├── dataService.js       Nạp các file JSON, tìm sản phẩm và đánh giá
+│   ├── accountService.js    Tài khoản: đăng ký, đăng nhập, đăng xuất, cập nhật hồ sơ, sổ địa chỉ
+│   ├── cartService.js       Giỏ hàng, tính tiền, lưu đơn hàng
+│   └── favoriteService.js   Sản phẩm yêu thích
+├── modules/
+│   └── ui.js                Phần chung mọi trang (header, menu, tìm kiếm, nhận tin) + banner, đồng hồ trang chủ
+└── render/                  Giao diện từng trang
+    ├── products.js          Thẻ sản phẩm, danh sách trang chủ, trang Sản phẩm (lọc, sắp xếp, phân trang)
+    ├── detail.js            Trang chi tiết sản phẩm
+    ├── cart.js              Trang giỏ hàng
+    ├── checkout.js          Trang thanh toán và "Mua ngay"
+    ├── profile.js           Trang tài khoản: hồ sơ, đơn hàng, sổ địa chỉ, yêu thích
+    ├── auth.js              Đăng nhập, đăng ký
+    └── contact.js           Trang liên hệ
 ```
+
+Mọi trang HTML đều nạp `app.js`. Mỗi hàm khởi tạo tự kiểm tra trang hiện tại có phần tử nó cần hay không (`if (!element) return;`), nên cùng một `app.js` dùng được cho tất cả các trang.
 
 ---
 
-## 3. Kiến trúc dữ liệu và các tính năng chính
-1. **Dữ liệu JSON thực tế (Single Source of Truth)**:
-   - `js/data/products.json`: Danh sách 30 sản phẩm.
-   - `js/data/categories.json`: Danh sách 5 danh mục sản phẩm.
-   - `js/data/reviews.json`: Các đánh giá sản phẩm.
-   - `js/data/users.json`: Dữ liệu người dùng mẫu.
-   - `js/data/order-statuses.json`: Metadata 5 trạng thái đơn hàng (`tat-ca`, `cho-xac-nhan`, `dang-giao`, `da-giao`, `da-huy`) dùng để render động bộ lọc trên hồ sơ cá nhân.
-   - `js/data/sample-orders.json`: Danh sách các đơn hàng mẫu minh họa mang cờ `isDemo: true`, chỉ hiển thị khi người dùng chưa có đơn hàng thực tế.
-   - Thư mục `js/data` chỉ chứa JSON. `js/services/dataService.js` nạp dữ liệu trước khi các module sử dụng và cung cấp hàm tra cứu sản phẩm, đánh giá; `js/services/orderService.js` nạp đơn hàng mẫu.
-2. **Giỏ hàng và tính tiền**:
-   - Sản phẩm được tính theo giá bán hiện tại, số lượng được giới hạn theo tồn kho.
-   - Tổng thanh toán gồm tiền sản phẩm và phí vận chuyển 30.000đ; đơn từ 500.000đ tự động miễn phí vận chuyển.
-3. **Cơ chế chống trùng lặp & Phục hồi đơn hàng (Idempotency & Resilience)**:
-   - Chống nhân bản đơn hàng bằng `idempotencyToken`.
-   - Cơ chế phục hồi dọn giỏ hàng lỗi (Pending Cleanup Recovery) được giới hạn phạm vi phiên qua marker `lasen_pending_cart_cleanup` và cờ `pendingCartCleanup` của đơn vừa đặt, tuyệt đối không chặn các đơn mua lại hợp lệ (legitimate repeat order) từ lịch sử.
-4. **Quản lý đơn hàng & Hồ sơ cá nhân**:
-   - Bộ lọc trạng thái đơn hàng được render động từ JSON, hoạt động đầy đủ trên 5 trạng thái với xử lý giao diện rỗng (empty state).
-   - Đăng ký, đăng nhập và đăng xuất bằng JavaScript thuần; hồ sơ, địa chỉ và đơn hàng gắn với tài khoản đang đăng nhập.
-   - Tự động điền (Autofill) địa chỉ mặc định từ Sổ địa chỉ sang biểu mẫu thanh toán theo cấu trúc tầng (Cascading: Tỉnh -> Huyện).
-5. **Tìm và lọc sản phẩm**:
-   - Chọn một hoặc nhiều loại sản phẩm, kết hợp khoảng giá theo giá bán hiện tại.
-   - Danh sách hỗ trợ tìm kiếm, sắp xếp và phân trang; trên điện thoại, mở nút Bộ lọc để chọn loại và giá.
+## 3. Các tính năng chính
+1. **Sản phẩm**: trang chủ có Flash sale, sản phẩm nổi bật, hàng mới và gợi ý theo loại; trang Sản phẩm tìm kiếm, lọc theo loại và khoảng giá, sắp xếp, phân trang (9 sản phẩm/trang); trang chi tiết có thư viện ảnh, chọn số lượng, tab mô tả, đánh giá, sản phẩm tương tự và sản phẩm đã xem gần đây.
+2. **Giỏ hàng và tính tiền**: tính theo giá khuyến mãi, số lượng không vượt quá tồn kho. Phí giao hàng 30.000đ, đơn từ 500.000đ được miễn phí.
+3. **Thanh toán**: kiểm tra form, chọn Tỉnh → Quận/Huyện, tự điền thông tin từ hồ sơ và địa chỉ mặc định. Nút "Mua ngay" ở trang chi tiết chỉ thanh toán sản phẩm đó và giữ nguyên giỏ hàng.
+4. **Tài khoản**: đăng ký, đăng nhập, đăng xuất, sửa hồ sơ, sổ địa chỉ (tối đa 5 địa chỉ, luôn có 1 địa chỉ mặc định), lịch sử đơn hàng lọc theo trạng thái (lấy từ `order-statuses.json`), đặt lại đơn cũ, danh sách yêu thích.
 
----
+## 4. Dữ liệu lưu trong localStorage
 
-## 4. Đăng ký và đăng nhập
+| Key | Nội dung |
+| --- | --- |
+| `lasen_cart` | Giỏ hàng: `[{ productId, quantity }]` |
+| `lasen_order_list` | Các đơn đã đặt (đơn mới nhất đứng đầu) |
+| `lasen_users` | Danh sách tài khoản (lần đầu lấy từ `users.json`) |
+| `lasen_current_user` | Id tài khoản đang đăng nhập |
+| `lasen_favorites_<id>` | Id các sản phẩm yêu thích của từng tài khoản |
+| `lasen_addresses_<id>` | Sổ địa chỉ của từng tài khoản |
+| `lasen_recent_products` | Id các sản phẩm đã xem gần đây |
 
-- Mở `login.html` để đăng nhập, `register.html` để đăng ký. Nút Tài khoản trên header tự chuyển đến hồ sơ khi đã đăng nhập.
-- Tài khoản cố định: **nguyenvana@gmail.com** / **password123** (khai báo tại `js/services/accountService.js`). `users.json` chỉ còn là dữ liệu mẫu tham khảo, không dùng để xác thực.
-- Đăng ký yêu cầu họ tên, số điện thoại Việt Nam, email chưa sử dụng và mật khẩu tối thiểu 8 ký tự kèm xác nhận. Đăng ký xong sẽ chuyển về trang đăng nhập.
-- Tài khoản mới và hồ sơ được lưu trong `localStorage` với khóa `lasen_accounts`. Mật khẩu mới được băm PBKDF2 với salt ngẫu nhiên bằng Web Crypto; không lưu mật khẩu gốc.
-- Phiên đăng nhập lưu tại `lasen_session` và được giữ khi tải lại hoặc mở lại trình duyệt, cho tới khi đăng xuất hoặc xóa dữ liệu trang. Phiên chỉ chứa mã người dùng.
-- Địa chỉ, sản phẩm yêu thích và trạng thái thanh toán có khóa riêng theo mã tài khoản đăng ký. Giỏ hàng vẫn dùng chung trên trình duyệt để giữ các sản phẩm đã chọn trước khi đăng nhập.
-- Chạy bằng Live Server/`localhost` hoặc HTTPS để Web Crypto hoạt động. Dữ liệu chỉ nằm trong trình duyệt và địa chỉ website hiện tại; đổi trình duyệt/cổng truy cập hoặc xóa dữ liệu trang sẽ không thấy tài khoản cũ. Đây là xác thực mô phỏng cho bài tập; website thực tế cần máy chủ để xác thực và bảo vệ dữ liệu.
+Muốn chạy lại từ đầu: mở DevTools (F12) → **Application** → **Local Storage** → chuột phải → **Clear**.
 
-## 5. Checklist đọc hiểu dự án
+## 5. Đăng ký và đăng nhập
+
+- Mở `login.html` để đăng nhập, `register.html` để đăng ký.
+- Tài khoản mẫu: **nguyenvana@gmail.com** / **password123** (lấy từ `js/data/users.json`). Tài khoản này có sẵn 4 đơn hàng mẫu (`sample-orders.json`) để minh họa khi chưa đặt đơn nào.
+- Đăng ký yêu cầu họ tên, số điện thoại 10 số, email chưa sử dụng, mật khẩu tối thiểu 8 ký tự và nhập lại mật khẩu khớp. Đăng ký xong sẽ chuyển về trang đăng nhập.
+- Đây là bản demo chạy trên máy (localhost): mật khẩu lưu nguyên văn trong localStorage và dữ liệu hiển thị bằng `innerHTML`. Website thật cần máy chủ để xác thực và bảo vệ dữ liệu.
+
+## 6. Checklist đọc hiểu dự án
 
 Đọc theo thứ tự các nhóm bên dưới. Khi đã hiểu một file, đổi `- [ ]` thành `- [x]` để đánh dấu. Chỉ tick khi bạn giải thích được vai trò của file, dữ liệu nó sử dụng và cách nó liên hệ với các file khác.
 
 Luồng chính để theo dõi: **xem sản phẩm → thêm vào giỏ → thanh toán → xem đơn hàng trong hồ sơ**. Với mỗi trang, mở HTML và JavaScript tương ứng cạnh nhau để đối chiếu các thuộc tính `data-*`.
 
-### 5.1. Tổng quan và điểm khởi động
+### 6.1. Tổng quan và điểm khởi động
 
-- [ ] [README.md](README.md) — Hiểu cách chạy dự án bằng HTTP và các chức năng chính; chạy thử một lượt mua hàng.
+- [ ] [README.md](README.md) — Hiểu cách chạy dự án và các chức năng chính; chạy thử một lượt mua hàng.
 - [ ] [index.html](index.html) — Xem cấu trúc trang chủ, các vùng `data-list` và thẻ `<script type="module" src="js/app.js">`.
-- [ ] [js/app.js](js/app.js) — Nắm các module được import và thứ tự gọi hàm khởi tạo.
+- [ ] [js/app.js](js/app.js) — Nắm cách nạp icon bằng `fetch` và thứ tự gọi các hàm khởi tạo.
 
-Mọi trang HTML đều nạp `app.js`. Các hàm khởi tạo kiểm tra phần tử DOM của chức năng trước khi xử lý, nên hãy chú ý các đoạn `querySelector(...)` và `if (!element) return`.
-
-Các bước chỉ chạy một lần được viết trực tiếp trong hàm chính của từng chức năng, có chú thích để đọc từ trên xuống. Chỉ giữ hàm riêng cho phần được dùng lại như lưu trữ, định dạng, kiểm tra dữ liệu và cập nhật giao diện theo sự kiện.
-
-### 5.2. Dữ liệu và các hàm dùng chung
+### 6.2. Dữ liệu và các hàm dùng chung
 
 - [ ] [js/data/products.json](js/data/products.json) — Hiểu cấu trúc một sản phẩm: `id`, giá, giá giảm, danh mục, loại da và tồn kho.
-- [ ] [js/data/categories.json](js/data/categories.json) — Hiểu dữ liệu danh mục sản phẩm.
 - [ ] [js/data/reviews.json](js/data/reviews.json) — Hiểu đánh giá được liên kết với sản phẩm qua `productId`.
-- [ ] [js/data/users.json](js/data/users.json) — Hiểu dữ liệu người dùng mẫu.
-- [ ] [js/services/dataService.js](js/services/dataService.js) — Theo dõi việc nạp JSON, export dữ liệu và tra cứu bằng `getProductById()` / `getReviewsByProductId()`.
-- [ ] [js/services/storage.js](js/services/storage.js) — Hiểu đọc, ghi, xóa dữ liệu JSON trong `localStorage` và xử lý khi lưu trữ lỗi.
-- [ ] [js/services/accountService.js](js/services/accountService.js) — Hiểu tài khoản cố định, đăng ký, băm mật khẩu, đăng nhập, phiên và cập nhật hồ sơ.
-- [ ] [login.html](login.html), [register.html](register.html), [js/render/auth.js](js/render/auth.js) — Theo dõi form đăng nhập/đăng ký, lỗi từng trường và chuyển trang.
-- [ ] [js/utils/format.js](js/utils/format.js) — Hiểu định dạng tiền, chuyển số nguyên và thoát ký tự HTML.
-- [ ] [js/services/toast.js](js/services/toast.js) — Hiểu cách hiển thị thông báo cho người dùng.
+- [ ] [js/data/users.json](js/data/users.json) — Hiểu dữ liệu tài khoản mẫu.
+- [ ] [js/services/dataService.js](js/services/dataService.js) — Theo dõi việc nạp JSON và tra cứu bằng `getProductById()` / `getReviewsByProductId()`.
+- [ ] [js/utils/helpers.js](js/utils/helpers.js) — Hiểu `formatPrice()`, `getPrice()`, `getStorage()` / `setStorage()`, `showToast()` và các hàm kiểm tra form.
 
-### 5.3. Danh sách và chi tiết sản phẩm
+### 6.3. Tài khoản
 
-- [ ] [products.html](products.html) — Xác định vùng danh sách, bộ lọc loại sản phẩm và khoảng giá, tìm kiếm, sắp xếp và phân trang.
+- [ ] [js/services/accountService.js](js/services/accountService.js) — Hiểu `getAccounts()`, `getCurrentUser()`, `login()`, `register()`, `updateProfile()`, `getUserKey()` và sổ địa chỉ.
+- [ ] [login.html](login.html), [register.html](register.html), [js/render/auth.js](js/render/auth.js) — Theo dõi form đăng nhập/đăng ký, lỗi từng ô nhập và chuyển trang.
+
+### 6.4. Danh sách và chi tiết sản phẩm
+
 - [ ] [js/services/favoriteService.js](js/services/favoriteService.js) — Hiểu cách lưu, thêm và bỏ sản phẩm yêu thích.
-- [ ] [js/render/products.js](js/render/products.js) — Bắt đầu từ `createProductCard()` và `renderProducts()`; theo dõi sự kiện thêm giỏ và yêu thích.
-- [ ] [js/modules/filter.js](js/modules/filter.js) — Bắt đầu từ `filterAndSortProducts()` và `initProductFilters()`; theo dõi lọc loại sản phẩm kết hợp giá, đồng bộ URL và render danh sách trên `products.html`.
+- [ ] [products.html](products.html) — Xác định vùng danh sách, bộ lọc loại sản phẩm và khoảng giá, tìm kiếm, sắp xếp và phân trang.
+- [ ] [js/render/products.js](js/render/products.js) — Bắt đầu từ `createProductCard()` và `renderProducts()`; sau đó đọc `filterProducts()` và `renderProductsPage()` cho trang Sản phẩm.
 - [ ] [product-detail.html](product-detail.html) — Xác định thông tin sản phẩm, thư viện ảnh, ô số lượng, các tab và đánh giá.
-- [ ] [js/render/detail.js](js/render/detail.js) — Bắt đầu từ `renderProductDetail()`; theo dõi lấy `id` từ URL, tra cứu sản phẩm và thêm số lượng đã chọn vào giỏ.
+- [ ] [js/render/detail.js](js/render/detail.js) — Bắt đầu từ `renderProductDetail()`; theo dõi lấy `id` từ URL, tra cứu sản phẩm, thêm giỏ và "Mua ngay".
 
-### 5.4. Giỏ hàng
+### 6.5. Giỏ hàng và thanh toán
 
-- [ ] [js/services/cartService.js](js/services/cartService.js) — Theo dõi `addToCart()` → `saveCart()`; hiểu chuẩn hóa giỏ, giới hạn tồn kho, tính tiền và phát sự kiện `cart:updated`.
-- [ ] [cart.html](cart.html) — Xác định bảng giỏ hàng, ô số lượng, tổng tiền và giao diện giỏ rỗng.
-- [ ] [js/render/cart.js](js/render/cart.js) — Bắt đầu từ `renderCart()` và `updateCartUI()`; hiểu cách hiển thị giỏ và xử lý đổi số lượng, xóa sản phẩm.
+- [ ] [js/services/cartService.js](js/services/cartService.js) — Theo dõi `addToCart()` → `saveCart()`; hiểu giới hạn tồn kho, `getCartItems()`, `getCartTotals()` và `saveOrder()`.
+- [ ] [cart.html](cart.html), [js/render/cart.js](js/render/cart.js) — Hiểu `showCart()` và cách xử lý nút tăng/giảm, xóa sản phẩm.
+- [ ] [checkout.html](checkout.html), [js/render/checkout.js](js/render/checkout.js) — Bắt đầu từ `renderCheckout()`; theo dõi `validateForm()`, `createOrder()` và `showOrderSuccess()`.
 
-### 5.5. Thanh toán và tạo đơn hàng
+### 6.6. Hồ sơ, lịch sử đơn hàng và sổ địa chỉ
 
-- [ ] [js/modules/validation.js](js/modules/validation.js) — Hiểu kiểm tra dữ liệu bắt buộc, email, số điện thoại và hiển thị lỗi trên form.
-- [ ] [js/services/checkoutService.js](js/services/checkoutService.js) — Bắt đầu từ `processCheckout()`; hiểu lấy dữ liệu giỏ, tạo đơn, lưu `lasen_orders` và dọn giỏ sau khi đặt hàng.
-- [ ] [checkout.html](checkout.html) — Xác định form người nhận, phương thức thanh toán, tóm tắt đơn và nút đặt hàng.
-- [ ] [js/render/checkout.js](js/render/checkout.js) — Bắt đầu từ `renderCheckout()` và `initCheckoutFormSubmit()`; theo dõi kiểm tra form, tạo `orderInput`, gọi service và hiển thị kết quả.
+- [ ] [js/data/order-statuses.json](js/data/order-statuses.json), [js/data/sample-orders.json](js/data/sample-orders.json) — Hiểu các trạng thái dùng để lọc và cấu trúc đơn mẫu.
+- [ ] [profile.html](profile.html), [js/render/profile.js](js/render/profile.js) — Bắt đầu từ `renderProfile()`; đọc lần lượt `initTabs()`, `initProfileForm()`, `initAddressBook()` và `renderOrders()`.
 
-Ở lượt đọc tiếp theo, xem kỹ cơ chế chống tạo đơn trùng và phục hồi khi dọn giỏ lỗi trong `checkoutService.js`.
+### 6.7. Giao diện chung và các trang phụ
 
-### 5.6. Hồ sơ, lịch sử đơn hàng và sổ địa chỉ
-
-- [ ] [js/data/order-statuses.json](js/data/order-statuses.json) — Hiểu các trạng thái dùng để lọc đơn hàng.
-- [ ] [js/data/sample-orders.json](js/data/sample-orders.json) — Hiểu cấu trúc đơn mẫu và cờ `isDemo`.
-- [ ] [js/services/orderService.js](js/services/orderService.js) — Hiểu cách nạp và lưu cache đơn mẫu để minh họa khi chưa có đơn thực tế.
-- [ ] [profile.html](profile.html) — Xác định các tab thông tin cá nhân, đơn hàng, địa chỉ và sản phẩm yêu thích.
-- [ ] [js/render/profile.js](js/render/profile.js) — Bắt đầu từ `renderProfile()`; đọc lần lượt phần hồ sơ, sổ địa chỉ và chuyển tab trong hàm này, sau đó xem `renderUserOrders()` và `renderWishlist()` để hiểu cập nhật danh sách theo sự kiện.
-
-### 5.7. Giao diện chung và các trang phụ
-
-- [ ] [js/modules/ui.js](js/modules/ui.js) — Bắt đầu từ `initUI()`; hiểu cập nhật giỏ trên header, tìm kiếm, menu mobile và các tương tác chung.
-- [ ] [contact.html](contact.html) — Xác định form liên hệ và vùng câu hỏi thường gặp.
-- [ ] [js/render/contact.js](js/render/contact.js) — Hiểu mở/gập câu hỏi và kiểm tra form liên hệ.
+- [ ] [js/modules/ui.js](js/modules/ui.js) — Bắt đầu từ `initUI()`; hiểu header, menu mobile, gợi ý tìm kiếm, banner và đồng hồ đếm ngược.
+- [ ] [contact.html](contact.html), [js/render/contact.js](js/render/contact.js) — Hiểu mở/gập câu hỏi và kiểm tra form liên hệ.
 - [ ] [about.html](about.html) — Hiểu cấu trúc trang giới thiệu và các thành phần dùng chung.
 
-### 5.8. CSS và icon — đọc sau khi nắm luồng JavaScript
+### 6.8. CSS và icon — đọc sau khi nắm luồng JavaScript
 
-- [ ] [js/icons.js](js/icons.js) — Hiểu cách nạp kho icon SVG vào DOM.
 - [ ] [js/utils/icons.svg](js/utils/icons.svg) — Hiểu các `<symbol>` được sử dụng qua `<use href="#i-...">`.
 - [ ] [css/base.css](css/base.css) — Nắm các quy tắc CSS nền tảng.
 - [ ] [css/components.css](css/components.css) — Nắm kiểu của các thành phần giao diện dùng chung.
-- [ ] [css/pages/home.css](css/pages/home.css) — Hiểu bố cục và kiểu riêng của trang chủ.
-- [ ] [css/pages/products.css](css/pages/products.css) — Hiểu bố cục danh sách và bộ lọc sản phẩm.
-- [ ] [css/pages/detail.css](css/pages/detail.css) — Hiểu bố cục trang chi tiết sản phẩm.
-- [ ] [css/pages/cart.css](css/pages/cart.css) — Hiểu bố cục trang giỏ hàng.
-- [ ] [css/pages/checkout.css](css/pages/checkout.css) — Hiểu bố cục trang thanh toán.
-- [ ] [css/pages/profile.css](css/pages/profile.css) — Hiểu bố cục các tab hồ sơ.
-- [ ] [css/pages/contact.css](css/pages/contact.css) — Hiểu bố cục trang liên hệ.
-- [ ] [css/pages/about.css](css/pages/about.css) — Hiểu bố cục trang giới thiệu.
-
-### 5.9. Kiểm thử — đối chiếu hành vi sau khi đọc code
-
-- [ ] [tests/unit.test.js](tests/unit.test.js) — Đọc các ví dụ kiểm tra hàm tiện ích, dữ liệu, validation và giỏ hàng.
-- [ ] [tests/filter_checkout.test.js](tests/filter_checkout.test.js) — Đối chiếu các trường hợp lọc sản phẩm và xử lý thanh toán.
-- [ ] [tests/new_features.test.js](tests/new_features.test.js) — Đọc các trường hợp kiểm thử tính năng bổ sung.
-- [ ] [tests/regression.test.js](tests/regression.test.js) — Đọc các trường hợp kiểm tra để lỗi cũ không xuất hiện lại.
-- [ ] [tests/icons.test.js](tests/icons.test.js) — Hiểu cách kiểm tra kho icon và các tham chiếu icon.
+- [ ] [css/pages/](css/pages/) — Bố cục riêng của từng trang.
