@@ -117,7 +117,7 @@ export function validateAndSanitizeOrder(order) {
     idempotencyToken: typeof order.idempotencyToken === 'string' ? order.idempotencyToken : null,
     cartFingerprint: typeof order.cartFingerprint === 'string' ? order.cartFingerprint : null,
     pendingCartCleanup: Boolean(order.pendingCartCleanup),
-    userId: order.userId || 1,
+    userId: order.userId ?? null,
     date: typeof order.date === 'string' ? order.date : new Date().toISOString(),
     status: typeof order.status === 'string' ? order.status : 'Chờ xác nhận',
     customer,
@@ -142,6 +142,8 @@ export function processCheckout(orderInput, deps = {}) {
   const ordersKey = deps.ordersKey || ORDERS_KEY;
   const completedKey = deps.completedKey || COMPLETED_CHECKOUT_KEY;
   const pendingCleanupKey = deps.pendingCleanupKey || PENDING_CLEANUP_KEY;
+  const preserveCart = deps.preserveCart === true;
+  const belongsToUser = order => order && String(order.userId ?? '') === String(orderInput.userId ?? '');
 
   const { customer, shippingAddress, paymentMethod, note, idempotencyToken } = orderInput;
 
@@ -156,23 +158,23 @@ export function processCheckout(orderInput, deps = {}) {
 
   // 2. KIỂM TRA IDEMPOTENCY THEO TOKEN TRƯỚC HẾT (kể cả khi giỏ hàng đã rỗng):
   if (idempotencyToken) {
-    if (lastCompleted && lastCompleted.idempotencyToken === idempotencyToken) {
+    if (belongsToUser(lastCompleted) && lastCompleted.idempotencyToken === idempotencyToken) {
       return {
         success: true,
         alreadyProcessed: true,
         order: lastCompleted,
-        clearedCart: true,
+        clearedCart: !preserveCart,
         message: 'Đơn hàng này đã được hoàn tất trước đó.'
       };
     }
 
-    const orderWithToken = ordersList.find(o => o.idempotencyToken === idempotencyToken);
+    const orderWithToken = ordersList.find(o => belongsToUser(o) && o.idempotencyToken === idempotencyToken);
     if (orderWithToken) {
       return {
         success: true,
         alreadyProcessed: true,
         order: orderWithToken,
-        clearedCart: true,
+        clearedCart: !preserveCart,
         message: 'Đơn hàng này đã được tiếp nhận thành công.'
       };
     }
@@ -196,12 +198,12 @@ export function processCheckout(orderInput, deps = {}) {
 
   // 6. KIỂM TRA PENDING CLEANUP RECOVERY (CHỈ KHI CÓ MARKER HỢP LỆ VÀ CÒN HẠN)
   // Tuyệt đối không đối chiếu mù quáng toàn bộ lịch sử để tránh chặn đơn hàng lặp lại hợp lệ (repeat order)
-  const pendingRecovery = storage.get(pendingCleanupKey, null);
+  const pendingRecovery = preserveCart ? null : storage.get(pendingCleanupKey, null);
   const lastOrder = ordersList[0];
 
   // Xác định marker cần kiểm tra (hỗ trợ cả mock storage tối giản chỉ lưu ordersList)
   let markerToCheck = pendingRecovery;
-  if (!markerToCheck && lastOrder && lastOrder.pendingCartCleanup && lastOrder.cartFingerprint === cartFingerprint) {
+  if (!preserveCart && !markerToCheck && belongsToUser(lastOrder) && lastOrder.pendingCartCleanup && lastOrder.cartFingerprint === cartFingerprint) {
     markerToCheck = {
       orderId: lastOrder.id,
       fingerprint: lastOrder.cartFingerprint,
@@ -210,7 +212,7 @@ export function processCheckout(orderInput, deps = {}) {
   }
 
   if (markerToCheck) {
-    const checkRes = validatePendingCleanupMarker(markerToCheck, cartFingerprint, ordersList);
+    const checkRes = validatePendingCleanupMarker(markerToCheck, cartFingerprint, ordersList.filter(belongsToUser));
     if (checkRes.isValid && checkRes.order) {
       const existingOrder = checkRes.order;
       const clearSuccess = cartService.clearCart();
@@ -256,7 +258,7 @@ export function processCheckout(orderInput, deps = {}) {
     id: orderId,
     idempotencyToken: idempotencyToken || null,
     cartFingerprint,
-    userId: orderInput.userId || 1,
+    userId: orderInput.userId ?? null,
     date: orderInput.date || new Date().toISOString(),
     status: 'Chờ xác nhận',
     customer: {
@@ -292,6 +294,16 @@ export function processCheckout(orderInput, deps = {}) {
 
   // Thử ghi metadata completed
   storage.set(completedKey, newOrder);
+
+  // Mua ngay chỉ đặt sản phẩm đã chọn, giữ nguyên giỏ và marker dọn giỏ cũ.
+  if (preserveCart) {
+    return {
+      success: true,
+      order: newOrder,
+      clearedCart: false,
+      message: 'Đặt hàng thành công!'
+    };
+  }
 
   // 9. Đơn hàng lưu thành công -> Tiến hành xóa giỏ hàng
   const clearSuccess = cartService.clearCart();

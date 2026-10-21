@@ -3,6 +3,7 @@
  */
 
 import { cartService } from '../services/cartService.js';
+import { createBuyNowSource } from '../services/buyNowService.js';
 import { formatPrice, escapeHTML } from '../utils/format.js';
 import { validation } from '../modules/validation.js';
 import { showToast } from '../services/toast.js';
@@ -110,10 +111,22 @@ export async function renderCheckout() {
   const form = document.querySelector('[data-checkout-form]');
   if (!form) return;
 
+  const params = new URLSearchParams(window.location.search);
+  const isBuyNow = params.has('buyNow');
+  const buyNowToken = params.get('token');
+  const checkoutSource = isBuyNow
+    ? createBuyNowSource(params.get('buyNow'), Number(params.get('quantity')))
+    : cartService;
   const currentUserId = getCurrentUser()?.id ?? null;
   const belongsToCurrentAccount = order => order && String(order.userId ?? '') === String(currentUserId ?? '');
-  const completedKey = getAccountStorageKey(COMPLETED_CHECKOUT_KEY);
+  const completedKey = getAccountStorageKey(isBuyNow ? `${COMPLETED_CHECKOUT_KEY}_buy_now` : COMPLETED_CHECKOUT_KEY);
   const pendingCleanupKey = getAccountStorageKey(PENDING_CLEANUP_KEY);
+  const checkoutDeps = {
+    cartService: checkoutSource,
+    preserveCart: isBuyNow,
+    completedKey,
+    pendingCleanupKey
+  };
 
   const refreshChangedAccount = () => {
     if (String(getCurrentUser()?.id ?? '') !== String(currentUserId ?? '')) {
@@ -124,8 +137,8 @@ export async function renderCheckout() {
   window.addEventListener('storage', refreshChangedAccount);
   window.addEventListener('auth:changed', refreshChangedAccount);
 
-  const items = cartService.getCartDetails();
-  const totals = cartService.getCartTotals();
+  const items = checkoutSource.getCartDetails();
+  const totals = checkoutSource.getCartTotals();
   const currentFingerprint = generateCartFingerprint(items);
 
   const rawOrders = storage.get(ORDERS_KEY, []);
@@ -137,8 +150,35 @@ export async function renderCheckout() {
   const completedOrder = validateAndSanitizeOrder(lastCompletedRaw);
   const lastCompleted = belongsToCurrentAccount(completedOrder) ? completedOrder : null;
 
+  if (isBuyNow) {
+    // Token nằm trên URL để tải lại trang không tạo thêm một đơn mua ngay.
+    const completedPurchase = buyNowToken && (
+      ordersList.find(order => belongsToCurrentAccount(order) && order.idempotencyToken === buyNowToken)
+      || (lastCompleted?.idempotencyToken === buyNowToken ? lastCompleted : null)
+    );
+    if (completedPurchase) {
+      renderOrderSuccessView(completedPurchase);
+      return;
+    }
+
+    // Không dùng giỏ hàng làm dự phòng khi đường dẫn mua ngay không hợp lệ.
+    if (!buyNowToken || !/^buy_\d+_[a-z0-9]+$/.test(buyNowToken) || items.length !== 1) {
+      const container = document.querySelector('.checkout');
+      if (container) {
+        container.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 48px 24px; text-align: center;">
+            <h2>Không thể mua ngay sản phẩm này</h2>
+            <p>Sản phẩm hoặc số lượng không hợp lệ, hoặc sản phẩm đã hết hàng. Vui lòng chọn lại.</p>
+            <a class="btn btn--primary" href="products.html">Chọn sản phẩm</a>
+          </div>
+        `;
+      }
+      return;
+    }
+  }
+
   // 1. Kiểm tra nếu có Pending cleanup recovery marker scoped phiên hợp lệ và còn hạn
-  const pendingRecovery = storage.get(pendingCleanupKey, null);
+  const pendingRecovery = isBuyNow ? null : storage.get(pendingCleanupKey, null);
   const recoveryOwner = ordersList.find(order => order.id === pendingRecovery?.orderId);
   if (pendingRecovery && (!recoveryOwner || belongsToCurrentAccount(recoveryOwner)) && currentFingerprint && items.length > 0) {
     const checkRes = validatePendingCleanupMarker(pendingRecovery, currentFingerprint, ordersList.filter(belongsToCurrentAccount));
@@ -320,14 +360,14 @@ export async function renderCheckout() {
   }
 
   // 6. Khởi tạo xử lý nộp form và đặt hàng an toàn với token
-  const idempotencyToken = `tok_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-  initCheckoutFormSubmit(form, idempotencyToken);
+  const idempotencyToken = isBuyNow ? buyNowToken : `tok_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  initCheckoutFormSubmit(form, idempotencyToken, checkoutDeps);
 }
 
 /**
  * Xử lý biểu mẫu đặt hàng, kiểm tra hợp lệ và tạo đơn hàng
  */
-export function initCheckoutFormSubmit(form, idempotencyToken) {
+export function initCheckoutFormSubmit(form, idempotencyToken, checkoutDeps = {}) {
   let isSubmitting = false;
   const initialUserId = getCurrentUser()?.id ?? null;
 
@@ -428,7 +468,7 @@ export function initCheckoutFormSubmit(form, idempotencyToken) {
       note: ghiChuInput ? ghiChuInput.value.trim() : ''
     };
 
-    const checkoutResult = processCheckout(orderInput);
+    const checkoutResult = processCheckout(orderInput, checkoutDeps);
 
     if (!checkoutResult.success) {
       isSubmitting = false;

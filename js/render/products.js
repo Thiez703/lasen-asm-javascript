@@ -1,7 +1,3 @@
-/**
- * Render thẻ sản phẩm và các danh sách trên trang chủ / trang shop
- */
-
 import { products } from '../services/dataService.js';
 import { formatPrice, escapeHTML } from '../utils/format.js';
 import { cartService } from '../services/cartService.js';
@@ -11,11 +7,6 @@ import { showToast } from '../services/toast.js';
 let isFavListenerAttached = false;
 let isCartListenerAttached = false;
 
-/**
- * Sinh mã HTML an toàn cho thẻ sản phẩm (Card)
- * @param {Object} product 
- * @returns {string}
- */
 export function createProductCard(product) {
   const isSale = typeof product.salePrice === 'number' && product.salePrice < product.price;
   const nowPrice = isSale ? product.salePrice : product.price;
@@ -69,18 +60,13 @@ export function createProductCard(product) {
   `;
 }
 
-/**
- * Render tất cả danh sách sản phẩm theo từng vị trí trên DOM
- */
 export function renderProducts() {
-  // Gắn sự kiện toàn cục một lần cho nút thêm vào giỏ.
   if (!isCartListenerAttached) {
     isCartListenerAttached = true;
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-add-to-cart]');
       if (!btn) return;
 
-      // Không xử lý nếu là nút trong trang product-detail (trang detail tự quản lý ô số lượng)
       if (btn.closest('.detail__actions')) return;
 
       const productId = btn.getAttribute('data-id');

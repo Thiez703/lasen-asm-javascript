@@ -1,5 +1,6 @@
 import { loadIcons } from './icons.js';
 import { initUI } from './modules/ui.js';
+import { initBanner } from './modules/banner.js';
 import { renderProducts } from './render/products.js';
 import { renderProfile } from './render/profile.js';
 import { renderCart } from './render/cart.js';
@@ -12,6 +13,7 @@ import { initProductFilters } from './modules/filter.js';
 await loadIcons();
 
 initUI();
+initBanner();
 renderAuth();
 renderProducts();
 initProductFilters();

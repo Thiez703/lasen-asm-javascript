@@ -163,36 +163,68 @@
     <h1 class="sr-only">Lá Sen — mỹ phẩm chăm sóc da từ sen và thảo mộc Việt Nam</h1>
 
     <!-- ----- 1. Banner ----- -->
-    <section class="hero-banner" aria-label="Ưu đãi và giới thiệu nổi bật">
-      <img class="hero-banner__img" src="assets/img/banners/banner.png"
-        alt="Lá Sen — Dưỡng da dịu lành từ sen Việt. Sữa rửa mặt, Serum, Kem dưỡng, Chống nắng — mỹ phẩm chính hãng 100%">
+    <section class="hero-banner" aria-label="Ưu đãi và giới thiệu nổi bật" aria-roledescription="trình chiếu" data-banner>
+      <div class="hero-banner__slides" id="hero-banner-slides" aria-live="off">
+        <div class="hero-banner__slide is-active" role="group" aria-roledescription="ảnh" aria-label="1 / 3"
+          aria-hidden="false" data-banner-slide>
+          <img class="hero-banner__img" src="assets/img/banners/banner.png" width="2056" height="656" fetchpriority="high"
+            alt="Lá Sen — Dưỡng da dịu lành từ sen Việt. Sữa rửa mặt, Serum, Kem dưỡng, Chống nắng — mỹ phẩm chính hãng 100%">
 
-      <!-- Overlay nút bấm + cam kết góc dưới trái -->
-      <div class="hero-banner__overlay">
-        <div class="hero-banner__actions">
-          <a class="btn btn--primary btn--lg" href="products.html">
-            <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
-            Mua ngay
-          </a>
-          <a class="btn btn--outline btn--lg" href="#flash-sale">
-            Xem ưu đãi
-            <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
-          </a>
+          <!-- Overlay nút bấm + cam kết chỉ hiển thị trên banner đầu tiên -->
+          <div class="hero-banner__overlay">
+            <div class="hero-banner__actions">
+              <a class="btn btn--primary btn--lg" href="products.html">
+                <svg class="icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+                Mua ngay
+              </a>
+              <a class="btn btn--outline btn--lg" href="#flash-sale">
+                Xem ưu đãi
+                <svg class="icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </a>
+            </div>
+            <ul class="hero-banner__perks">
+              <li class="hero-banner__perk">
+                <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
+                Freeship từ 500k
+              </li>
+              <li class="hero-banner__perk">
+                <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
+                Giao 2h nội thành Cần Thơ
+              </li>
+              <li class="hero-banner__perk">
+                <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+                Đổi trả 7 ngày
+              </li>
+            </ul>
+          </div>
         </div>
-        <ul class="hero-banner__perks">
-          <li class="hero-banner__perk">
-            <svg class="icon" aria-hidden="true"><use href="#i-truck"></use></svg>
-            Freeship từ 500k
-          </li>
-          <li class="hero-banner__perk">
-            <svg class="icon" aria-hidden="true"><use href="#i-bolt"></use></svg>
-            Giao 2h nội thành Cần Thơ
-          </li>
-          <li class="hero-banner__perk">
-            <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
-            Đổi trả 7 ngày
-          </li>
-        </ul>
+        <div class="hero-banner__slide hero-banner__slide--green" role="group" aria-roledescription="ảnh" aria-label="2 / 3"
+          aria-hidden="true" inert data-banner-slide>
+          <img class="hero-banner__img" src="assets/img/banners/banner2.jpg" width="800" height="333"
+            alt="Bộ sản phẩm chăm sóc da trà xanh Innisfree">
+        </div>
+        <div class="hero-banner__slide hero-banner__slide--blue" role="group" aria-roledescription="ảnh" aria-label="3 / 3"
+          aria-hidden="true" inert data-banner-slide>
+          <img class="hero-banner__img" src="assets/img/banners/banner3.jpg" width="1400" height="525"
+            alt="Giải cứu làn da ngày hè — ưu đãi sản phẩm chăm sóc và chống nắng lên đến 30%">
+        </div>
+      </div>
+
+      <button class="hero-banner__arrow hero-banner__arrow--prev" type="button" aria-label="Banner trước"
+        aria-controls="hero-banner-slides" data-banner-prev>
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-left"></use></svg>
+      </button>
+      <button class="hero-banner__arrow hero-banner__arrow--next" type="button" aria-label="Banner tiếp theo"
+        aria-controls="hero-banner-slides" data-banner-next>
+        <svg class="icon" aria-hidden="true"><use href="#i-chevron-right"></use></svg>
+      </button>
+      <div class="hero-banner__controls" role="group" aria-label="Điều khiển banner">
+        <button class="hero-banner__dot is-active" type="button" aria-label="Xem banner 1 / 3"
+          aria-controls="hero-banner-slides" aria-pressed="true" data-banner-dot="0"></button>
+        <button class="hero-banner__dot" type="button" aria-label="Xem banner 2 / 3"
+          aria-controls="hero-banner-slides" aria-pressed="false" data-banner-dot="1"></button>
+        <button class="hero-banner__dot" type="button" aria-label="Xem banner 3 / 3"
+          aria-controls="hero-banner-slides" aria-pressed="false" data-banner-dot="2"></button>
       </div>
     </section>
 

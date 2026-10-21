@@ -135,15 +135,14 @@ export function renderProductDetail() {
       }
     }
 
-    // Nút thêm giỏ hàng
-    const addBtn = detailArticle.querySelector('.detail__add[data-add-to-cart]');
-    if (addBtn) {
-      addBtn.setAttribute('data-id', product.id);
+    // Vô hiệu hóa các nút mua hàng khi sản phẩm hết hàng.
+    detailArticle.querySelectorAll('[data-add-to-cart], [data-buy-now]').forEach(button => {
+      button.setAttribute('data-id', product.id);
       if (product.stock <= 0) {
-        addBtn.disabled = true;
-        addBtn.textContent = 'Tạm hết hàng';
+        button.disabled = true;
+        button.textContent = 'Tạm hết hàng';
       }
-    }
+    });
 
     // Nút yêu thích
     const wishBtn = detailArticle.querySelector('[data-wishlist], [data-favorite-toggle]');
@@ -223,6 +222,7 @@ export function renderProductDetail() {
     const minusBtn = document.querySelector('[data-qty-minus]');
     const plusBtn = document.querySelector('[data-qty-plus]');
     const addBtn = document.querySelector('.detail__add[data-add-to-cart]');
+    const buyNowBtn = document.querySelector('[data-buy-now]');
 
     if (qtyInput) {
       qtyInput.min = '1';
@@ -252,17 +252,30 @@ export function renderProductDetail() {
         updateQty(qtyInput.value);
       });
 
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
+      [addBtn, buyNowBtn].filter(Boolean).forEach(button => {
+        button.addEventListener('click', () => {
+          updateQty(qtyInput.value);
           const qty = parseInteger(qtyInput.value, 1);
-          const res = cartService.addToCart(product.id, qty);
-          if (res.success) {
-            showToast(res.message);
-          } else {
-            showToast(res.message, 'error');
+
+          if (button === buyNowBtn) {
+            const params = new URLSearchParams({
+              buyNow: product.id,
+              quantity: String(qty),
+              token: `buy_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
+            });
+            window.location.href = `checkout.html?${params}`;
+            return;
           }
+
+          const res = cartService.addToCart(product.id, qty);
+          if (!res.success) {
+            showToast(res.message, 'error');
+            return;
+          }
+
+          showToast(res.message);
         });
-      }
+      });
     }
   }
 

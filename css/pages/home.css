@@ -21,11 +21,105 @@
   line-height: 0;
 }
 
+.hero-banner__slides {
+  position: relative;
+  /* Giữ tỉ lệ ảnh banner.png; ảnh khác tỉ lệ sẽ cắt phần dư. */
+  aspect-ratio: 2056 / 656;
+}
+
+.hero-banner__slide {
+  position: absolute;
+  inset: 0;
+  background-color: var(--c-primary-tint);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.45s ease, visibility 0.45s;
+}
+
+.hero-banner__slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.hero-banner__slide--green {
+  background-color: #edf4df;
+}
+
+.hero-banner__slide--blue {
+  background-color: #cceaf2;
+}
+
 .hero-banner__img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   object-fit: cover;
+}
+
+.hero-banner__arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--c-line);
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--c-primary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-50%);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.hero-banner__arrow:hover {
+  background-color: var(--c-primary);
+  color: #fff;
+}
+
+.hero-banner__arrow--prev {
+  left: clamp(8px, 2vw, 32px);
+}
+
+.hero-banner__arrow--next {
+  right: clamp(8px, 2vw, 32px);
+}
+
+.hero-banner__controls {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateX(-50%);
+  line-height: 1.5;
+}
+
+.hero-banner__dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 32px;
+}
+
+.hero-banner__dot::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--c-ink-muted);
+}
+
+.hero-banner__dot.is-active::before {
+  background-color: var(--c-primary);
+  box-shadow: 0 0 0 3px var(--c-primary-tint);
 }
 
 /* Overlay: nút bấm + cam kết, đặt ngay dưới phần chữ trên banner */
@@ -100,19 +194,34 @@
 
 /* Responsive: mobile nhỏ thì thu gọn */
 @media (max-width: 575px) {
+  .hero-banner__arrow {
+    top: calc((100% - 32px) / 2);
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-banner__controls {
+    position: static;
+    justify-content: center;
+    border-radius: 0;
+    transform: none;
+  }
+
   .hero-banner__overlay {
-    padding: var(--sp-2) var(--sp-3);
-    gap: var(--sp-2);
+    left: 44px;
+    right: 44px;
+    bottom: 10%;
+    padding: 0;
   }
 
   .hero-banner__actions .btn {
-    padding: var(--sp-2) var(--sp-4);
-    font-size: var(--fs-sm);
+    min-height: 32px;
+    padding: var(--sp-1) var(--sp-2);
+    font-size: 0.6875rem;
   }
 
-  .hero-banner__perk {
-    font-size: 0.6875rem;
-    padding: 2px var(--sp-2);
+  .hero-banner__perks {
+    display: none;
   }
 }
 

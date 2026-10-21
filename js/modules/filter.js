@@ -12,10 +12,6 @@ const PAGE_SIZE = 9;
 
 /**
  * Lọc và sắp xếp sản phẩm mà không thay đổi danh sách gốc.
- *
- * @param {Array} list Danh sách sản phẩm gốc
- * @param {Object} criteria Tiêu chí lọc
- * @returns {Array} Danh sách sản phẩm sau lọc và sắp xếp
  */
 export function filterAndSortProducts(list, criteria = {}) {
   let result = [...list];
