@@ -3,6 +3,7 @@ import { getStorage, setStorage, showToast, formatPrice, getPrice } from '../uti
 
 const CART_KEY = 'lasen_cart';
 const ORDERS_KEY = 'lasen_order_list';
+const CANCELLED_ORDERS_KEY = 'lasen_cancelled_orders';
 const SHIPPING_FEE = 30000;
 const FREE_SHIPPING_FROM = 500000;
 
@@ -105,4 +106,14 @@ export function saveOrder(order) {
   const orders = getOrders();
   orders.unshift(order);
   setStorage(ORDERS_KEY, orders);
+}
+
+export function getCancelledOrderIds() {
+  return getStorage(CANCELLED_ORDERS_KEY, []);
+}
+
+export function cancelOrder(orderId) {
+  const cancelledIds = getCancelledOrderIds();
+  cancelledIds.push(orderId);
+  setStorage(CANCELLED_ORDERS_KEY, cancelledIds);
 }

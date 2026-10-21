@@ -1,6 +1,4 @@
-import { products } from '../services/dataService.js';
 import { getCart, getCartItems, getCartTotals, updateQuantity, removeFromCart, clearCart } from '../services/cartService.js';
-import { renderProductList } from './products.js';
 import { formatPrice, showToast } from '../utils/helpers.js';
 
 export function renderCart() {
@@ -8,7 +6,6 @@ export function renderCart() {
   if (!cartBox) return;
 
   showCart();
-  renderProductList('[data-list="suggest"]', products.slice(0, 4));
 
   cartBox.addEventListener('click', (event) => {
     const button = event.target.closest('button');

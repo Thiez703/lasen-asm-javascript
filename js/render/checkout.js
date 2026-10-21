@@ -3,102 +3,10 @@ import { getCart, getCartItems, getCartTotals, clearCart, saveOrder } from '../s
 import { getCurrentUser, getAddresses } from '../services/accountService.js';
 import { formatPrice, isValidEmail, isValidPhone, showError, clearErrors, clearErrorWhenTyping, showToast } from '../utils/helpers.js';
 
-const locationData = {
-  'can-tho': {
-    name: 'TP. Cần Thơ',
-    districts: [
-      { id: 'ninh-kieu', name: 'Quận Ninh Kiều' },
-      { id: 'binh-thuy', name: 'Quận Bình Thuỷ' },
-      { id: 'cai-rang', name: 'Quận Cái Răng' },
-      { id: 'o-mon', name: 'Quận Ô Môn' },
-      { id: 'thot-not', name: 'Quận Thốt Nốt' },
-      { id: 'phong-dien', name: 'Huyện Phong Điền' }
-    ]
-  },
-  'ho-chi-minh': {
-    name: 'TP. Hồ Chí Minh',
-    districts: [
-      { id: 'q1', name: 'Quận 1' },
-      { id: 'q3', name: 'Quận 3' },
-      { id: 'q7', name: 'Quận 7' },
-      { id: 'q10', name: 'Quận 10' },
-      { id: 'thu-duc', name: 'TP. Thủ Đức' },
-      { id: 'binh-thanh', name: 'Quận Bình Thạnh' },
-      { id: 'go-vap', name: 'Quận Gò Vấp' }
-    ]
-  },
-  'ha-noi': {
-    name: 'TP. Hà Nội',
-    districts: [
-      { id: 'ba-dinh', name: 'Quận Ba Đình' },
-      { id: 'hoan-kiem', name: 'Quận Hoàn Kiếm' },
-      { id: 'dong-da', name: 'Quận Đống Đa' },
-      { id: 'cau-giay', name: 'Quận Cầu Giấy' },
-      { id: 'hai-ba-trung', name: 'Quận Hai Bà Trưng' },
-      { id: 'tay-ho', name: 'Quận Tây Hồ' }
-    ]
-  },
-  'da-nang': {
-    name: 'TP. Đà Nẵng',
-    districts: [
-      { id: 'hai-chau', name: 'Quận Hải Châu' },
-      { id: 'thanh-khe', name: 'Quận Thanh Khê' },
-      { id: 'son-tra', name: 'Quận Sơn Trà' },
-      { id: 'ngu-hanh-son', name: 'Quận Ngũ Hành Sơn' },
-      { id: 'cam-le', name: 'Quận Cẩm Lệ' }
-    ]
-  },
-  'an-giang': {
-    name: 'An Giang',
-    districts: [
-      { id: 'long-xuyen', name: 'TP. Long Xuyên' },
-      { id: 'chau-doc', name: 'TP. Châu Đốc' },
-      { id: 'thoai-son', name: 'Huyện Thoại Sơn' }
-    ]
-  },
-  'vinh-long': {
-    name: 'Vĩnh Long',
-    districts: [
-      { id: 'tp-vinh-long', name: 'TP. Vĩnh Long' },
-      { id: 'long-ho', name: 'Huyện Long Hồ' },
-      { id: 'binh-minh', name: 'Thị xã Bình Minh' }
-    ]
-  },
-  'hau-giang': {
-    name: 'Hậu Giang',
-    districts: [
-      { id: 'vi-thanh', name: 'TP. Vị Thanh' },
-      { id: 'nga-bay', name: 'TP. Ngã Bảy' },
-      { id: 'chau-thanh-a', name: 'Huyện Châu Thành A' }
-    ]
-  },
-  'soc-trang': {
-    name: 'Sóc Trăng',
-    districts: [
-      { id: 'tp-soc-trang', name: 'TP. Sóc Trăng' },
-      { id: 'my-xuyen', name: 'Huyện Mỹ Xuyên' },
-      { id: 'vinh-chau', name: 'Thị xã Vĩnh Châu' }
-    ]
-  },
-  'kien-giang': {
-    name: 'Kiên Giang',
-    districts: [
-      { id: 'rach-gia', name: 'TP. Rạch Giá' },
-      { id: 'phu-quoc', name: 'TP. Phú Quốc' },
-      { id: 'ha-tien', name: 'TP. Hà Tiên' }
-    ]
-  },
-  'ca-mau': {
-    name: 'Cà Mau',
-    districts: [
-      { id: 'tp-ca-mau', name: 'TP. Cà Mau' },
-      { id: 'nam-can', name: 'Huyện Năm Căn' },
-      { id: 'u-minh', name: 'Huyện U Minh' }
-    ]
-  }
-};
+const PROVINCES_API = 'https://provinces.open-api.vn/api/v1/?depth=2';
+let provinces = [];
 
-export function renderCheckout() {
+export async function renderCheckout() {
   const form = document.querySelector('[data-checkout-form]');
   if (!form) return;
 
@@ -119,12 +27,6 @@ export function renderCheckout() {
 
   showOrderSummary(items, totals);
 
-  const provinceSelect = document.getElementById('tinhThanh');
-  showDistricts(provinceSelect.value);
-  provinceSelect.addEventListener('change', () => showDistricts(provinceSelect.value));
-
-  fillCustomerInfo();
-
   clearErrorWhenTyping(form);
   form.querySelector('[name="dongY"]').addEventListener('change', () => showError('dongY', ''));
 
@@ -143,6 +45,15 @@ export function renderCheckout() {
     showToast('Đặt hàng thành công!');
     showOrderSuccess(order);
   });
+
+  const response = await fetch(PROVINCES_API);
+  provinces = await response.json();
+
+  showProvinces();
+  const provinceSelect = document.getElementById('tinhThanh');
+  provinceSelect.addEventListener('change', () => showDistricts(provinceSelect.value));
+
+  fillCustomerInfo();
 }
 
 function showEmptyCart() {
@@ -173,9 +84,15 @@ function showOrderSummary(items, totals) {
   document.querySelector('.checkout__aside [data-cart-total]').textContent = formatPrice(totals.total);
 }
 
-function showDistricts(provinceKey) {
+function showProvinces() {
+  const options = provinces.map(province => `<option value="${province.code}">${province.name}</option>`);
+  document.getElementById('tinhThanh').innerHTML = '<option value="">Chọn tỉnh / thành phố</option>' + options.join('');
+  showDistricts('');
+}
+
+function showDistricts(provinceCode) {
   const districtSelect = document.getElementById('quanHuyen');
-  const province = locationData[provinceKey];
+  const province = provinces.find(item => item.code === Number(provinceCode));
 
   if (!province) {
     districtSelect.innerHTML = '<option value="">Chọn tỉnh / thành phố trước</option>';
@@ -183,7 +100,7 @@ function showDistricts(provinceKey) {
     return;
   }
 
-  const options = province.districts.map(district => `<option value="${district.id}">${district.name}</option>`);
+  const options = province.districts.map(district => `<option value="${district.code}">${district.name}</option>`);
   districtSelect.innerHTML = '<option value="">Chọn quận / huyện</option>' + options.join('');
   districtSelect.disabled = false;
 }
@@ -203,19 +120,18 @@ function fillCustomerInfo() {
   document.getElementById('ghiChu').value = defaultAddress.note;
 
   const addressText = defaultAddress.address.toLowerCase();
-  for (const key in locationData) {
-    const province = locationData[key];
-    const provinceName = province.name.toLowerCase().replace('tp. ', '');
+  const province = provinces.find(item => {
+    const shortName = item.name.toLowerCase().replace('thành phố ', '').replace('tỉnh ', '');
+    return addressText.includes(shortName);
+  });
+  if (!province) return;
 
-    if (addressText.includes(provinceName)) {
-      document.getElementById('tinhThanh').value = key;
-      showDistricts(key);
+  document.getElementById('tinhThanh').value = province.code;
+  showDistricts(province.code);
 
-      const district = province.districts.find(item => addressText.includes(item.name.toLowerCase()));
-      if (district) {
-        document.getElementById('quanHuyen').value = district.id;
-      }
-    }
+  const district = province.districts.find(item => addressText.includes(item.name.toLowerCase()));
+  if (district) {
+    document.getElementById('quanHuyen').value = district.code;
   }
 }
 
@@ -256,9 +172,10 @@ function validateForm(form) {
 }
 
 function createOrder(items, totals) {
-  const province = locationData[document.getElementById('tinhThanh').value];
-  const districtId = document.getElementById('quanHuyen').value;
-  const district = province.districts.find(item => item.id === districtId);
+  const provinceSelect = document.getElementById('tinhThanh');
+  const districtSelect = document.getElementById('quanHuyen');
+  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+  const districtName = districtSelect.options[districtSelect.selectedIndex].text;
   const payment = document.querySelector('[name="thanhToan"]:checked').value;
   const user = getCurrentUser();
 
@@ -272,7 +189,7 @@ function createOrder(items, totals) {
       phone: document.getElementById('soDienThoai').value.trim(),
       email: document.getElementById('email').value.trim()
     },
-    shippingAddress: `${document.getElementById('diaChi').value.trim()}, ${district.name}, ${province.name}`,
+    shippingAddress: `${document.getElementById('diaChi').value.trim()}, ${districtName}, ${provinceName}`,
     paymentMethod: payment === 'cod' ? 'COD' : 'Chuyển khoản',
     note: document.getElementById('ghiChu').value.trim(),
     items: items.map(item => {

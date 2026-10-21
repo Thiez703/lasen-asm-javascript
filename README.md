@@ -60,8 +60,8 @@ Mọi trang HTML đều nạp `app.js`. Mỗi hàm khởi tạo tự kiểm tra 
 ## 3. Các tính năng chính
 1. **Sản phẩm**: trang chủ có Flash sale, sản phẩm nổi bật, hàng mới và gợi ý theo loại; trang Sản phẩm tìm kiếm, lọc theo loại và khoảng giá, sắp xếp, phân trang (9 sản phẩm/trang); trang chi tiết có thư viện ảnh, chọn số lượng, tab mô tả, đánh giá, sản phẩm tương tự và sản phẩm đã xem gần đây.
 2. **Giỏ hàng và tính tiền**: tính theo giá khuyến mãi, số lượng không vượt quá tồn kho. Phí giao hàng 30.000đ, đơn từ 500.000đ được miễn phí.
-3. **Thanh toán**: kiểm tra form, chọn Tỉnh → Quận/Huyện, tự điền thông tin từ hồ sơ và địa chỉ mặc định. Nút "Mua ngay" ở trang chi tiết chỉ thanh toán sản phẩm đó và giữ nguyên giỏ hàng.
-4. **Tài khoản**: đăng ký, đăng nhập, đăng xuất, sửa hồ sơ, sổ địa chỉ (tối đa 5 địa chỉ, luôn có 1 địa chỉ mặc định), lịch sử đơn hàng lọc theo trạng thái (lấy từ `order-statuses.json`), đặt lại đơn cũ, danh sách yêu thích.
+3. **Thanh toán**: kiểm tra form, chọn Tỉnh → Quận/Huyện (danh sách lấy từ API `https://provinces.open-api.vn/api/v1/?depth=2`, cần có Internet), tự điền thông tin từ hồ sơ và địa chỉ mặc định. Nút "Mua ngay" ở trang chi tiết chỉ thanh toán sản phẩm đó và giữ nguyên giỏ hàng.
+4. **Tài khoản**: đăng ký, đăng nhập, đăng xuất, sửa hồ sơ, sổ địa chỉ (tối đa 5 địa chỉ, luôn có 1 địa chỉ mặc định), lịch sử đơn hàng lọc theo trạng thái (lấy từ `order-statuses.json`), huỷ đơn khi đang "Chờ xác nhận", đặt lại đơn cũ, danh sách yêu thích.
 
 ## 4. Dữ liệu lưu trong localStorage
 
@@ -69,6 +69,7 @@ Mọi trang HTML đều nạp `app.js`. Mỗi hàm khởi tạo tự kiểm tra 
 | --- | --- |
 | `lasen_cart` | Giỏ hàng: `[{ productId, quantity }]` |
 | `lasen_order_list` | Các đơn đã đặt (đơn mới nhất đứng đầu) |
+| `lasen_cancelled_orders` | Mã các đơn đã huỷ (dùng cho cả đơn mẫu đọc từ file JSON) |
 | `lasen_users` | Danh sách tài khoản (lần đầu lấy từ `users.json`) |
 | `lasen_current_user` | Id tài khoản đang đăng nhập |
 | `lasen_favorites_<id>` | Id các sản phẩm yêu thích của từng tài khoản |
@@ -80,7 +81,7 @@ Muốn chạy lại từ đầu: mở DevTools (F12) → **Application** → **L
 ## 5. Đăng ký và đăng nhập
 
 - Mở `login.html` để đăng nhập, `register.html` để đăng ký.
-- Tài khoản mẫu: **nguyenvana@gmail.com** / **password123** (lấy từ `js/data/users.json`). Tài khoản này có sẵn 4 đơn hàng mẫu (`sample-orders.json`) để minh họa khi chưa đặt đơn nào.
+- Tài khoản mẫu: **nguyenvana@gmail.com** / **password123** (lấy từ `js/data/users.json`). Tài khoản này có sẵn 10 đơn hàng mẫu (`sample-orders.json`) đủ 4 trạng thái để thử bộ lọc đơn hàng; đơn mẫu luôn hiện bên dưới các đơn đã đặt. Tài khoản **tranthib@gmail.com** / **password123** có 2 đơn mẫu.
 - Đăng ký yêu cầu họ tên, số điện thoại 10 số, email chưa sử dụng, mật khẩu tối thiểu 8 ký tự và nhập lại mật khẩu khớp. Đăng ký xong sẽ chuyển về trang đăng nhập.
 - Đây là bản demo chạy trên máy (localhost): mật khẩu lưu nguyên văn trong localStorage và dữ liệu hiển thị bằng `innerHTML`. Website thật cần máy chủ để xác thực và bảo vệ dữ liệu.
 

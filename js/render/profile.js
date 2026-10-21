@@ -1,6 +1,6 @@
 import { getProductById } from '../services/dataService.js';
 import { getCurrentUser, updateProfile, logout, getAddresses, saveAddresses } from '../services/accountService.js';
-import { getOrders, addToCart } from '../services/cartService.js';
+import { getOrders, getCancelledOrderIds, cancelOrder, addToCart } from '../services/cartService.js';
 import { renderWishlist } from './products.js';
 import { updateHeaderAccount } from '../modules/ui.js';
 import { formatPrice, isValidEmail, isValidPhone, showError, clearErrors, clearErrorWhenTyping, showToast } from '../utils/helpers.js';
@@ -284,15 +284,18 @@ function initAddressBook() {
 async function renderOrders(user) {
   const statusResponse = await fetch('js/data/order-statuses.json');
   const statuses = await statusResponse.json();
+  const sampleResponse = await fetch('js/data/sample-orders.json');
+  const sampleOrders = await sampleResponse.json();
 
-  let orders = getOrders().filter(order => order.userId === user.id);
-  let isDemo = false;
-  if (orders.length === 0) {
-    const sampleResponse = await fetch('js/data/sample-orders.json');
-    const sampleOrders = await sampleResponse.json();
-    orders = sampleOrders.filter(order => order.userId === user.id);
-    isDemo = orders.length > 0;
-  }
+  const realOrders = getOrders().filter(order => order.userId === user.id);
+  const demoOrders = sampleOrders.filter(order => order.userId === user.id);
+  const orders = realOrders.concat(demoOrders);
+  const cancelledIds = getCancelledOrderIds();
+  orders.forEach(order => {
+    if (cancelledIds.includes(order.id)) {
+      order.status = 'Đã huỷ';
+    }
+  });
   document.querySelector('[data-orders-count]').textContent = orders.length;
 
   const filterBox = document.querySelector('[data-order-filters]');
@@ -305,17 +308,7 @@ async function renderOrders(user) {
   function showOrders(statusKey) {
     const filtered = orders.filter(order => statusKey === 'tat-ca' || ORDER_STATUS[order.status].key === statusKey);
     document.querySelector('[data-orders-empty]').classList.toggle('is-hidden', filtered.length > 0);
-
-    let html = '';
-    if (isDemo && filtered.length > 0) {
-      html += `
-        <div style="margin-bottom: 16px; padding: 12px 16px; background: #fff8e1; border: 1px solid #ffe082; border-radius: 6px; font-size: 13px; color: #7f5f00;">
-          <strong>Chế độ xem minh họa:</strong> Bạn chưa có đơn hàng thực tế nào. Dưới đây là các <strong>đơn hàng mẫu</strong>.
-        </div>
-      `;
-    }
-    html += filtered.map(order => createOrderCard(order)).join('');
-    orderList.innerHTML = html;
+    orderList.innerHTML = filtered.map(order => createOrderCard(order)).join('');
   }
 
   filterBox.addEventListener('click', (event) => {
@@ -337,12 +330,26 @@ async function renderOrders(user) {
     }, 800);
   });
 
+  orderList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-order-cancel]');
+    if (!button || !confirm('Bạn có chắc muốn huỷ đơn hàng này?')) return;
+
+    const order = orders.find(item => item.id === button.getAttribute('data-id'));
+    order.status = 'Đã huỷ';
+    cancelOrder(order.id);
+    showOrders(filterBox.querySelector('.is-active').getAttribute('data-order-filter'));
+    showToast(`Đã huỷ đơn hàng #${order.id}.`);
+  });
+
   showOrders('tat-ca');
 }
 
 function createOrderCard(order) {
   const status = ORDER_STATUS[order.status];
   const date = new Date(order.date).toLocaleDateString('vi-VN');
+  const cancelButtonHTML = status.key === 'cho-xac-nhan'
+    ? `<button class="btn btn--ghost btn--sm" type="button" data-order-cancel data-id="${order.id}">Huỷ đơn</button>`
+    : '';
 
   const itemsHTML = order.items.map(item => {
     const product = getProductById(item.productId);
@@ -377,6 +384,7 @@ function createOrderCard(order) {
         <span style="font-size: 13px;">Địa chỉ: ${order.shippingAddress}</span>
         <div style="display: flex; align-items: center; gap: 16px;">
           <span class="order__total" style="font-size: 15px; font-weight: 700;">Tổng tiền: ${formatPrice(order.total)}</span>
+          ${cancelButtonHTML}
           <button class="btn btn--outline btn--sm" type="button" data-order-rebuy data-id="${order.id}">Đặt lại đơn này</button>
         </div>
       </footer>
