@@ -1,27 +1,21 @@
-import { loadIcons } from './icons.js';
 import { initUI } from './modules/ui.js';
-import { initBanner } from './modules/banner.js';
 import { renderProducts } from './render/products.js';
-import { renderProfile } from './render/profile.js';
+import { renderProductDetail } from './render/detail.js';
 import { renderCart } from './render/cart.js';
 import { renderCheckout } from './render/checkout.js';
-import { renderProductDetail } from './render/detail.js';
-import { renderContact } from './render/contact.js';
+import { renderProfile } from './render/profile.js';
 import { renderAuth } from './render/auth.js';
-import { initProductFilters } from './modules/filter.js';
+import { renderContact } from './render/contact.js';
 
-await loadIcons();
+const response = await fetch('js/utils/icons.svg');
+const svgText = await response.text();
+document.body.insertAdjacentHTML('afterbegin', svgText);
 
 initUI();
-initBanner();
-renderAuth();
 renderProducts();
-initProductFilters();
 renderProductDetail();
 renderCart();
 renderCheckout();
 renderProfile();
+renderAuth();
 renderContact();
-
-
-
