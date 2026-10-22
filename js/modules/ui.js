@@ -130,7 +130,7 @@ function initBanner() {
     dot.addEventListener('click', () => showSlide(i));
   });
 
-  setInterval(() => showSlide(currentIndex + 1), 5000);
+  setInterval(() => showSlide(currentIndex + 1), 3000);
 }
 
 function initCountdown() {

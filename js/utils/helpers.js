@@ -21,11 +21,10 @@ export function setStorage(key, value) {
 
 // Hiện thông báo nhỏ ở góc màn hình, tự ẩn sau 3 giây
 export function showToast(message, type = 'success') {
-  const icon = type === 'error' ? '#i-close' : '#i-check';
   const toast = document.createElement('div');
   toast.className = type === 'error' ? 'toast toast--error' : 'toast';
   toast.innerHTML = `
-    <svg class="icon toast__icon" aria-hidden="true"><use href="${icon}"></use></svg>
+       <div class="toast-stack" aria-live="polite" aria-atomic="true" data-toast></div>
     <span class="toast__msg">${message}</span>
   `;
 

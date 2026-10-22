@@ -5,10 +5,12 @@ const USERS_KEY = 'lasen_users';
 const CURRENT_USER_KEY = 'lasen_current_user';
 const ADDRESSES_KEY = 'lasen_addresses';
 
+// 1. Đọc danh sách tài khoản
 export function getAccounts() {
   return getStorage(USERS_KEY, users);
 }
 
+// 2. Tài khoản đang đăng nhập, đăng nhập, đăng xuất và đăng ký
 export function getCurrentUser() {
   const userId = getStorage(CURRENT_USER_KEY, null);
   return getAccounts().find(account => account.id === userId);
@@ -41,6 +43,7 @@ export function register(newUser) {
   return true;
 }
 
+// 3. Cập nhật thông tin hồ sơ
 export function updateProfile(newInfo) {
   const accounts = getAccounts();
   const userId = getStorage(CURRENT_USER_KEY, null);
@@ -55,7 +58,8 @@ export function updateProfile(newInfo) {
   return true;
 }
 
-// Tạo key localStorage riêng cho tài khoản đang đăng nhập, ví dụ: lasen_favorites_1
+// 4. Tạo khóa lưu trữ riêng cho từng tài khoản
+// Ví dụ: lasen_favorites_1
 export function getUserKey(key) {
   const user = getCurrentUser();
   if (!user) {
@@ -64,6 +68,7 @@ export function getUserKey(key) {
   return key + '_' + user.id;
 }
 
+// 5. Đọc và lưu sổ địa chỉ
 export function getAddresses() {
   const user = getCurrentUser();
   let firstAddresses = [];

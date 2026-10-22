@@ -272,7 +272,12 @@ function initAddressBook() {
 
     const deleteButton = event.target.closest('[data-address-delete]');
     if (deleteButton && confirm('Bạn có chắc muốn xoá địa chỉ này?')) {
-      const addresses = getAddresses().filter(item => item.id !== deleteButton.getAttribute('data-id'));
+      const addresses = getAddresses();
+      const addressId = deleteButton.getAttribute('data-id');
+      const index = addresses.findIndex(item => item.id === addressId);
+      if (index === -1) return;
+
+      addresses.splice(index, 1);
       saveAddresses(addresses);
       showAddresses();
       closeForm();

@@ -164,7 +164,13 @@ function renderPagination(currentPage, totalPages) {
     </button>
   `;
   for (let page = 1; page <= totalPages; page++) {
-    const activeClass = page === currentPage ? 'is-active' : '';
+    let activeClass;
+
+    if (page === currentPage) {
+      activeClass = 'is-active';
+    } else {
+      activeClass = '';
+    }
     html += `<button class="pagination__btn ${activeClass}" type="button" data-page="${page}">${page}</button>`;
   }
   html += `
