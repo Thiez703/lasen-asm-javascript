@@ -1,8 +1,3 @@
-/* =========================================================
-   LÁ SEN — cart.css
-   Riêng cho trang giỏ hàng.
-   ========================================================= */
-
 .cart {
   display: grid;
   grid-template-columns: 1fr;
@@ -16,17 +11,11 @@
   background-color: var(--c-surface);
   overflow: hidden;
 }
-
-/* Bảng được bố cục bằng grid thay vì table-layout để đổi hình dạng
-   giữa mobile và desktop. Ngữ nghĩa bảng giữ nguyên nhờ thuộc tính
-   role đặt sẵn trong HTML. */
 .cart-table,
 .cart-table thead,
 .cart-table tbody {
   display: block;
 }
-
-/* ---------- Mobile: mỗi dòng là một thẻ ---------- */
 
 .cart-table__head {
   display: none;
@@ -99,8 +88,6 @@
   color: var(--c-primary);
 }
 
-/* ---------- Chân bảng ---------- */
-
 .cart__foot {
   display: flex;
   flex-wrap: wrap;
@@ -109,8 +96,6 @@
   gap: var(--sp-2);
   margin-top: var(--sp-4);
 }
-
-/* ---------- Từ 768px: quay lại dạng bảng thật ---------- */
 
 @media (min-width: 768px) {
   .cart-table__head {
@@ -152,10 +137,7 @@
   .cart-row__product {
     align-items: center;
   }
-
 }
-
-/* ---------- Từ 1024px: tổng tiền dính bên phải ---------- */
 
 @media (min-width: 1024px) {
   .cart {

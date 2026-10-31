@@ -1,15 +1,41 @@
-/* =========================================================
-   LÁ SEN — detail.css
-   Riêng cho trang chi tiết sản phẩm.
-   ========================================================= */
+.tabs__list {
+  display: flex;
+  gap: var(--sp-1);
+  border-bottom: 1px solid var(--c-line);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.tabs__btn {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 2px solid transparent;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-ink-muted);
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tabs__btn:hover {
+  color: var(--c-primary);
+}
+
+.tabs__btn.is-active {
+  color: var(--c-primary);
+  border-bottom-color: var(--c-primary);
+}
+
+.tabs__panel {
+  padding-top: var(--sp-6);
+}
 
 .detail {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--sp-6);
 }
-
-/* ---------- Thư viện ảnh ---------- */
 
 .gallery__main {
   position: relative;
@@ -62,8 +88,6 @@
   aspect-ratio: 1 / 1;
   object-fit: cover;
 }
-
-/* ---------- Cột thông tin ---------- */
 
 .detail__brand {
   font-size: var(--fs-sm);
@@ -127,8 +151,6 @@
   font-size: var(--fs-sm);
   color: var(--c-ink-muted);
 }
-
-/* Bảng thông số dạng danh sách định nghĩa */
 .detail__specs {
   margin-bottom: var(--sp-4);
   border-top: 1px solid var(--c-line);
@@ -164,8 +186,6 @@
 .detail__stock[data-stock='out-of-stock'] {
   color: var(--c-ink-muted);
 }
-
-/* Khối mua hàng */
 .detail__buy {
   display: flex;
   flex-direction: column;
@@ -215,8 +235,6 @@
   color: var(--c-primary-soft);
 }
 
-/* ---------- Nội dung tab ---------- */
-
 .detail__tabs {
   padding-top: var(--sp-8);
 }
@@ -239,8 +257,6 @@
 .prose p + p {
   margin-top: var(--sp-3);
 }
-
-/* Bảng thành phần */
 .table-scroll {
   overflow-x: auto;
   border: 1px solid var(--c-line);
@@ -289,8 +305,6 @@
 .ing-table tbody tr:last-child td {
   border-bottom: 0;
 }
-
-/* Các bước sử dụng — chuỗi tuần tự nên đánh số */
 .steps {
   counter-reset: step;
   margin-block: var(--sp-4);
@@ -326,8 +340,6 @@
   font-weight: 700;
   color: var(--c-ink);
 }
-
-/* Đánh giá */
 .reviews {
   display: grid;
   grid-template-columns: 1fr;
@@ -398,8 +410,6 @@
   color: var(--c-ink-muted);
 }
 
-/* ---------- Từ 768px ---------- */
-
 @media (min-width: 768px) {
   .detail__spec {
     grid-template-columns: 180px 1fr;
@@ -421,8 +431,6 @@
     grid-column: 2;
   }
 }
-
-/* ---------- Từ 1024px ---------- */
 
 @media (min-width: 1024px) {
   .detail {

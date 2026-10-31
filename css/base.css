@@ -1,43 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
 
-/* =========================================================
-   LÁ SEN — base.css
-   Token thiết kế, reset, thiết lập gốc và lớp tiện ích.
-   ========================================================= */
-
 :root {
-  /* Màu — Hồng Sen · Hồng phấn · Đỏ sale
-     Hồng sen đậm  = màu chủ đạo, nút và tiêu đề
-     Hồng phấn     = nền dịu, viền, chip
-     Đỏ            = giá sale và flash sale, chỉ dùng cho con số  */
-  --c-primary: #D6246B;
-  /* hồng sen đậm — màu chủ đạo */
-  --c-primary-dark: #A8144F;
-  /* hồng mận — hover, nhấn mạnh */
-  --c-primary-soft: #F27BA9;
-  /* hồng trung — viền, icon phụ */
-  --c-primary-tint: #FFE7F0;
-  /* hồng phấn — nền chip, badge mềm */
-  --c-paper: #FFF5F8;
-  /* nền trang ngả hồng */
-  --c-surface: #FFFFFF;
-  /* nền thẻ, ô nhập */
-  --c-ink: #2B1620;
-  /* mực đậm ngả mận */
-  --c-ink-muted: #7A5F6C;
-  /* chữ phụ */
-  --c-sale: #E8342F;
-  /* đỏ — giá sale, flash sale, lỗi */
-  --c-line: #F3DCE5;
-  /* đường kẻ, viền */
-  --c-gold: #E9A23B;
-  /* vàng — sao đánh giá, huy hiệu */
-  --c-gold-soft: #F7D69A;
-  /* vàng nhạt — hover, glow */
-  --c-green: #2E8B62;
-  /* xanh lá sen — chi tiết phụ trên banner */
-
-  /* Chữ */
+  --c-primary: #d6246b;
+  --c-primary-dark: #a8144f;
+  --c-primary-soft: #f27ba9;
+  --c-primary-tint: #ffe7f0;
+  --c-paper: #fff5f8;
+  --c-surface: #ffffff;
+  --c-ink: #2b1620;
+  --c-ink-muted: #7a5f6c;
+  --c-sale: #e8342f;
+  --c-line: #f3dce5;
+  --c-gold: #e9a23b;
+  --c-gold-soft: #f7d69a;
+  --c-green: #2e8b62;
   --f-body: 'Be Vietnam Pro', system-ui, sans-serif;
   --f-head: 'Be Vietnam Pro', system-ui, sans-serif;
 
@@ -47,8 +23,6 @@
   --fs-lg: 1.25rem;
   --fs-xl: 1.75rem;
   --fs-2xl: 2.5rem;
-
-  /* Khoảng cách — thang 4px */
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
   --sp-3: 0.75rem;
@@ -57,26 +31,22 @@
   --sp-8: 2rem;
   --sp-12: 3rem;
   --sp-16: 4rem;
-
-  /* Khác */
   --radius: 10px;
   --radius-sm: 6px;
   --radius-pill: 999px;
-  --shadow: 0 2px 8px rgba(168, 20, 79, 0.10);
+  --shadow: 0 2px 8px rgba(168, 20, 79, 0.1);
   --container: 1200px;
   --header-h: 76px;
   --catnav-h: 46px;
-
-  /* ── Premium tokens ── */
   --shadow-sm: 0 1px 3px rgba(168, 20, 79, 0.08);
   --shadow-md: 0 4px 16px rgba(168, 20, 79, 0.13);
   --shadow-lg: 0 8px 32px rgba(168, 20, 79, 0.16);
   --shadow-glow: 0 0 20px rgba(214, 36, 107, 0.28);
   --shadow-card-hover: 0 12px 28px rgba(168, 20, 79, 0.16);
 
-  --grad-primary: linear-gradient(135deg, #8E0E43 0%, #D6246B 55%, #F0568F 100%);
-  --grad-warm: linear-gradient(135deg, #D6246B 0%, #F27BA9 100%);
-  --grad-flash: linear-gradient(90deg, #E8342F 0%, #F0568F 45%, #D6246B 100%);
+  --grad-primary: linear-gradient(135deg, #8e0e43 0%, #d6246b 55%, #f0568f 100%);
+  --grad-warm: linear-gradient(135deg, #d6246b 0%, #f27ba9 100%);
+  --grad-flash: linear-gradient(90deg, #e8342f 0%, #f0568f 45%, #d6246b 100%);
   --grad-shine: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.22) 50%, transparent 60%);
 
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -85,8 +55,6 @@
   --glass-bg: rgba(255, 255, 255, 0.94);
   --glass-blur: 14px;
 }
-
-/* ---------- Keyframes ---------- */
 
 @keyframes shimmer {
   0% {
@@ -99,20 +67,16 @@
 }
 
 @keyframes pulseGlow {
-
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(214, 36, 107, 0.30);
+    box-shadow: 0 0 0 0 rgba(214, 36, 107, 0.3);
   }
 
   50% {
     box-shadow: 0 0 12px 4px rgba(214, 36, 107, 0.14);
   }
 }
-
-/* Dùng cho tia sét ở tiêu đề flash sale */
 @keyframes throb {
-
   0%,
   100% {
     transform: scale(1);
@@ -132,8 +96,6 @@
     transform: translateX(-50%);
   }
 }
-
-/* ---------- Reset ---------- */
 
 *,
 *::before,
@@ -214,8 +176,6 @@ del {
   text-decoration-thickness: 1px;
 }
 
-/* ---------- Tiêu đề ---------- */
-
 h1,
 h2,
 h3,
@@ -260,8 +220,6 @@ h4 {
 p {
   text-wrap: pretty;
 }
-
-/* ---------- Lớp tiện ích ---------- */
 
 .container {
   width: 100%;
@@ -315,7 +273,9 @@ p {
   font-size: var(--fs-sm);
   font-weight: 600;
   border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease, gap 0.3s var(--ease-spring);
+  transition:
+    border-color 0.2s ease,
+    gap 0.3s var(--ease-spring);
 }
 
 .section__link:hover {
@@ -343,13 +303,9 @@ p {
   white-space: nowrap;
   border: 0;
 }
-
-/* Trạng thái dùng chung — JS bật/tắt */
 .is-hidden {
   display: none !important;
 }
-
-/* Kho icon inline dùng cho <use href="#i-..."> */
 .sprite {
   display: none;
 }
@@ -383,15 +339,11 @@ p {
   top: var(--sp-2);
 }
 
-/* ---------- Focus nhìn thấy được ---------- */
-
 :focus-visible {
   outline: 2px solid var(--c-primary);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }
-
-/* ---------- Tôn trọng lựa chọn giảm chuyển động ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   html {

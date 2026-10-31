@@ -1,8 +1,12 @@
 import { products, getProductById, getReviewsByProductId } from '../services/dataService.js';
 import { addToCart } from '../services/cartService.js';
 import { isFavorite } from '../services/favoriteService.js';
-import { createStars, renderProductList } from './products.js';
-import { formatPrice, getPrice, getStorage, setStorage, showToast } from '../utils/helpers.js';
+import { requireLogin } from '../services/accountService.js';
+import { createStars, renderProductList } from '../components/productCard.js';
+import { formatPrice, getPrice } from '../utils/price.js';
+import { getStorage, setStorage } from '../utils/storage.js';
+import { showToast } from '../utils/toast.js';
+import { showPrompt } from '../utils/dialog.js';
 
 const RECENT_KEY = 'lasen_recent_products';
 
@@ -28,10 +32,15 @@ export function renderProductDetail() {
 
 function showNotFound() {
   document.querySelector('main').innerHTML = `
-    <div class="container" style="padding-block: 60px; text-align: center;">
-      <h1 style="font-size: 24px; margin-bottom: 12px;">Không tìm thấy sản phẩm</h1>
-      <p style="color: var(--c-muted, #666); margin-bottom: 24px;">Sản phẩm không tồn tại hoặc đường liên kết đã thay đổi.</p>
-      <a class="btn btn--primary" href="products.html">Xem tất cả sản phẩm</a>
+    <div class="container section">
+      <div class="empty">
+        <svg class="empty__icon" aria-hidden="true"><use href="#i-search"></use></svg>
+        <h1 class="empty__title">Không tìm thấy sản phẩm</h1>
+        <p class="empty__text">Sản phẩm không tồn tại hoặc đường liên kết đã thay đổi.</p>
+        <div class="empty__actions">
+          <a class="btn btn--primary" href="products.html">Xem tất cả sản phẩm</a>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -45,7 +54,8 @@ function showProductInfo(product) {
     <li class="breadcrumb__item"><a class="breadcrumb__link" href="products.html?cat=${product.category}">${product.categoryName}</a></li>
     <li class="breadcrumb__item" aria-current="page">${product.name}</li>
   `;
-  document.querySelector('.detail__brand').innerHTML = `${product.brandName} · <a href="products.html?cat=${product.category}">${product.categoryName}</a>`;
+  document.querySelector('.detail__brand').innerHTML =
+    `${product.brandName} · <a href="products.html?cat=${product.category}">${product.categoryName}</a>`;
   document.querySelector('.detail__name').textContent = product.name;
   document.querySelector('.detail__rating').innerHTML = `
     <span class="rating__stars" aria-hidden="true">${createStars(product.rating)}</span>
@@ -72,19 +82,23 @@ function initGallery(product) {
   mainImage.src = product.images[0];
   mainImage.alt = product.name;
 
-  const percent = Math.round((product.price - getPrice(product)) / product.price * 100);
+  const percent = Math.round(((product.price - getPrice(product)) / product.price) * 100);
   document.querySelector('.gallery__badge').textContent = '-' + percent + '%';
 
   const thumbList = document.querySelector('.gallery__thumbs');
-  thumbList.innerHTML = product.images.map((image, index) => `
+  thumbList.innerHTML = product.images
+    .map(
+      (image, index) => `
     <li>
       <button class="gallery__thumb ${index === 0 ? 'is-active' : ''}" type="button" data-src="${image}">
         <img src="${image}" alt="${product.name} - ảnh ${index + 1}" loading="lazy">
       </button>
     </li>
-  `).join('');
+  `
+    )
+    .join('');
 
-  thumbList.addEventListener('click', (event) => {
+  thumbList.addEventListener('click', event => {
     const thumb = event.target.closest('.gallery__thumb');
     if (!thumb) return;
 
@@ -94,13 +108,11 @@ function initGallery(product) {
   });
 }
 
-// Ô chọn số lượng, nút "Thêm vào giỏ" và nút "Mua ngay"
 function initBuyButtons(product) {
   const quantityInput = document.querySelector('[data-qty-input]');
   quantityInput.value = 1;
   quantityInput.max = product.stock;
 
-  // Giữ số lượng trong khoảng từ 1 đến số lượng tồn kho
   function setQuantity(quantity) {
     if (quantity < 1) quantity = 1;
     if (quantity > product.stock) quantity = product.stock;
@@ -118,10 +130,12 @@ function initBuyButtons(product) {
   });
 
   document.querySelector('.detail__add').addEventListener('click', () => {
+    if (!requireLogin()) return;
     addToCart(product.id, Number(quantityInput.value));
   });
 
   document.querySelector('[data-buy-now]').addEventListener('click', () => {
+    if (!requireLogin()) return;
     window.location.href = `checkout.html?buyNow=${product.id}&quantity=${quantityInput.value}`;
   });
 }
@@ -154,7 +168,9 @@ function showReviews(product) {
   if (reviews.length === 0) {
     reviewList.innerHTML = '<li style="padding: 16px; text-align: center;">Chưa có đánh giá nào cho sản phẩm này.</li>';
   } else {
-    reviewList.innerHTML = reviews.map(review => `
+    reviewList.innerHTML = reviews
+      .map(
+        review => `
       <li class="review">
         <p class="review__head">
           <span class="review__author">${review.userName}</span>
@@ -163,11 +179,21 @@ function showReviews(product) {
         <p class="rating"><span class="rating__stars">${createStars(review.rating)}</span></p>
         <p class="review__text">${review.comment}</p>
       </li>
-    `).join('');
+    `
+      )
+      .join('');
   }
 
-  document.querySelector('[data-review-open]').addEventListener('click', () => {
-    const comment = prompt(`Viết đánh giá của bạn cho "${product.name}":`);
+  document.querySelector('[data-review-open]').addEventListener('click', async () => {
+    const comment = await showPrompt({
+      icon: 'i-star',
+      title: 'Viết đánh giá',
+      message: `Chia sẻ cảm nhận của bạn về "${product.name}".`,
+      label: 'Nội dung đánh giá',
+      placeholder: 'Sản phẩm dùng thế nào, có hợp với da bạn không…',
+      emptyMessage: 'Vui lòng nhập nội dung đánh giá.',
+      confirmText: 'Gửi đánh giá'
+    });
     if (comment) {
       showToast('Cảm ơn bạn đã gửi đánh giá! Đánh giá sẽ hiển thị sau khi được duyệt.');
     }
@@ -185,10 +211,10 @@ function showRelatedProducts(product) {
   renderProductList('[data-list="related"]', related.slice(0, 4));
 }
 
-// Hiện các sản phẩm đã xem gần đây và lưu sản phẩm đang xem vào lịch sử
 function showRecentProducts(product) {
   const recentList = document.querySelector('[data-list="recent"]');
-  const emptyMessage = '<p style="grid-column: 1 / -1; padding: 24px; text-align: center;">Chưa có sản phẩm nào khác trong lịch sử xem.</p>';
+  const emptyMessage =
+    '<p style="grid-column: 1 / -1; padding: 24px; text-align: center;">Chưa có sản phẩm nào khác trong lịch sử xem.</p>';
 
   let recentIds = getStorage(RECENT_KEY, []).filter(id => id !== product.id);
   const recentProducts = recentIds.slice(0, 4).map(id => getProductById(id));
@@ -199,7 +225,7 @@ function showRecentProducts(product) {
   }
 
   recentIds.unshift(product.id);
-  setStorage(RECENT_KEY, recentIds.slice(0, 8));
+  setStorage(RECENT_KEY, recentIds.slice(0, 5));
 
   document.querySelector('[data-recent-clear]').addEventListener('click', () => {
     localStorage.removeItem(RECENT_KEY);

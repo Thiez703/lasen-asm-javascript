@@ -1,9 +1,10 @@
 import { users } from './dataService.js';
-import { getStorage, setStorage } from '../utils/helpers.js';
+import { getStorage, setStorage } from '../utils/storage.js';
+import { showConfirm } from '../utils/dialog.js';
 
 const USERS_KEY = 'lasen_users';
 const CURRENT_USER_KEY = 'lasen_current_user';
-const ADDRESSES_KEY = 'lasen_addresses';
+const RETURN_PAGE_KEY = 'lasen_return_page';
 
 export function getAccounts() {
   return getStorage(USERS_KEY, users);
@@ -55,7 +56,6 @@ export function updateProfile(newInfo) {
   return true;
 }
 
-// Tạo key localStorage riêng cho tài khoản đang đăng nhập, ví dụ: lasen_favorites_1
 export function getUserKey(key) {
   const user = getCurrentUser();
   if (!user) {
@@ -64,26 +64,31 @@ export function getUserKey(key) {
   return key + '_' + user.id;
 }
 
-export function getAddresses() {
-  const user = getCurrentUser();
-  let firstAddresses = [];
-  if (user.address) {
-    firstAddresses = [{
-      id: 'addr-1',
-      name: user.name,
-      phone: user.phone,
-      address: user.address,
-      note: '',
-      isDefault: true
-    }];
+export function requireLogin() {
+  if (getCurrentUser()) {
+    return true;
   }
-  return getStorage(getUserKey(ADDRESSES_KEY), firstAddresses);
+  showConfirm({
+    icon: 'i-user',
+    title: 'Bạn chưa đăng nhập',
+    message: 'Đăng nhập để thêm vào giỏ hàng, lưu sản phẩm yêu thích hoặc mua hàng.',
+    confirmText: 'Đăng nhập',
+    cancelText: 'Để sau'
+  }).then(confirmed => {
+    if (confirmed) {
+      rememberCurrentPage();
+      window.location.href = 'login.html';
+    }
+  });
+  return false;
 }
 
-export function saveAddresses(addresses) {
-  const hasDefault = addresses.some(address => address.isDefault);
-  if (addresses.length > 0 && !hasDefault) {
-    addresses[0].isDefault = true;
-  }
-  setStorage(getUserKey(ADDRESSES_KEY), addresses);
+export function rememberCurrentPage() {
+  sessionStorage.setItem(RETURN_PAGE_KEY, window.location.href);
+}
+
+export function getPageAfterLogin() {
+  const page = sessionStorage.getItem(RETURN_PAGE_KEY) || 'profile.html';
+  sessionStorage.removeItem(RETURN_PAGE_KEY);
+  return page;
 }

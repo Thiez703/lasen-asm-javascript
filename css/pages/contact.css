@@ -1,7 +1,47 @@
-/* =========================================================
-   LÁ SEN — contact.css
-   Riêng cho trang liên hệ.
-   ========================================================= */
+.accordion__item {
+  margin-bottom: var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-surface);
+  overflow: hidden;
+}
+
+.accordion__btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-4);
+  text-align: left;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--c-ink);
+  transition: color 0.2s ease;
+}
+
+.accordion__btn:hover {
+  color: var(--c-primary);
+}
+
+.accordion__icon {
+  color: var(--c-primary);
+  transition: transform 0.2s ease;
+}
+
+.accordion__item.is-open .accordion__icon {
+  transform: rotate(180deg);
+}
+
+.accordion__panel {
+  padding: 0 var(--sp-4) var(--sp-4);
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.accordion__panel p + p {
+  margin-top: var(--sp-3);
+}
 
 .contact {
   display: grid;
@@ -9,8 +49,6 @@
   gap: var(--sp-6);
   align-items: start;
 }
-
-/* ---------- Khối thông tin ---------- */
 
 .info-list {
   display: grid;
@@ -72,8 +110,6 @@
   font-size: var(--fs-xs);
   color: var(--c-ink-muted);
 }
-
-/* Giờ mở cửa */
 .hours {
   font-size: var(--fs-sm);
 }
@@ -100,8 +136,6 @@
   white-space: nowrap;
 }
 
-/* ---------- Bản đồ ---------- */
-
 .map__title {
   margin-bottom: var(--sp-3);
   font-family: var(--f-body);
@@ -123,8 +157,6 @@
   height: 320px;
   border: 0;
 }
-
-/* ---------- Biểu mẫu ---------- */
 
 .contact-card {
   padding: var(--sp-6);
@@ -151,8 +183,6 @@
   text-align: center;
 }
 
-/* ---------- Câu hỏi thường gặp ---------- */
-
 .faq {
   max-width: 800px;
 }
@@ -161,8 +191,6 @@
   font: inherit;
   color: inherit;
 }
-
-/* ---------- Từ 768px ---------- */
 
 @media (min-width: 768px) {
   .info-list {
@@ -177,8 +205,6 @@
     padding: var(--sp-8);
   }
 }
-
-/* ---------- Từ 1024px ---------- */
 
 @media (min-width: 1024px) {
   .contact {

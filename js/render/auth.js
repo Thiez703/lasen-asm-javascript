@@ -1,12 +1,13 @@
-import { getCurrentUser, login, register } from '../services/accountService.js';
-import { isValidEmail, isValidPhone, clearErrors, clearErrorWhenTyping } from '../utils/helpers.js';
+import { getCurrentUser, login, register, getPageAfterLogin } from '../services/accountService.js';
+import { isValidEmail, isValidPhone, clearErrors, clearErrorWhenTyping } from '../utils/form.js';
+import { showToastOnNextPage } from '../utils/toast.js';
 
 export function renderAuth() {
   const form = document.querySelector('[data-auth-form]');
   if (!form) return;
 
   if (getCurrentUser()) {
-    window.location.href = 'profile.html';
+    window.location.replace('profile.html');
     return;
   }
 
@@ -16,9 +17,11 @@ export function renderAuth() {
       if (input.type === 'password') {
         input.type = 'text';
         button.textContent = 'Ẩn';
+        button.setAttribute('aria-pressed', 'true');
       } else {
         input.type = 'password';
         button.textContent = 'Hiện';
+        button.setAttribute('aria-pressed', 'false');
       }
     });
   });
@@ -33,17 +36,23 @@ export function renderAuth() {
 }
 
 function showFieldError(name, message) {
+  const input = document.getElementById('auth-' + name);
+  input.closest('.field').classList.add('is-invalid');
+  input.setAttribute('aria-invalid', 'true');
   document.getElementById('auth-error-' + name).textContent = message;
+}
+
+function hideFieldError(name) {
+  const input = document.getElementById('auth-' + name);
+  input.closest('.field').classList.remove('is-invalid');
+  input.removeAttribute('aria-invalid');
+  document.getElementById('auth-error-' + name).textContent = '';
 }
 
 function initLoginForm(form) {
   const emailInput = document.getElementById('auth-email');
   const passwordInput = document.getElementById('auth-password');
   const messageBox = document.querySelector('[data-auth-message]');
-
-  if (window.location.search.includes('registered=1')) {
-    document.querySelector('[data-registration-success]').hidden = false;
-  }
 
   document.querySelector('[data-fill-demo]').addEventListener('click', () => {
     emailInput.value = document.querySelector('[data-demo-email]').textContent;
@@ -54,7 +63,7 @@ function initLoginForm(form) {
     messageBox.hidden = true;
   });
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
     clearErrors(form);
     messageBox.hidden = true;
@@ -71,10 +80,14 @@ function initLoginForm(form) {
       showFieldError('password', 'Vui lòng nhập mật khẩu.');
       isValid = false;
     }
-    if (!isValid) return;
+    if (!isValid) {
+      form.querySelector('[aria-invalid="true"]').focus();
+      return;
+    }
 
     if (login(email, password)) {
-      window.location.href = 'profile.html';
+      showToastOnNextPage('Đăng nhập thành công!');
+      window.location.replace(getPageAfterLogin());
     } else {
       messageBox.textContent = 'Email hoặc mật khẩu chưa đúng.';
       messageBox.hidden = false;
@@ -83,12 +96,16 @@ function initLoginForm(form) {
 }
 
 function initRegisterForm(form) {
-  form.addEventListener('submit', (event) => {
+  document.getElementById('auth-password').addEventListener('input', () => {
+    hideFieldError('confirmPassword');
+  });
+
+  form.addEventListener('submit', event => {
     event.preventDefault();
     clearErrors(form);
 
     const name = document.getElementById('auth-name').value.trim();
-    const phone = document.getElementById('auth-phone').value.trim();
+    const phone = document.getElementById('auth-phone').value.replaceAll(' ', '');
     const email = document.getElementById('auth-email').value.trim().toLowerCase();
     const password = document.getElementById('auth-password').value;
     const confirmPassword = document.getElementById('auth-confirmPassword').value;
@@ -106,7 +123,7 @@ function initRegisterForm(form) {
       showFieldError('email', 'Vui lòng nhập địa chỉ email hợp lệ.');
       isValid = false;
     }
-    if (password.length < 8) {
+    if (password.trim().length < 8) {
       showFieldError('password', 'Mật khẩu cần ít nhất 8 ký tự.');
       isValid = false;
     }
@@ -114,13 +131,20 @@ function initRegisterForm(form) {
       showFieldError('confirmPassword', 'Mật khẩu xác nhận chưa khớp.');
       isValid = false;
     }
-    if (!isValid) return;
+    if (!isValid) {
+      form.querySelector('[aria-invalid="true"]').focus();
+      return;
+    }
 
     const success = register({ name: name, phone: phone, email: email, password: password });
     if (!success) {
       showFieldError('email', 'Email này đã được đăng ký.');
+      document.getElementById('auth-email').focus();
       return;
     }
-    window.location.href = 'login.html?registered=1';
+
+    login(email, password);
+    showToastOnNextPage('Đăng ký thành công! Chào mừng bạn đến với Lá Sen.');
+    window.location.replace(getPageAfterLogin());
   });
 }

@@ -1,7 +1,57 @@
-/* =========================================================
-   LÁ SEN — products.css
-   Riêng cho trang danh sách sản phẩm.
-   ========================================================= */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-8);
+}
+
+.pagination__btn {
+  display: inline-grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-surface);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--c-ink);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.pagination__btn:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+.pagination__btn.is-active {
+  background-color: var(--c-primary);
+  border-color: var(--c-primary);
+  color: var(--c-surface);
+}
+
+.pagination__btn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination__btn[disabled]:hover {
+  border-color: var(--c-line);
+  color: var(--c-ink);
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background-color: var(--c-ink);
+  background-color: color-mix(in srgb, var(--c-ink) 45%, transparent);
+}
 
 .shop {
   display: grid;
@@ -9,11 +59,6 @@
   gap: var(--sp-6);
   padding-bottom: var(--sp-12);
 }
-
-/* ---------- Sidebar bộ lọc ----------
-   Mobile: drawer trượt từ trái, JS thêm .is-open
-   Desktop (>=1024px): cột tĩnh, dính theo trang
-------------------------------------- */
 
 .shop__sidebar {
   position: fixed;
@@ -103,8 +148,6 @@
   color: var(--c-line);
 }
 
-/* ---------- Thanh công cụ ---------- */
-
 .toolbar {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -140,8 +183,6 @@
 .toolbar__count strong {
   color: var(--c-ink);
 }
-
-/* ---------- Từ 1024px: bố cục hai cột ---------- */
 
 @media (min-width: 1024px) {
   .shop {

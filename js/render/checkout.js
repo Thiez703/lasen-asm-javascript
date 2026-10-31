@@ -1,106 +1,24 @@
 import { getProductById } from '../services/dataService.js';
-import { getCart, getCartItems, getCartTotals, clearCart, saveOrder } from '../services/cartService.js';
-import { getCurrentUser, getAddresses } from '../services/accountService.js';
-import { formatPrice, isValidEmail, isValidPhone, showError, clearErrors, clearErrorWhenTyping, showToast } from '../utils/helpers.js';
+import { getCart, getCartItems, getCartTotals, clearCart } from '../services/cartService.js';
+import { saveOrder } from '../services/orderService.js';
+import { getCurrentUser, rememberCurrentPage } from '../services/accountService.js';
+import { getAddresses } from '../services/addressService.js';
+import { getProvinces } from '../services/locationService.js';
+import { formatPrice } from '../utils/price.js';
+import { isValidEmail, isValidPhone, showError, clearErrors, clearErrorWhenTyping } from '../utils/form.js';
+import { showToast } from '../utils/toast.js';
 
-const locationData = {
-  'can-tho': {
-    name: 'TP. Cần Thơ',
-    districts: [
-      { id: 'ninh-kieu', name: 'Quận Ninh Kiều' },
-      { id: 'binh-thuy', name: 'Quận Bình Thuỷ' },
-      { id: 'cai-rang', name: 'Quận Cái Răng' },
-      { id: 'o-mon', name: 'Quận Ô Môn' },
-      { id: 'thot-not', name: 'Quận Thốt Nốt' },
-      { id: 'phong-dien', name: 'Huyện Phong Điền' }
-    ]
-  },
-  'ho-chi-minh': {
-    name: 'TP. Hồ Chí Minh',
-    districts: [
-      { id: 'q1', name: 'Quận 1' },
-      { id: 'q3', name: 'Quận 3' },
-      { id: 'q7', name: 'Quận 7' },
-      { id: 'q10', name: 'Quận 10' },
-      { id: 'thu-duc', name: 'TP. Thủ Đức' },
-      { id: 'binh-thanh', name: 'Quận Bình Thạnh' },
-      { id: 'go-vap', name: 'Quận Gò Vấp' }
-    ]
-  },
-  'ha-noi': {
-    name: 'TP. Hà Nội',
-    districts: [
-      { id: 'ba-dinh', name: 'Quận Ba Đình' },
-      { id: 'hoan-kiem', name: 'Quận Hoàn Kiếm' },
-      { id: 'dong-da', name: 'Quận Đống Đa' },
-      { id: 'cau-giay', name: 'Quận Cầu Giấy' },
-      { id: 'hai-ba-trung', name: 'Quận Hai Bà Trưng' },
-      { id: 'tay-ho', name: 'Quận Tây Hồ' }
-    ]
-  },
-  'da-nang': {
-    name: 'TP. Đà Nẵng',
-    districts: [
-      { id: 'hai-chau', name: 'Quận Hải Châu' },
-      { id: 'thanh-khe', name: 'Quận Thanh Khê' },
-      { id: 'son-tra', name: 'Quận Sơn Trà' },
-      { id: 'ngu-hanh-son', name: 'Quận Ngũ Hành Sơn' },
-      { id: 'cam-le', name: 'Quận Cẩm Lệ' }
-    ]
-  },
-  'an-giang': {
-    name: 'An Giang',
-    districts: [
-      { id: 'long-xuyen', name: 'TP. Long Xuyên' },
-      { id: 'chau-doc', name: 'TP. Châu Đốc' },
-      { id: 'thoai-son', name: 'Huyện Thoại Sơn' }
-    ]
-  },
-  'vinh-long': {
-    name: 'Vĩnh Long',
-    districts: [
-      { id: 'tp-vinh-long', name: 'TP. Vĩnh Long' },
-      { id: 'long-ho', name: 'Huyện Long Hồ' },
-      { id: 'binh-minh', name: 'Thị xã Bình Minh' }
-    ]
-  },
-  'hau-giang': {
-    name: 'Hậu Giang',
-    districts: [
-      { id: 'vi-thanh', name: 'TP. Vị Thanh' },
-      { id: 'nga-bay', name: 'TP. Ngã Bảy' },
-      { id: 'chau-thanh-a', name: 'Huyện Châu Thành A' }
-    ]
-  },
-  'soc-trang': {
-    name: 'Sóc Trăng',
-    districts: [
-      { id: 'tp-soc-trang', name: 'TP. Sóc Trăng' },
-      { id: 'my-xuyen', name: 'Huyện Mỹ Xuyên' },
-      { id: 'vinh-chau', name: 'Thị xã Vĩnh Châu' }
-    ]
-  },
-  'kien-giang': {
-    name: 'Kiên Giang',
-    districts: [
-      { id: 'rach-gia', name: 'TP. Rạch Giá' },
-      { id: 'phu-quoc', name: 'TP. Phú Quốc' },
-      { id: 'ha-tien', name: 'TP. Hà Tiên' }
-    ]
-  },
-  'ca-mau': {
-    name: 'Cà Mau',
-    districts: [
-      { id: 'tp-ca-mau', name: 'TP. Cà Mau' },
-      { id: 'nam-can', name: 'Huyện Năm Căn' },
-      { id: 'u-minh', name: 'Huyện U Minh' }
-    ]
-  }
-};
+let provinces = [];
 
-export function renderCheckout() {
+export async function renderCheckout() {
   const form = document.querySelector('[data-checkout-form]');
   if (!form) return;
+
+  if (!getCurrentUser()) {
+    rememberCurrentPage();
+    window.location.replace('login.html');
+    return;
+  }
 
   const params = new URLSearchParams(window.location.search);
   const buyNowId = params.get('buyNow');
@@ -119,16 +37,10 @@ export function renderCheckout() {
 
   showOrderSummary(items, totals);
 
-  const provinceSelect = document.getElementById('tinhThanh');
-  showDistricts(provinceSelect.value);
-  provinceSelect.addEventListener('change', () => showDistricts(provinceSelect.value));
-
-  fillCustomerInfo();
-
   clearErrorWhenTyping(form);
   form.querySelector('[name="dongY"]').addEventListener('change', () => showError('dongY', ''));
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
     if (!validateForm(form)) {
       showToast('Vui lòng kiểm tra lại các thông tin còn thiếu hoặc sai.', 'error');
@@ -143,20 +55,38 @@ export function renderCheckout() {
     showToast('Đặt hàng thành công!');
     showOrderSuccess(order);
   });
+
+  try {
+    provinces = await getProvinces();
+  } catch (error) {
+    showToast('Không thể tải danh sách tỉnh / thành phố. Vui lòng thử lại.', 'error');
+    return;
+  }
+
+  showProvinces();
+  const provinceSelect = document.getElementById('tinhThanh');
+  provinceSelect.addEventListener('change', () => showDistricts(provinceSelect.value));
+
+  fillCustomerInfo();
 }
 
 function showEmptyCart() {
   document.querySelector('.checkout').innerHTML = `
-    <div style="grid-column: 1 / -1; padding: 48px 24px; text-align: center; background: var(--c-surface, #fff); border-radius: 8px;">
-      <h2 style="font-size: 20px; margin-bottom: 8px;">Giỏ hàng của bạn đang trống</h2>
-      <p style="margin-bottom: 24px;">Vui lòng thêm sản phẩm vào giỏ hàng trước khi thanh toán.</p>
-      <a class="btn btn--primary" href="products.html">Khám phá sản phẩm ngay</a>
+    <div class="empty checkout__empty">
+      <svg class="empty__icon" aria-hidden="true"><use href="#i-cart"></use></svg>
+      <h2 class="empty__title">Giỏ hàng của bạn đang trống</h2>
+      <p class="empty__text">Vui lòng thêm sản phẩm vào giỏ hàng trước khi thanh toán.</p>
+      <div class="empty__actions">
+        <a class="btn btn--primary" href="products.html">Khám phá sản phẩm ngay</a>
+      </div>
     </div>
   `;
 }
 
 function showOrderSummary(items, totals) {
-  document.querySelector('[data-list="order"]').innerHTML = items.map(item => `
+  document.querySelector('[data-list="order"]').innerHTML = items
+    .map(
+      item => `
     <li class="summary__item">
       <img class="summary__thumb" src="${item.product.image}" alt="${item.product.name}" loading="lazy">
       <span class="summary__info">
@@ -165,17 +95,26 @@ function showOrderSummary(items, totals) {
       </span>
       <span class="summary__price">${formatPrice(item.lineTotal)}</span>
     </li>
-  `).join('');
+  `
+    )
+    .join('');
 
   document.querySelector('[data-cart-count-items]').textContent = totals.totalQuantity;
   document.querySelector('[data-cart-subtotal]').textContent = formatPrice(totals.subtotal);
-  document.querySelector('[data-cart-shipping]').textContent = totals.shipping === 0 ? 'Miễn phí' : formatPrice(totals.shipping);
+  document.querySelector('[data-cart-shipping]').textContent =
+    totals.shipping === 0 ? 'Miễn phí' : formatPrice(totals.shipping);
   document.querySelector('.checkout__aside [data-cart-total]').textContent = formatPrice(totals.total);
 }
 
-function showDistricts(provinceKey) {
+function showProvinces() {
+  const options = provinces.map(province => `<option value="${province.code}">${province.name}</option>`);
+  document.getElementById('tinhThanh').innerHTML = '<option value="">Chọn tỉnh / thành phố</option>' + options.join('');
+  showDistricts('');
+}
+
+function showDistricts(provinceCode) {
   const districtSelect = document.getElementById('quanHuyen');
-  const province = locationData[provinceKey];
+  const province = provinces.find(item => item.code === Number(provinceCode));
 
   if (!province) {
     districtSelect.innerHTML = '<option value="">Chọn tỉnh / thành phố trước</option>';
@@ -183,7 +122,7 @@ function showDistricts(provinceKey) {
     return;
   }
 
-  const options = province.districts.map(district => `<option value="${district.id}">${district.name}</option>`);
+  const options = province.districts.map(district => `<option value="${district.code}">${district.name}</option>`);
   districtSelect.innerHTML = '<option value="">Chọn quận / huyện</option>' + options.join('');
   districtSelect.disabled = false;
 }
@@ -202,20 +141,10 @@ function fillCustomerInfo() {
   document.getElementById('diaChi').value = defaultAddress.address;
   document.getElementById('ghiChu').value = defaultAddress.note;
 
-  const addressText = defaultAddress.address.toLowerCase();
-  for (const key in locationData) {
-    const province = locationData[key];
-    const provinceName = province.name.toLowerCase().replace('tp. ', '');
-
-    if (addressText.includes(provinceName)) {
-      document.getElementById('tinhThanh').value = key;
-      showDistricts(key);
-
-      const district = province.districts.find(item => addressText.includes(item.name.toLowerCase()));
-      if (district) {
-        document.getElementById('quanHuyen').value = district.id;
-      }
-    }
+  if (defaultAddress.provinceCode && defaultAddress.districtCode) {
+    document.getElementById('tinhThanh').value = defaultAddress.provinceCode;
+    showDistricts(defaultAddress.provinceCode);
+    document.getElementById('quanHuyen').value = defaultAddress.districtCode;
   }
 }
 
@@ -256,9 +185,10 @@ function validateForm(form) {
 }
 
 function createOrder(items, totals) {
-  const province = locationData[document.getElementById('tinhThanh').value];
-  const districtId = document.getElementById('quanHuyen').value;
-  const district = province.districts.find(item => item.id === districtId);
+  const provinceSelect = document.getElementById('tinhThanh');
+  const districtSelect = document.getElementById('quanHuyen');
+  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].text;
+  const districtName = districtSelect.options[districtSelect.selectedIndex].text;
   const payment = document.querySelector('[name="thanhToan"]:checked').value;
   const user = getCurrentUser();
 
@@ -272,7 +202,7 @@ function createOrder(items, totals) {
       phone: document.getElementById('soDienThoai').value.trim(),
       email: document.getElementById('email').value.trim()
     },
-    shippingAddress: `${document.getElementById('diaChi').value.trim()}, ${district.name}, ${province.name}`,
+    shippingAddress: `${document.getElementById('diaChi').value.trim()}, ${districtName}, ${provinceName}`,
     paymentMethod: payment === 'cod' ? 'COD' : 'Chuyển khoản',
     note: document.getElementById('ghiChu').value.trim(),
     items: items.map(item => {
@@ -283,34 +213,39 @@ function createOrder(items, totals) {
 }
 
 function showOrderSuccess(order) {
-  const itemsHTML = order.items.map(item => {
-    const product = getProductById(item.productId);
-    return `
-      <li style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--c-border, #eee);">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <img src="${product.image}" alt="${product.name}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px;">
+  const itemsHTML = order.items
+    .map(item => {
+      const product = getProductById(item.productId);
+      return `
+      <li class="checkout-success__item">
+        <div class="checkout-success__product">
+          <img class="checkout-success__thumb" src="${product.image}" alt="${product.name}">
           <div>
-            <div style="font-weight: 500; font-size: 14px;">${product.name}</div>
-            <div style="font-size: 12px;">${formatPrice(item.price)} × ${item.quantity}</div>
+            <div class="checkout-success__name">${product.name}</div>
+            <div class="checkout-success__qty">${formatPrice(item.price)} × ${item.quantity}</div>
           </div>
         </div>
-        <div style="font-weight: 600; font-size: 14px;">${formatPrice(item.price * item.quantity)}</div>
+        <div class="checkout-success__price">${formatPrice(item.price * item.quantity)}</div>
       </li>
     `;
-  }).join('');
+    })
+    .join('');
 
   const container = document.querySelector('.checkout');
-  container.innerHTML = `
-    <div style="grid-column: 1 / -1; max-width: 760px; margin: 0 auto; background: var(--c-surface, #fff); border-radius: 8px; box-shadow: var(--shadow, 0 4px 12px rgba(0,0,0,0.08)); padding: 32px;">
-      <div style="text-align: center; margin-bottom: 24px;">
-        <h2 style="font-size: 24px; margin-bottom: 8px;">Đặt hàng thành công!</h2>
-        <p style="display: inline-block; padding: 6px 14px; background: #fff3cd; color: #856404; border-radius: 4px; font-weight: 600; font-size: 13px;">
+  const dialog = document.createElement('dialog');
+  dialog.className = 'checkout-success';
+  dialog.innerHTML = `
+    <div class="checkout-success__box">
+      <button class="checkout-success__close" type="button" aria-label="Đóng">×</button>
+      <div class="checkout-success__heading">
+        <h2 class="checkout-success__title">Đặt hàng thành công!</h2>
+        <p class="checkout-success__demo">
           ĐÂY LÀ ĐƠN HÀNG MÔ PHỎNG (DEMO — KHÔNG THU TIỀN THỰC TẾ)
         </p>
         <p>Cảm ơn <strong>${order.customer.name}</strong>, Lá Sen đã ghi nhận đơn hàng <strong>#${order.id}</strong>.</p>
       </div>
 
-      <div style="background: var(--c-paper, #f9f9f9); border-radius: 6px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; line-height: 1.8;">
+      <div class="checkout-success__details">
         <div><strong>Thời gian đặt:</strong> ${new Date(order.date).toLocaleString('vi-VN')}</div>
         <div><strong>Số điện thoại:</strong> ${order.customer.phone}</div>
         <div><strong>Địa chỉ giao:</strong> ${order.shippingAddress}</div>
@@ -318,19 +253,30 @@ function showOrderSuccess(order) {
         <div><strong>Trạng thái:</strong> <span class="badge badge--soft">${order.status}</span></div>
       </div>
 
-      <h3 style="font-size: 16px; margin-bottom: 12px;">Sản phẩm đã đặt</h3>
-      <ul style="list-style: none; padding: 0; margin: 0 0 24px;">${itemsHTML}</ul>
+      <h3 class="checkout-success__subtitle">Sản phẩm đã đặt</h3>
+      <ul class="checkout-success__items">${itemsHTML}</ul>
 
-      <div style="display: flex; justify-content: space-between; margin-bottom: 32px; font-size: 18px; font-weight: 700;">
+      <div class="checkout-success__total">
         <span>Tổng thanh toán:</span>
-        <span style="color: var(--c-primary, #27ae60);">${formatPrice(order.total)}</span>
+        <span>${formatPrice(order.total)}</span>
       </div>
 
-      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <div class="checkout-success__actions">
+        <button class="btn btn--outline checkout-success__dismiss" type="button">Đóng</button>
         <a class="btn btn--outline" href="products.html">Tiếp tục mua sắm</a>
         <a class="btn btn--primary" href="profile.html">Xem đơn hàng trong Hồ sơ</a>
       </div>
     </div>
   `;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const closeDialog = () => dialog.close();
+  dialog.querySelector('.checkout-success__close').addEventListener('click', closeDialog);
+  dialog.querySelector('.checkout-success__dismiss').addEventListener('click', closeDialog);
+  dialog.addEventListener('click', event => {
+    if (event.target === dialog) closeDialog();
+  });
+  dialog.addEventListener('close', () => dialog.remove());
+
+  container.appendChild(dialog);
+  dialog.showModal();
 }

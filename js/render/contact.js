@@ -1,4 +1,5 @@
-import { isValidEmail, showError, clearErrors, clearErrorWhenTyping, showToast } from '../utils/helpers.js';
+import { isValidEmail, showError, clearErrors, clearErrorWhenTyping } from '../utils/form.js';
+import { showToast } from '../utils/toast.js';
 
 export function renderContact() {
   const form = document.querySelector('[data-contact-form]');
@@ -17,7 +18,7 @@ export function renderContact() {
 
   clearErrorWhenTyping(form);
 
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', event => {
     event.preventDefault();
     clearErrors(form);
 
