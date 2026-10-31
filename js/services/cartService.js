@@ -1,18 +1,22 @@
 import { getProductById } from './dataService.js';
-import { getStorage, setStorage, showToast, formatPrice, getPrice } from '../utils/helpers.js';
+import { getCurrentUser, getUserKey } from './accountService.js';
+import { getStorage, setStorage } from '../utils/storage.js';
+import { showToast } from '../utils/toast.js';
+import { formatPrice, getPrice } from '../utils/price.js';
 
 const CART_KEY = 'lasen_cart';
-const ORDERS_KEY = 'lasen_order_list';
-const CANCELLED_ORDERS_KEY = 'lasen_cancelled_orders';
 const SHIPPING_FEE = 30000;
 const FREE_SHIPPING_FROM = 500000;
 
 export function getCart() {
-  return getStorage(CART_KEY, []);
+  if (!getCurrentUser()) {
+    return [];
+  }
+  return getStorage(getUserKey(CART_KEY), []);
 }
 
 export function saveCart(cart) {
-  setStorage(CART_KEY, cart);
+  setStorage(getUserKey(CART_KEY), cart);
   updateHeaderCart();
 }
 
@@ -61,7 +65,6 @@ export function clearCart() {
   saveCart([]);
 }
 
-// Ghép thông tin sản phẩm, đơn giá và thành tiền vào từng dòng của giỏ hàng
 export function getCartItems(cart = getCart()) {
   return cart.map(item => {
     const product = getProductById(item.productId);
@@ -80,7 +83,7 @@ export function getCartTotals(items) {
   const subtotal = items.reduce((sum, item) => sum + item.lineTotal, 0);
 
   let shipping = SHIPPING_FEE;
-  if (subtotal === 0 || subtotal >= FREE_SHIPPING_FROM) {
+  if (items.length === 0 || subtotal >= FREE_SHIPPING_FROM) {
     shipping = 0;
   }
 
@@ -96,24 +99,4 @@ export function updateHeaderCart() {
   const totals = getCartTotals(getCartItems());
   document.querySelector('[data-cart-count]').textContent = totals.totalQuantity;
   document.querySelector('.header [data-cart-total]').textContent = formatPrice(totals.total);
-}
-
-export function getOrders() {
-  return getStorage(ORDERS_KEY, []);
-}
-
-export function saveOrder(order) {
-  const orders = getOrders();
-  orders.unshift(order);
-  setStorage(ORDERS_KEY, orders);
-}
-
-export function getCancelledOrderIds() {
-  return getStorage(CANCELLED_ORDERS_KEY, []);
-}
-
-export function cancelOrder(orderId) {
-  const cancelledIds = getCancelledOrderIds();
-  cancelledIds.push(orderId);
-  setStorage(CANCELLED_ORDERS_KEY, cancelledIds);
 }

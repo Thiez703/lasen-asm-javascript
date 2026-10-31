@@ -1,5 +1,14 @@
-import { getCart, getCartItems, getCartTotals, updateQuantity, removeFromCart, clearCart } from '../services/cartService.js';
-import { formatPrice, showToast } from '../utils/helpers.js';
+import {
+  getCart,
+  getCartItems,
+  getCartTotals,
+  updateQuantity,
+  removeFromCart,
+  clearCart
+} from '../services/cartService.js';
+import { formatPrice } from '../utils/price.js';
+import { showToast } from '../utils/toast.js';
+import { showConfirm } from '../utils/dialog.js';
 
 export function renderCart() {
   const cartBox = document.querySelector('[data-cart]');
@@ -7,7 +16,7 @@ export function renderCart() {
 
   showCart();
 
-  cartBox.addEventListener('click', (event) => {
+  cartBox.addEventListener('click', async event => {
     const button = event.target.closest('button');
     if (!button) return;
 
@@ -17,7 +26,15 @@ export function renderCart() {
     if (button.hasAttribute('data-qty-dec')) {
       if (cartItem.quantity > 1) {
         updateQuantity(productId, cartItem.quantity - 1);
-      } else if (confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+      } else if (
+        await showConfirm({
+          icon: 'i-trash',
+          title: 'Xóa sản phẩm?',
+          message: 'Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?',
+          confirmText: 'Xóa',
+          danger: true
+        })
+      ) {
         removeFromCart(productId);
         showToast('Đã xóa sản phẩm khỏi giỏ hàng.');
       }
@@ -32,7 +49,16 @@ export function renderCart() {
       showToast('Đã xóa sản phẩm khỏi giỏ hàng.');
     }
 
-    if (button.hasAttribute('data-cart-clear') && confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) {
+    if (
+      button.hasAttribute('data-cart-clear') &&
+      (await showConfirm({
+        icon: 'i-trash',
+        title: 'Xóa toàn bộ giỏ hàng?',
+        message: 'Tất cả sản phẩm trong giỏ sẽ bị xóa.',
+        confirmText: 'Xóa tất cả',
+        danger: true
+      }))
+    ) {
       clearCart();
       showToast('Đã xóa toàn bộ giỏ hàng.');
     }
@@ -40,7 +66,7 @@ export function renderCart() {
     showCart();
   });
 
-  cartBox.addEventListener('change', (event) => {
+  cartBox.addEventListener('change', event => {
     const input = event.target;
     if (!input.hasAttribute('data-qty-val')) return;
 
@@ -56,7 +82,9 @@ function showCart() {
   document.querySelector('[data-cart]').classList.toggle('is-hidden', items.length === 0);
   document.querySelector('[data-cart-empty]').classList.toggle('is-hidden', items.length > 0);
 
-  document.querySelector('[data-list="cart"] tbody').innerHTML = items.map(item => `
+  document.querySelector('[data-list="cart"] tbody').innerHTML = items
+    .map(
+      item => `
     <tr class="cart-row" role="row">
       <th class="cart-row__product" scope="row" role="rowheader">
         <a class="cart-row__thumb" href="product-detail.html?id=${item.product.id}" tabindex="-1">
@@ -84,10 +112,13 @@ function showCart() {
         <button class="btn btn--ghost btn--sm btn--icon" type="button" aria-label="Xóa" data-cart-remove data-id="${item.product.id}">Xóa</button>
       </td>
     </tr>
-  `).join('');
+  `
+    )
+    .join('');
 
   document.querySelector('[data-cart-count-items]').textContent = totals.totalQuantity;
   document.querySelector('[data-cart-subtotal]').textContent = formatPrice(totals.subtotal);
-  document.querySelector('[data-cart-shipping]').textContent = totals.shipping === 0 ? 'Miễn phí' : formatPrice(totals.shipping);
+  document.querySelector('[data-cart-shipping]').textContent =
+    totals.shipping === 0 ? 'Miễn phí' : formatPrice(totals.shipping);
   document.querySelector('.cart__aside [data-cart-total]').textContent = formatPrice(totals.total);
 }

@@ -1,18 +1,275 @@
-/* =========================================================
-   LÁ SEN — home.css
-   Riêng cho trang chủ: banner, danh mục, flash sale,
-   dải sản phẩm, thương hiệu, bài viết.
-   ========================================================= */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
 
-/* Dải nền hồng phấn xen kẽ để các khối sản phẩm không dính vào nhau */
+.countdown__unit {
+  min-width: 52px;
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line);
+  text-align: center;
+}
+
+.countdown__num {
+  display: block;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--c-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown__lbl {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+.section-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2) var(--sp-4);
+  margin-bottom: var(--sp-6);
+  padding-bottom: var(--sp-3);
+  border-bottom: 2px solid var(--c-line);
+}
+
+.section-title__text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-lg);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--c-primary-dark);
+  text-transform: uppercase;
+}
+
+.section-title__text .icon {
+  color: var(--c-primary);
+}
+
+.section-title__sub {
+  flex: 1 1 100%;
+  order: 3;
+  max-width: 66ch;
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.section-title__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-1) var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--c-primary);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    gap 0.3s var(--ease-spring);
+}
+
+.section-title__link:hover {
+  background-color: var(--c-primary);
+  border-color: var(--c-primary);
+  color: var(--c-surface);
+  gap: var(--sp-2);
+}
+
+@media (min-width: 768px) {
+  .section-title__text {
+    font-size: var(--fs-xl);
+  }
+}
+
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(190px, 1fr);
+  gap: var(--sp-3);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding-bottom: var(--sp-3);
+  scrollbar-color: var(--c-primary-soft) var(--c-line);
+  scrollbar-width: thin;
+}
+
+.rail > * {
+  scroll-snap-align: start;
+}
+
+.rail::-webkit-scrollbar {
+  height: 6px;
+}
+
+.rail::-webkit-scrollbar-track {
+  background-color: var(--c-line);
+  border-radius: 999px;
+}
+
+.rail::-webkit-scrollbar-thumb {
+  background-color: var(--c-primary-soft);
+  border-radius: 999px;
+}
+@media (min-width: 1024px) {
+  .rail {
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--sp-4);
+    overflow-x: visible;
+    padding-bottom: 0;
+  }
+}
+
+.policy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius);
+  background-color: var(--c-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.policy__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.policy__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 999px;
+  background-color: var(--c-primary-tint);
+  color: var(--c-primary);
+}
+
+.policy__icon .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.policy__title {
+  font-family: var(--f-body);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.policy__text {
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
+
+@media (min-width: 1024px) {
+  .policy {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-6);
+    padding: var(--sp-6);
+  }
+}
+
+.post-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--c-line);
+  border-radius: 14px;
+  background-color: var(--c-surface);
+  overflow: hidden;
+  transition:
+    transform 0.35s var(--ease-out),
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--c-primary-soft);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.post-card__media {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background-color: var(--c-paper);
+}
+
+.post-card__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.post-card:hover .post-card__img {
+  transform: scale(1.06);
+}
+
+.post-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+}
+
+.post-card__tag {
+  align-self: flex-start;
+  padding: 2px var(--sp-2);
+  border-radius: var(--radius-sm);
+  background-color: var(--c-primary-tint);
+  color: var(--c-primary-dark);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.post-card__title {
+  font-family: var(--f-body);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  line-height: 1.4;
+  color: var(--c-ink);
+}
+
+.post-card__title a:hover {
+  color: var(--c-primary);
+}
+
+.post-card__excerpt {
+  font-size: var(--fs-sm);
+  color: var(--c-ink-muted);
+}
+
+.post-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: auto;
+  padding-top: var(--sp-2);
+  font-size: var(--fs-xs);
+  color: var(--c-ink-muted);
+}
 .section--alt {
   background-color: var(--c-primary-tint);
   border-block: 1px solid var(--c-line);
 }
-
-/* =========================================================
-   1. Banner đầu trang — ảnh toàn chiều rộng
-   ========================================================= */
 
 .hero-banner {
   position: relative;
@@ -23,7 +280,6 @@
 
 .hero-banner__slides {
   position: relative;
-  /* Giữ tỉ lệ ảnh banner.png; ảnh khác tỉ lệ sẽ cắt phần dư. */
   aspect-ratio: 2056 / 656;
 }
 
@@ -34,7 +290,9 @@
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.45s ease, visibility 0.45s;
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s;
 }
 
 .hero-banner__slide.is-active {
@@ -72,7 +330,9 @@
   color: var(--c-primary);
   box-shadow: var(--shadow-md);
   transform: translateY(-50%);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .hero-banner__arrow:hover {
@@ -121,8 +381,6 @@
   background-color: var(--c-primary);
   box-shadow: 0 0 0 3px var(--c-primary-tint);
 }
-
-/* Overlay: nút bấm + cam kết, đặt ngay dưới phần chữ trên banner */
 .hero-banner__overlay {
   position: absolute;
   left: 10%;
@@ -134,8 +392,6 @@
   padding: 0 var(--sp-6);
   line-height: 1.5;
 }
-
-/* Nhóm nút CTA */
 .hero-banner__actions {
   display: flex;
   flex-wrap: wrap;
@@ -159,8 +415,6 @@
   background-color: var(--c-primary);
   color: #fff;
 }
-
-/* Dải cam kết nhỏ dưới nút */
 .hero-banner__perks {
   display: flex;
   flex-wrap: wrap;
@@ -191,8 +445,6 @@
   height: 1.1em;
   color: var(--c-primary);
 }
-
-/* Responsive: mobile nhỏ thì thu gọn */
 @media (max-width: 575px) {
   .hero-banner__arrow {
     top: calc((100% - 32px) / 2);
@@ -225,17 +477,9 @@
   }
 }
 
-/* =========================================================
-   2. Dải cam kết ngay dưới banner
-   ========================================================= */
-
 .policy-row {
   padding-top: var(--sp-4);
 }
-
-/* =========================================================
-   4. Danh mục nổi bật
-   ========================================================= */
 
 .cats {
   display: grid;
@@ -252,8 +496,11 @@
   border: 1px solid transparent;
   border-radius: 14px;
   text-align: center;
-  transition: background-color 0.3s ease, border-color 0.3s ease,
-    transform 0.3s var(--ease-out), box-shadow 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.3s var(--ease-out),
+    box-shadow 0.3s ease;
 }
 
 .cat:hover {
@@ -312,10 +559,6 @@
   }
 }
 
-/* =========================================================
-   5. Flash sale
-   ========================================================= */
-
 .flash {
   position: relative;
   background: var(--grad-flash);
@@ -333,7 +576,7 @@
   pointer-events: none;
 }
 
-.flash>.container {
+.flash > .container {
   position: relative;
   z-index: 1;
 }
@@ -400,8 +643,6 @@
   font-size: 0.625rem;
   color: var(--c-ink-muted);
 }
-
-/* Thẻ sản phẩm trong khối flash nằm trên nền đỏ nên bỏ viền hồng */
 .flash .card {
   border-color: transparent;
 }
@@ -410,10 +651,6 @@
 .flash .card:focus-within {
   border-color: var(--c-gold);
 }
-
-/* =========================================================
-   6. Banner khuyến mãi đôi
-   ========================================================= */
 
 .promo-duo {
   display: grid;
@@ -505,17 +742,9 @@
   }
 }
 
-/* =========================================================
-   7. Chọn theo loại sản phẩm
-   ========================================================= */
-
 .category-filter {
   margin-bottom: var(--sp-6);
 }
-
-/* =========================================================
-   8. Thương hiệu bán tại Lá Sen
-   ========================================================= */
 
 .brands {
   display: grid;
@@ -563,10 +792,6 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
-
-/* =========================================================
-   9. Giới thiệu ngắn
-   ========================================================= */
 
 .intro {
   position: relative;
@@ -618,7 +843,9 @@
   border-radius: 18px;
   opacity: 0.45;
   pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
 }
 
 .intro__figure:hover::before {
@@ -680,10 +907,6 @@
   font-size: var(--fs-xs);
   color: var(--c-ink-muted);
 }
-
-/* =========================================================
-   10. Bài viết chăm da
-   ========================================================= */
 
 .posts {
   display: grid;
